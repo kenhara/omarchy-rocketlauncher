@@ -38,6 +38,9 @@ QtObject {
   })
   property var nextLaunch: null
   property var upcoming: []
+  property var past: []
+  property bool pastLoaded: false
+  property bool pastLoading: false
   property var ongoing: []
   property string fetchedAt: ""
   property string dataSource: "none"   // sample | disk | network
@@ -244,16 +247,32 @@ QtObject {
 
   function slimCrewMember(c) {
     if (!c) return null
+    // Already-slim sample / cache rows
+    if (!c.astronaut && (c.name || c.wiki_url || c.image_url)) {
+      return {
+        name: c.name || "",
+        role: c.role || "",
+        agency: c.agency || "",
+        image_url: c.image_url || "",
+        wiki_url: c.wiki_url || "",
+        url: c.url || ""
+      }
+    }
     var a = c.astronaut || {}
     var role = c.role || {}
     var img = a.image || {}
     var ag = a.agency || {}
     var roleName = (typeof role === "object") ? (role.role || "") : String(role || "")
+    // Prefer Wikipedia, else LL2 astronaut page
+    var wiki = a.wiki || a.wiki_url || c.wiki_url || ""
+    var astrUrl = a.url || c.url || ""
     return {
       name: a.name || "",
       role: roleName,
       agency: ag.abbrev || ag.name || "",
-      image_url: img.image_url || img.thumbnail_url || ""
+      image_url: img.image_url || img.thumbnail_url || "",
+      wiki_url: wiki,
+      url: astrUrl
     }
   }
 
@@ -429,6 +448,14 @@ QtObject {
     for (var i = 0; i < rawUp.length; i++)
       up.push(slimLaunch(rawUp[i]))
     store.upcoming = up
+    var past = []
+    var rawPast = obj.past || obj.previous || []
+    for (var pi = 0; pi < rawPast.length; pi++)
+      past.push(slimLaunch(rawPast[pi]))
+    if (past.length) {
+      store.past = past
+      store.pastLoaded = true
+    }
     var next = slimLaunch(obj.next_launch) || pickNext(up)
     // Ingest bundled / cached detail map
     if (obj.details && typeof obj.details === "object") {
@@ -481,6 +508,7 @@ QtObject {
       stats: store.stats,
       next_launch: store.nextLaunch,
       upcoming: store.upcoming,
+      past: store.past,
       ongoing: store.ongoing,
       details: store.launchDetails,
       notified_milestones: store.notifiedMilestones || ({})
@@ -811,7 +839,7 @@ QtObject {
         rememberDetail(detail)
         if (store.nextLaunch && store.nextLaunch.id === id)
           store.nextLaunch = mergeDetailOntoLaunch(store.nextLaunch, detail)
-        // Also refresh matching upcoming row
+        // Also refresh matching upcoming / past rows
         var up = []
         for (var i = 0; i < store.upcoming.length; i++) {
           var row = store.upcoming[i]
@@ -821,6 +849,15 @@ QtObject {
             up.push(row)
         }
         store.upcoming = up
+        var pastRows = []
+        for (var pi = 0; pi < store.past.length; pi++) {
+          var prow = store.past[pi]
+          if (prow && prow.id === id)
+            pastRows.push(mergeDetailOntoLaunch(prow, detail))
+          else
+            pastRows.push(prow)
+        }
+        store.past = pastRows
         store.dataChanged()
         persistToDisk()
       } catch (e) {
@@ -962,6 +999,41 @@ QtObject {
   property var fetchAgency: null
   property var fetchUpcoming: null
   property var fetchDragon: null
+
+  // Lazy-load previous launches on first Past Missions expand (saves free-tier quota).
+  function ensurePastLaunches() {
+    if (store.pastLoaded || store.pastLoading) return false
+    // Bundled / disk sample already applied → mark loaded without a network hit.
+    if (store.past && store.past.length > 0) {
+      store.pastLoaded = true
+      store.dataChanged()
+      return true
+    }
+    store.pastLoading = true
+    httpGet(store.apiBase + "/launches/previous/?lsp__id=" + store.agencyId + "&limit=5&mode=list", function(ok, body) {
+      store.pastLoading = false
+      if (!ok) {
+        store.lastError = "past fetch failed"
+        store.dataChanged()
+        return
+      }
+      try {
+        var raw = JSON.parse(body)
+        var rows = raw.results || []
+        var past = []
+        for (var i = 0; i < rows.length; i++)
+          past.push(slimLaunch(rows[i]))
+        store.past = past
+        store.pastLoaded = true
+        store.dataChanged()
+        persistToDisk()
+      } catch (e) {
+        store.lastError = "past parse failed"
+        store.dataChanged()
+      }
+    })
+    return true
+  }
 
   function refreshFromNetwork() {
     if (store.loading) return

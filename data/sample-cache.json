@@ -209,8 +209,8 @@
       "landing_summary": "RTLS | Landing Zone 40",
       "booster_serial": "B1101",
       "booster_flight": 2,
-      "patch_url": "https://thespacedevs-dev.nyc3.digitaloceanspaces.com/media/mission_patch_images/crew-12_mission_patch_20251226182237.png",
-      "image_url": "https://thespacedevs-dev.nyc3.digitaloceanspaces.com/media/images/falcon_9_at_slc_image_20260208171226.jpg",
+      "patch_url": "https://thespacedevs-prod.nyc3.digitaloceanspaces.com/media/mission_patch_images/crew-12_mission_patch_20260208171350.png",
+      "image_url": "https://thespacedevs-prod.nyc3.digitaloceanspaces.com/media/images/falcon_9_at_slc_image_20260208171226.jpg",
       "webcast_live": false,
       "vid_urls": [
         {
@@ -251,30 +251,125 @@
           "name": "Jessica Meir",
           "role": "Spacecraft Commander",
           "agency": "NASA",
-          "image_url": "https://thespacedevs-dev.nyc3.digitaloceanspaces.com/media/images/jessica_meir_image_20200417064900.jpeg"
+          "image_url": "https://thespacedevs-prod.nyc3.digitaloceanspaces.com/media/images/jessica_meir_image_20200417064900.jpeg",
+          "wiki_url": "https://en.wikipedia.org/wiki/Jessica_Meir",
+          "url": "https://ll.thespacedevs.com/2.3.0/astronauts/573/"
         },
         {
           "name": "Jack Hathaway",
           "role": "Pilot",
           "agency": "NASA",
-          "image_url": "https://thespacedevs-dev.nyc3.digitaloceanspaces.com/media/images/jack_hathaway_image_20211206185407.jpg"
+          "image_url": "https://thespacedevs-prod.nyc3.digitaloceanspaces.com/media/images/jack_hathaway_image_20211206185407.jpg",
+          "wiki_url": "https://en.wikipedia.org/wiki/Jack_Hathaway",
+          "url": "https://ll.thespacedevs.com/2.3.0/astronauts/712/"
         },
         {
           "name": "Sophie Adenot",
           "role": "Flight Engineer",
           "agency": "ESA",
-          "image_url": "https://thespacedevs-dev.nyc3.digitaloceanspaces.com/media/images/sophie_adenot_image_20221123150954.jpg"
+          "image_url": "https://thespacedevs-prod.nyc3.digitaloceanspaces.com/media/images/sophie_adenot_image_20221123150954.jpg",
+          "wiki_url": "https://en.wikipedia.org/wiki/Sophie_Adenot",
+          "url": "https://ll.thespacedevs.com/2.3.0/astronauts/747/"
         },
         {
           "name": "Andrei Fedyaev",
           "role": "Flight Engineer",
           "agency": "RFSA",
-          "image_url": "https://thespacedevs-dev.nyc3.digitaloceanspaces.com/media/images/andrei_fedyaev_image_20230207203113.jpg"
+          "image_url": "https://thespacedevs-prod.nyc3.digitaloceanspaces.com/media/images/andrei_fedyaev_image_20230207203113.jpg",
+          "wiki_url": "https://en.wikipedia.org/wiki/Andrey_Fedyaev",
+          "url": "https://ll.thespacedevs.com/2.3.0/astronauts/732/"
         }
       ],
       "spacecraft_name": "Crew Dragon Freedom",
       "spacecraft_serial": "C212",
       "detailed_at": "2026-08-23T08:45:00Z"
     }
-  }
+  },
+  "past": [
+    {
+      "id": "6208f972-18ec-490f-bbe5-6f5c6cfcd48c",
+      "name": "Falcon 9 Block 5 | Starlink Group 15-20",
+      "mission_name": "Starlink Group 15-20",
+      "vehicle": "Falcon 9 Block 5",
+      "status_id": 3,
+      "status": "Launch Successful",
+      "status_abbrev": "Success",
+      "net": "2026-08-22T07:25:16Z",
+      "window_start": "2026-08-22T07:25:00Z",
+      "window_end": "2026-08-22T11:25:00Z",
+      "net_precision": "Second",
+      "image_url": "https://thespacedevs-prod.nyc3.digitaloceanspaces.com/media/images/falcon2520925_image_20221009234147.png",
+      "thumbnail_url": "https://thespacedevs-prod.nyc3.digitaloceanspaces.com/media/images/255bauto255d__image_thumbnail_20240305192320.png",
+      "webcast_live": false,
+      "vid_urls": []
+    },
+    {
+      "id": "bbdc4d47-1de3-428e-9fe1-bbf45d9b1e04",
+      "name": "Falcon 9 Block 5 | Starlink Group 10-39",
+      "mission_name": "Starlink Group 10-39",
+      "vehicle": "Falcon 9 Block 5",
+      "status_id": 3,
+      "status": "Launch Successful",
+      "status_abbrev": "Success",
+      "net": "2026-08-21T15:14:22Z",
+      "window_start": "2026-08-21T14:57:00Z",
+      "window_end": "2026-08-21T18:57:00Z",
+      "net_precision": "Second",
+      "image_url": "https://thespacedevs-prod.nyc3.digitaloceanspaces.com/media/images/falcon2520925_image_20221009234147.png",
+      "thumbnail_url": "https://thespacedevs-prod.nyc3.digitaloceanspaces.com/media/images/255bauto255d__image_thumbnail_20240305192320.png",
+      "webcast_live": false,
+      "vid_urls": []
+    },
+    {
+      "id": "f6958a77-37bb-4559-a108-40ba0ff9e34a",
+      "name": "Falcon 9 Block 5 | Starlink Group 17-50",
+      "mission_name": "Starlink Group 17-50",
+      "vehicle": "Falcon 9 Block 5",
+      "status_id": 3,
+      "status": "Launch Successful",
+      "status_abbrev": "Success",
+      "net": "2026-08-19T04:01:07Z",
+      "window_start": "2026-08-19T02:00:00Z",
+      "window_end": "2026-08-19T06:00:00Z",
+      "net_precision": "Second",
+      "image_url": "https://thespacedevs-prod.nyc3.digitaloceanspaces.com/media/images/falcon2520925_image_20221009234147.png",
+      "thumbnail_url": "https://thespacedevs-prod.nyc3.digitaloceanspaces.com/media/images/255bauto255d__image_thumbnail_20240305192320.png",
+      "webcast_live": false,
+      "vid_urls": []
+    },
+    {
+      "id": "55b79515-ddbf-4198-8a59-29a12ed21330",
+      "name": "Falcon 9 Block 5 | USSF-366",
+      "mission_name": "USSF-366",
+      "vehicle": "Falcon 9 Block 5",
+      "status_id": 3,
+      "status": "Launch Successful",
+      "status_abbrev": "Success",
+      "net": "2026-08-16T01:50:45Z",
+      "window_start": "2026-08-15T21:52:00Z",
+      "window_end": "2026-08-16T01:52:00Z",
+      "net_precision": "Second",
+      "image_url": "https://thespacedevs-prod.nyc3.digitaloceanspaces.com/media/images/falcon_9_liftof_image_20260816171423.jpg",
+      "thumbnail_url": "https://thespacedevs-prod.nyc3.digitaloceanspaces.com/media/images/falcon_9_liftof_image_thumbnail_20260816171423.jpeg",
+      "webcast_live": false,
+      "vid_urls": []
+    },
+    {
+      "id": "be8b4b0d-1989-48a5-a96d-e8e4d59ed8b3",
+      "name": "Falcon 9 Block 5 | Globalstar 2-R Mission 1 (x 8)",
+      "mission_name": "Globalstar 2-R Mission 1 (x 8)",
+      "vehicle": "Falcon 9 Block 5",
+      "status_id": 3,
+      "status": "Launch Successful",
+      "status_abbrev": "Success",
+      "net": "2026-08-16T01:12:14Z",
+      "window_start": "2026-08-16T01:12:00Z",
+      "window_end": "2026-08-16T01:27:00Z",
+      "net_precision": "Second",
+      "image_url": "https://thespacedevs-prod.nyc3.digitaloceanspaces.com/media/images/falcon_9_image_20230807133459.jpeg",
+      "thumbnail_url": "https://thespacedevs-prod.nyc3.digitaloceanspaces.com/media/images/255bauto255d__image_thumbnail_20240305193628.jpeg",
+      "webcast_live": false,
+      "vid_urls": []
+    }
+  ]
 }

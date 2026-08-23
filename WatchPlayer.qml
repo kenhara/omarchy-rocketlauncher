@@ -194,6 +194,7 @@ Item {
         MouseArea {
           anchors.fill: parent
           enabled: root.hasStream
+          cursorShape: enabled ? Qt.PointingHandCursor : Qt.ArrowCursor
           onClicked: {
             if (mediaPlayer.playbackState === MediaPlayer.PlayingState)
               mediaPlayer.pause()
@@ -222,6 +223,7 @@ Item {
 
         MouseArea {
           anchors.fill: parent
+          cursorShape: Qt.PointingHandCursor
           onClicked: {
             root.muted = !root.muted
             root.muteToggled()
@@ -247,6 +249,7 @@ Item {
 
         MouseArea {
           anchors.fill: parent
+          cursorShape: Qt.PointingHandCursor
           onClicked: root.openOriginal()
         }
       }
@@ -270,6 +273,7 @@ Item {
 
         MouseArea {
           anchors.fill: parent
+          cursorShape: Qt.PointingHandCursor
           onClicked: root.closeRequested()
         }
       }

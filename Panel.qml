@@ -34,6 +34,7 @@ Panel {
   readonly property color fainterForeground: Qt.darker(contentForeground, 1.7)
 
   readonly property var liveStore: store
+  property bool pastSectionExpanded: false
 
   onOpenedChanged: {
     if (root.opened && liveStore && liveStore.nextLaunch && liveStore.nextLaunch.id) {
@@ -129,6 +130,20 @@ Panel {
   function requestNextDetail() {
     if (!liveStore) return
     liveStore.ensureNextDetail()
+  }
+
+  function requestLaunchDetail(id) {
+    if (!liveStore || !id) return
+    if (liveStore.selectedLaunchId === id && liveStore.detailExpanded) {
+      liveStore.detailExpanded = false
+      return
+    }
+    liveStore.fetchLaunchDetail(id)
+  }
+
+  function detailForId(id) {
+    if (!liveStore || !id) return null
+    return liveStore.detailFor(id)
   }
 
   readonly property bool isWatching: !!(liveStore && liveStore.watching)
@@ -324,6 +339,7 @@ Panel {
           MissionCard {
             width: parent.width
             compact: false
+            interactive: true
             foreground: root.contentForeground
             surfaceColor: root.surfaceColor
             fontFamily: root.contentFontFamily
@@ -377,7 +393,8 @@ Panel {
           MissionDetail {
             width: parent.width
             detail: root.nextDetail()
-            expanded: !!(liveStore && liveStore.detailExpanded)
+            expanded: !!(liveStore && liveStore.detailExpanded && liveStore.nextLaunch
+              && liveStore.selectedLaunchId === liveStore.nextLaunch.id)
             foreground: root.contentForeground
             surfaceColor: root.surfaceColor
             fontFamily: root.contentFontFamily
@@ -461,23 +478,153 @@ Panel {
               return liveStore.upcoming.slice(0, 5)
             }
 
-            MissionCard {
+            Column {
               required property var modelData
               width: parent.width
-              compact: true
-              foreground: root.contentForeground
-              surfaceColor: root.surfaceColor
-              fontFamily: root.contentFontFamily
-              title: modelData.mission_name || modelData.name || "—"
-              subtitle: modelData.vehicle || ""
-              meta: {
-                if (!modelData.net) return ""
-                if (!liveStore) return modelData.net
-                return "NET " + liveStore.formatNetShort(modelData.net)
+              spacing: Style.space(6)
+
+              MissionCard {
+                width: parent.width
+                compact: true
+                interactive: true
+                foreground: root.contentForeground
+                surfaceColor: root.surfaceColor
+                fontFamily: root.contentFontFamily
+                title: modelData.mission_name || modelData.name || "—"
+                subtitle: modelData.vehicle || ""
+                meta: {
+                  if (!modelData.net) return ""
+                  if (!liveStore) return modelData.net
+                  var tip = "NET " + liveStore.formatNetShort(modelData.net)
+                  if (liveStore.selectedLaunchId === modelData.id && liveStore.detailExpanded)
+                    tip += "  ·  tap to collapse"
+                  else
+                    tip += "  ·  tap for detail"
+                  return tip
+                }
+                badgeText: badgeFor(modelData).text
+                badgeKind: badgeFor(modelData).kind
+                showWatch: false
+                onClicked: root.requestLaunchDetail(modelData.id)
               }
-              badgeText: badgeFor(modelData).text
-              badgeKind: badgeFor(modelData).kind
-              showWatch: false
+
+              MissionDetail {
+                width: parent.width
+                detail: {
+                  if (!liveStore || liveStore.selectedLaunchId !== modelData.id)
+                    return null
+                  if (liveStore.nextLaunch && liveStore.nextLaunch.id === modelData.id)
+                    return null
+                  return liveStore.detailFor(modelData.id) || modelData
+                }
+                expanded: !!(liveStore && liveStore.detailExpanded
+                  && liveStore.selectedLaunchId === modelData.id
+                  && (!liveStore.nextLaunch || liveStore.nextLaunch.id !== modelData.id))
+                foreground: root.contentForeground
+                surfaceColor: root.surfaceColor
+                fontFamily: root.contentFontFamily
+              }
+            }
+          }
+        }
+
+        // 6. Past missions (lazy-loaded on first expand)
+        Column {
+          width: parent.width
+          spacing: Style.space(8)
+
+          Item {
+            width: parent.width
+            height: pastHdr.implicitHeight
+
+            PanelSectionHeader {
+              id: pastHdr
+              text: root.pastSectionExpanded ? "PAST MISSIONS" : "PAST MISSIONS  ·  tap to expand"
+              foreground: root.contentForeground
+              fontFamily: root.contentFontFamily
+            }
+
+            MouseArea {
+              anchors.fill: parent
+              cursorShape: Qt.PointingHandCursor
+              onClicked: {
+                root.pastSectionExpanded = !root.pastSectionExpanded
+                if (root.pastSectionExpanded && liveStore)
+                  liveStore.ensurePastLaunches()
+              }
+            }
+          }
+
+          Text {
+            width: parent.width
+            visible: root.pastSectionExpanded && !!(liveStore && liveStore.pastLoading)
+            text: "Loading past missions…"
+            color: root.contentForeground
+            opacity: 0.45
+            font.family: root.contentFontFamily
+            font.pixelSize: Style.font.caption
+          }
+
+          Text {
+            width: parent.width
+            visible: root.pastSectionExpanded && !!(liveStore && liveStore.pastLoaded
+              && (!liveStore.past || liveStore.past.length === 0) && !liveStore.pastLoading)
+            text: "No past missions cached"
+            color: root.contentForeground
+            opacity: 0.4
+            font.family: root.contentFontFamily
+            font.pixelSize: Style.font.caption
+          }
+
+          Repeater {
+            model: {
+              if (!root.pastSectionExpanded || !liveStore || !liveStore.past) return []
+              return liveStore.past.slice(0, 5)
+            }
+
+            Column {
+              required property var modelData
+              width: parent.width
+              spacing: Style.space(6)
+
+              MissionCard {
+                width: parent.width
+                compact: true
+                interactive: true
+                foreground: root.contentForeground
+                surfaceColor: root.surfaceColor
+                fontFamily: root.contentFontFamily
+                title: modelData.mission_name || modelData.name || "—"
+                subtitle: modelData.vehicle || ""
+                meta: {
+                  if (!modelData.net) return ""
+                  if (!liveStore) return modelData.net
+                  var tip = liveStore.formatNetShort(modelData.net)
+                  if (liveStore.selectedLaunchId === modelData.id && liveStore.detailExpanded)
+                    tip += "  ·  tap to collapse"
+                  else
+                    tip += "  ·  tap for detail"
+                  return tip
+                }
+                badgeText: badgeFor(modelData).text
+                badgeKind: badgeFor(modelData).kind
+                showWatch: false
+                onClicked: root.requestLaunchDetail(modelData.id)
+              }
+
+              MissionDetail {
+                width: parent.width
+                detail: {
+                  if (!liveStore || liveStore.selectedLaunchId !== modelData.id)
+                    return null
+                  return liveStore.detailFor(modelData.id) || modelData
+                }
+                expanded: !!(liveStore && liveStore.detailExpanded
+                  && liveStore.selectedLaunchId === modelData.id)
+                foreground: root.contentForeground
+                surfaceColor: root.surfaceColor
+                fontFamily: root.contentFontFamily
+              }
             }
           }
         }

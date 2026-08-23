@@ -15,11 +15,37 @@ Item {
   readonly property bool hasDetail: !!(detail && (detail.description || detail.pad_name || detail.landing_summary))
   readonly property var crewList: (detail && detail.crew) ? detail.crew : []
   readonly property bool hasCrew: crewList && crewList.length > 0
-  readonly property string patchUrl: (detail && detail.patch_url) ? detail.patch_url : ""
+  readonly property string preferredPatchUrl: {
+    if (!detail) return ""
+    if (detail.patch_url) return detail.patch_url
+    if (detail.image_url) return detail.image_url
+    return ""
+  }
+
+  property bool patchFailed: false
+  property string patchSource: ""
+
+  onPreferredPatchUrlChanged: {
+    patchFailed = false
+    patchSource = preferredPatchUrl
+  }
+  onDetailChanged: {
+    patchFailed = false
+    patchSource = preferredPatchUrl
+  }
+
+  readonly property bool showPatch: patchSource.length > 0 && !patchFailed
 
   visible: hasDetail && expanded
   implicitWidth: Style.space(320)
   implicitHeight: visible ? col.implicitHeight : 0
+
+  function crewLink(member) {
+    if (!member) return ""
+    if (member.wiki_url) return member.wiki_url
+    if (member.url) return member.url
+    return ""
+  }
 
   Column {
     id: col
@@ -30,10 +56,11 @@ Item {
     Row {
       width: parent.width
       spacing: Style.space(10)
-      visible: root.patchUrl.length > 0 || (root.detail && (root.detail.mission_type || root.detail.orbit))
+      visible: root.showPatch || (root.detail && (root.detail.mission_type || root.detail.orbit))
 
       Rectangle {
-        visible: root.patchUrl.length > 0
+        id: patchRect
+        visible: root.showPatch
         width: Style.space(48)
         height: Style.space(48)
         radius: Math.max(4, Style.cornerRadius - 2)
@@ -41,17 +68,31 @@ Item {
         clip: true
 
         Image {
+          id: patchImage
           anchors.fill: parent
           anchors.margins: 4
-          source: root.patchUrl
+          source: root.patchSource
           fillMode: Image.PreserveAspectFit
           asynchronous: true
           cache: true
+          visible: status === Image.Ready
+          onStatusChanged: {
+            if (status === Image.Error) {
+              // Prefer patch_url; if that fails, try image_url once; then hide.
+              if (root.detail && root.patchSource === root.detail.patch_url && root.detail.image_url
+                  && root.detail.image_url !== root.patchSource) {
+                root.patchSource = root.detail.image_url
+                return
+              }
+              root.patchFailed = true
+              root.patchSource = ""
+            }
+          }
         }
       }
 
       Column {
-        width: parent.width - (root.patchUrl.length > 0 ? Style.space(48) + parent.spacing : 0)
+        width: parent.width - (root.showPatch ? Style.space(48) + parent.spacing : 0)
         spacing: Style.space(2)
         anchors.verticalCenter: parent.verticalCenter
 
@@ -184,6 +225,8 @@ Item {
             width: Style.space(72)
             spacing: Style.space(4)
 
+            readonly property string linkUrl: root.crewLink(modelData)
+
             Rectangle {
               width: Style.space(40)
               height: Style.space(40)
@@ -200,6 +243,11 @@ Item {
                 asynchronous: true
                 cache: true
                 visible: status === Image.Ready
+                onStatusChanged: {
+                  // On error, leave visible=false so initial-letter fallback shows.
+                  if (status === Image.Error)
+                    source = ""
+                }
               }
 
               Text {
@@ -247,6 +295,16 @@ Item {
               opacity: 0.45
               font.family: root.fontFamily
               font.pixelSize: Style.font.caption
+            }
+
+            MouseArea {
+              anchors.fill: parent
+              enabled: parent.linkUrl.length > 0
+              cursorShape: enabled ? Qt.PointingHandCursor : Qt.ArrowCursor
+              onClicked: {
+                if (parent.linkUrl.length)
+                  Qt.openUrlExternally(parent.linkUrl)
+              }
             }
           }
         }

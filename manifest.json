@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "harris.launch-desk",
   "name": "Launch Desk",
-  "version": "1.4.0",
+  "version": "1.4.1",
   "author": "Harris Kenny",
   "license": "MIT",
   "description": "Falcon & Starship launch desk for Omarchy \u2014 flip-digit stats, countdown, mission detail, Watch. Unofficial. Launch data via The Space Devs (LL2).",

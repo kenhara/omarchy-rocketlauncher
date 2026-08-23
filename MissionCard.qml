@@ -16,6 +16,8 @@ Item {
   property string fontFamily: Style.font.family
   property bool showWatch: false
   property bool compact: false
+  // Only true when parent wires an action (detail expand, etc.)
+  property bool interactive: false
 
   signal watchClicked()
   signal clicked()
@@ -57,6 +59,8 @@ Item {
 
     MouseArea {
       anchors.fill: parent
+      enabled: root.interactive
+      cursorShape: root.interactive ? Qt.PointingHandCursor : Qt.ArrowCursor
       onClicked: root.clicked()
     }
 
@@ -153,6 +157,7 @@ Item {
 
         MouseArea {
           anchors.fill: parent
+          cursorShape: Qt.PointingHandCursor
           onClicked: root.watchClicked()
         }
       }

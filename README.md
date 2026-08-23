@@ -1,13 +1,13 @@
 # Launch Desk
 
 Falcon & Starship launch desk for Omarchy — flip-digit stats, countdown,
-ongoing missions, expandable mission detail, and in-panel Watch. Built as a
+ongoing missions, past missions, expandable mission detail, and in-panel Watch. Built as a
 native Quattro `bar-widget` (not Electron).
 
 **ID:** `harris.launch-desk`  
 **Author:** Harris Kenny  
 **License:** MIT  
-**Version:** 1.4.0
+**Version:** 1.4.1
 
 ## Repository
 
@@ -78,6 +78,12 @@ bundles binaries and never runs remote installers.
   (cached by id after the first hit). **Middle-click** play/pauses Watch when
   active, otherwise refreshes data. **Right-click** starts Watch for the next
   launch.
+- **Past Missions** — expand the section in the panel to load the last few
+  SpaceX launches (`/launches/previous/`, lazy on first expand to save free-tier
+  quota). Tap a card for the same on-demand mission detail as Next / Upcoming.
+  Offline sample cache ships a few past rows from research fixtures.
+- Crew avatars with a Wikipedia / LL2 astronaut URL are clickable (opens in the
+  browser). Pointer cursor only appears on actionable controls.
 - Tap the next-launch card to expand/collapse detail (description, pad,
   landing, patch, crew when present). Starlink-style flights omit the empty
   crew section.
@@ -103,6 +109,9 @@ bundles binaries and never runs remote installers.
 | WATCH button | Start in-panel Watch |
 | PLAY / PAUSE / MUTE / OPEN ORIGINAL | Same as keys, on the Watch chrome |
 | Tap next-launch card | Expand / collapse mission detail |
+| Tap upcoming / past card | Expand / collapse mission detail for that id |
+| Past Missions header | Expand section (lazy-loads previous launches once) |
+| Crew avatar (when linked) | Open Wikipedia / LL2 astronaut page |
 
 ### stickyWatch (Meet-style PiP)
 
@@ -189,20 +198,29 @@ Base: `https://ll.thespacedevs.com/2.3.0/` · Falcon / Starship launches via LSP
 
 ### Refresh cycle (default every 30 minutes, never faster than every 10)
 
-Up to **three** list GETs:
+Up to **three** list GETs on the regular refresh cycle:
 
 1. `GET /agencies/121/` — totals (launches, landings, pending, consecutive successes)
 2. `GET /launches/upcoming/?lsp__id=121&limit=5&mode=list` — upcoming list (compact)
 3. `GET /spacecraft/?search=Crew%20Dragon&in_space=true` — ongoing Crew Dragon
 
+### Past missions (lazy)
+
+On **first expand** of the Past Missions section (not on every refresh):
+
+4. `GET /launches/previous/?lsp__id=121&limit=5&mode=list` — recent past launches
+
+Bundled `data/sample-cache.json` includes offline past rows from
+`docs/research/samples/ll2-spacex-previous-*.json`.
+
 ### Mission detail (on demand)
 
-When you open the panel or expand the next/selected card:
+When you open the panel or expand the next / upcoming / past card:
 
-4. `GET /launches/{id}/` — **one detailed fetch per id**, then cached in
+5. `GET /launches/{id}/` — **one detailed fetch per id**, then cached in
    `~/.cache/launch-desk/cache.json` and in-memory `launchDetails`.
 
-Do **not** detailed-fetch every upcoming row. Stay under the free tier
+Do **not** detailed-fetch every upcoming/past row. Stay under the free tier
 (**15 req/hour**).
 
 **Cache path:** `~/.cache/launch-desk/cache.json`  

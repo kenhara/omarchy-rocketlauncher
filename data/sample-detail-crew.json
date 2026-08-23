@@ -10,8 +10,8 @@
   "landing_summary": "RTLS | Landing Zone 40",
   "booster_serial": "B1101",
   "booster_flight": 2,
-  "patch_url": "https://thespacedevs-dev.nyc3.digitaloceanspaces.com/media/mission_patch_images/crew-12_mission_patch_20251226182237.png",
-  "image_url": "https://thespacedevs-dev.nyc3.digitaloceanspaces.com/media/images/falcon_9_at_slc_image_20260208171226.jpg",
+  "patch_url": "https://thespacedevs-prod.nyc3.digitaloceanspaces.com/media/mission_patch_images/crew-12_mission_patch_20260208171350.png",
+  "image_url": "https://thespacedevs-prod.nyc3.digitaloceanspaces.com/media/images/falcon_9_at_slc_image_20260208171226.jpg",
   "webcast_live": false,
   "vid_urls": [
     {
@@ -52,25 +52,33 @@
       "name": "Jessica Meir",
       "role": "Spacecraft Commander",
       "agency": "NASA",
-      "image_url": "https://thespacedevs-dev.nyc3.digitaloceanspaces.com/media/images/jessica_meir_image_20200417064900.jpeg"
+      "image_url": "https://thespacedevs-prod.nyc3.digitaloceanspaces.com/media/images/jessica_meir_image_20200417064900.jpeg",
+      "wiki_url": "https://en.wikipedia.org/wiki/Jessica_Meir",
+      "url": "https://ll.thespacedevs.com/2.3.0/astronauts/573/"
     },
     {
       "name": "Jack Hathaway",
       "role": "Pilot",
       "agency": "NASA",
-      "image_url": "https://thespacedevs-dev.nyc3.digitaloceanspaces.com/media/images/jack_hathaway_image_20211206185407.jpg"
+      "image_url": "https://thespacedevs-prod.nyc3.digitaloceanspaces.com/media/images/jack_hathaway_image_20211206185407.jpg",
+      "wiki_url": "https://en.wikipedia.org/wiki/Jack_Hathaway",
+      "url": "https://ll.thespacedevs.com/2.3.0/astronauts/712/"
     },
     {
       "name": "Sophie Adenot",
       "role": "Flight Engineer",
       "agency": "ESA",
-      "image_url": "https://thespacedevs-dev.nyc3.digitaloceanspaces.com/media/images/sophie_adenot_image_20221123150954.jpg"
+      "image_url": "https://thespacedevs-prod.nyc3.digitaloceanspaces.com/media/images/sophie_adenot_image_20221123150954.jpg",
+      "wiki_url": "https://en.wikipedia.org/wiki/Sophie_Adenot",
+      "url": "https://ll.thespacedevs.com/2.3.0/astronauts/747/"
     },
     {
       "name": "Andrei Fedyaev",
       "role": "Flight Engineer",
       "agency": "RFSA",
-      "image_url": "https://thespacedevs-dev.nyc3.digitaloceanspaces.com/media/images/andrei_fedyaev_image_20230207203113.jpg"
+      "image_url": "https://thespacedevs-prod.nyc3.digitaloceanspaces.com/media/images/andrei_fedyaev_image_20230207203113.jpg",
+      "wiki_url": "https://en.wikipedia.org/wiki/Andrey_Fedyaev",
+      "url": "https://ll.thespacedevs.com/2.3.0/astronauts/732/"
     }
   ],
   "spacecraft_name": "Crew Dragon Freedom",
