@@ -2,7 +2,7 @@ import QtQuick
 import Quickshell
 import Quickshell.Io
 
-// Launch Library 2 client + cache for Launch Desk.
+// Launch Library 2 client + cache for Space Jockey.
 // Pure QML + Qt network (XMLHttpRequest). No elevated privilege.
 //
 // Refresh budget: default 30–60 min (schema knob, min 600s). Free tier is
@@ -23,7 +23,7 @@ QtObject {
 
   readonly property string apiBase: "https://ll.thespacedevs.com/2.3.0"
   readonly property int agencyId: 121
-  readonly property string cacheDir: Quickshell.env("HOME") + "/.cache/launch-desk"
+  readonly property string cacheDir: Quickshell.env("HOME") + "/.cache/space-jockey"
   readonly property string cachePath: cacheDir + "/cache.json"
   readonly property string pluginDir: String(Qt.resolvedUrl("."))
     .replace(/^file:\/\//, "")
@@ -608,7 +608,7 @@ QtObject {
           idleInhibit.command = [
             "systemd-inhibit",
             "--what=idle",
-            "--who=Launch Desk",
+            "--who=Space Jockey",
             "--why=Watch playing (stickyWatch)",
             "--mode=block",
             "sleep", "infinity"
@@ -629,9 +629,9 @@ QtObject {
     try {
       notifyProc.command = [
         "notify-send",
-        "-a", "Launch Desk",
+        "-a", "Space Jockey",
         "-u", "normal",
-        String(title || "Launch Desk"),
+        String(title || "Space Jockey"),
         String(body || "")
       ]
       notifyProc.running = true
@@ -677,12 +677,12 @@ QtObject {
     // Cross T−10 (600s): was above 10 min, now at/under 10 min but still pre-liftoff
     if (prev > 600 && delta <= 600 && delta > 0 && !store.wasNotified(L.id, "t10")) {
       store.markNotified(L.id, "t10")
-      store.notifySend("T−10: " + mission, "Launch Desk · NET in about 10 minutes")
+      store.notifySend("T−10: " + mission, "Space Jockey · NET in about 10 minutes")
     }
     // Cross T−0: was positive, now ≤ 0 (liftoff window)
     if (prev > 0 && delta <= 0 && delta > -3600 && !store.wasNotified(L.id, "t0")) {
       store.markNotified(L.id, "t0")
-      store.notifySend("T−0: " + mission, "Launch Desk · liftoff window")
+      store.notifySend("T−0: " + mission, "Space Jockey · liftoff window")
     }
     store.prevCountdownSec = delta
   }

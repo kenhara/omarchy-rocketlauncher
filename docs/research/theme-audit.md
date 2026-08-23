@@ -1,4 +1,4 @@
-# Launch Desk — Theme & Native Patterns Audit
+# Space Jockey — Theme & Native Patterns Audit
 
 **Date:** 2026-08-23 (America/Denver)  
 **Sources:** all QML at repo root; community raw QML from Coin Toss, Minesweeper, Game of Life, Coverglow; `docs/research/omarchy-plugins.md`; `docs/research/examples/official-omarchy-shell.md`.
@@ -77,7 +77,7 @@ readonly property color bgColor: (root.bar && root.bar.barBackground)
 
 ## 3. Lifecycle / Panel / BarWidget contract gaps
 
-| Contract piece | Minesweeper / Game of Life | Launch Desk | Gap? |
+| Contract piece | Minesweeper / Game of Life | Space Jockey | Gap? |
 |----------------|----------------------------|-------------|------|
 | `kinds: ["bar-widget"]` only + nested Panel via Loader | Yes | Yes | OK |
 | Forward `opened` / `popoutSwitchClosing` from Loader | Yes | Yes | OK |
@@ -89,13 +89,13 @@ readonly property color bgColor: (root.bar && root.bar.barBackground)
 | `popoutSwitching` / `popoutSwitchClosing` wired into KeyboardPanel | Minesweeper yes | Yes | OK |
 | Pause expensive work when closed | GoL timer gated; Coin Toss tick on `opened` | Starfield timer gated; countdown clock always on | Minor: 1 Hz clock is cheap — OK |
 | Prefer `BarIconButton` + `Style.bar.*Slot` for icon-only | Minesweeper | Uses `WidgetButton` (text countdown) | OK — text needs WidgetButton |
-| Coin Toss uses **Panel as bar entry** (no nested Loader) | N/A | Launch Desk correctly uses clock/minesweeper nested pattern | No change |
+| Coin Toss uses **Panel as bar entry** (no nested Loader) | N/A | Space Jockey correctly uses clock/minesweeper nested pattern | No change |
 
 **No critical lifecycle bugs found.** Main gap vs winners is **visual theming**, not open/close wiring.
 
 ---
 
-## 4. Exact code changes for theme-native Launch Desk
+## 4. Exact code changes for theme-native Space Jockey
 
 1. **`Panel.qml`**
    - Replace fixed `surfaceColor` / `digitWell` with theme-derived:

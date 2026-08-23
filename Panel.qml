@@ -3,10 +3,10 @@ import Quickshell
 import qs.Commons
 import qs.Ui
 
-// Nested details panel for Launch Desk (loaded by BarWidget — not a separate kind).
+// Nested details panel for Space Jockey (loaded by BarWidget — not a separate kind).
 Panel {
   id: root
-  moduleName: "harris.launch-desk"
+  moduleName: "harris.space-jockey"
   manageIpc: false
 
   property var anchorItem: null
@@ -248,7 +248,7 @@ Panel {
           spacing: Style.space(4)
 
           Text {
-            text: "LAUNCH DESK"
+            text: "SPACE JOCKEY"
             color: root.contentForeground
             font.family: root.contentFontFamily
             font.pixelSize: Style.font.body

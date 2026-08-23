@@ -1,6 +1,6 @@
-# DHH / Omarchy signals for Launch Desk
+# DHH / Omarchy signals for Space Jockey
 
-**Purpose:** Concrete things DHH (and close Quattro framing) has said about Omarchy, plugins, and the “malleable computer” — mapped to competition plugin strategy for `harris.launch-desk`.  
+**Purpose:** Concrete things DHH (and close Quattro framing) has said about Omarchy, plugins, and the “malleable computer” — mapped to competition plugin strategy for `harris.space-jockey`.  
 **Refresh:** Sun 23 Aug 2026 (America/Denver)  
 **Competition:** Mon 24 Aug 2026, 09:00 CEST · Core Team vote · “best ideas and execution”  
 **Note:** X/Twitter API was not used; quotes come from omarchy.org/news, GitHub releases/manual, hey.com essays, Rails World 2025 transcript coverage, Digg syndication of launch tweets, and secondary Linux coverage.
@@ -79,9 +79,9 @@ Core Team judges are steeped in the above. Implied scoring axes:
 
 ---
 
-## 3. Concrete Launch Desk improvements mapped to signals
+## 3. Concrete Space Jockey improvements mapped to signals
 
-**Baseline product (already shipped):** bar countdown · flip-digit stats · mission detail · crew avatars · Watch (yt-dlp + Qt Multimedia) · LL2 data · unofficial disclaimer · README install/IPC · schema knobs (`refreshIntervalSec`, `notifyMilestones`, `barShowMissionName`, `stickyWatch`) · Fun category · MIT · `harris.launch-desk` v1.3.0.
+**Baseline product (already shipped):** bar countdown · flip-digit stats · mission detail · crew avatars · Watch (yt-dlp + Qt Multimedia) · LL2 data · unofficial disclaimer · README install/IPC · schema knobs (`refreshIntervalSec`, `notifyMilestones`, `barShowMissionName`, `stickyWatch`) · Fun category · MIT · `harris.space-jockey` (was `harris.launch-desk`).
 
 | Signal | Already done | Still worth doing (pre-deadline) |
 |--------|--------------|----------------------------------|
@@ -93,7 +93,7 @@ Core Team judges are steeped in the above. Implied scoring axes:
 | **Ship fun, not perfect security theater** (#22) | No sudo install; LL2 + cache | `omarchy plugin validate`; avoid `omarchy pkg add`; honest deps; aim marketplace baseline `passed` |
 | **Dead-simple delight** (#26) | One panel, one pitch | **Hero `preview.png`** on real Omarchy desktop (bar + flips + mission); README controls table |
 | **Honest / unapologetic Linux** (#3, #27) | Unofficial disclaimer; LL2 honesty (no fake reflights) | Keep — Core Team will notice affiliation cosplay |
-| **Competition closing vibe** (#24) | Pitch: “SpaceX launch desk on your Omarchy bar…” | Demo script: open → flips → expand → Space Watch → Esc → optional T−10 toast |
+| **Competition closing vibe** (#24) | Pitch: “Space Jockey on your Omarchy bar…” | Demo script: open → flips → expand → Space Watch → Esc → optional T−10 toast |
 
 ### Priority stack (aligned with DHH signals, not just peer plugins)
 
@@ -122,7 +122,7 @@ Core Team judges are steeped in the above. Implied scoring axes:
 | Digg Quattro tweet roundup | https://digg.com/tech/lwpvnwp5 |
 | Rails World 2025 keynote (“computers should be fun”) | https://www.rubyevents.org/talks/opening-keynote-rails-world-2025 |
 | Linuxiac Quattro coverage | https://linuxiac.com/arch-based-omarchy-4-0-quattro-is-here-with-its-biggest-desktop-overhaul-yet/ |
-| Related internal briefs | `docs/research/launch-desk-next-ideas.md`, `docs/research/omarchy-plugins.md`, `DESIGN.md` |
+| Related internal briefs | `docs/research/space-jockey-next-ideas.md`, `docs/research/omarchy-plugins.md`, `DESIGN.md` |
 
 ---
 

@@ -5,7 +5,7 @@
     "fetched_at": "2026-08-22T17:30:00Z",
     "agency_id": 121,
     "bundled_sample": true,
-    "note": "Offline sample built from research/samples for Launch Desk UI."
+    "note": "Offline sample built from research/samples for Space Jockey UI."
   },
   "stats": {
     "total_launches": 721,

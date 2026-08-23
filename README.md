@@ -1,21 +1,28 @@
-# Launch Desk
+# Space Jockey
 
-Falcon & Starship launch desk for Omarchy — flip-digit stats, countdown,
+Rocket-pilot Falcon & Starship board for Omarchy — flip-digit stats, countdown,
 ongoing missions, past missions, expandable mission detail, and in-panel Watch. Built as a
-native Quattro `bar-widget` (not Electron).
+native Quattro `bar-widget` (not Electron). Named for Heinlein’s Space Jockey vibe
+(rocket pilot) — unofficial; not SpaceX-branded.
 
-**ID:** `harris.launch-desk`  
+**ID:** `harris.space-jockey`  
 **Author:** Harris Kenny  
 **License:** MIT  
-**Version:** 1.4.1
+**Version:** 1.4.2
+
+### 1.4.2
+- Renamed to **Space Jockey** (`harris.space-jockey`); cache → `~/.cache/space-jockey`.
+- Local folder + GitHub: `kenhara/omarchy-space-jockey`.
 
 ## Repository
 
-Suggested GitHub repo name: **`omarchy-launch-desk`**.
+**Local rename done** (folder `omarchy-space-jockey`, id `harris.space-jockey`).
+GitHub: **https://github.com/kenhara/omarchy-space-jockey**
+below use the *suggested* name — use the current remote URL until the rename lands.
 
 ## Unofficial disclaimer
 
-**Launch Desk is unofficial.** It is **not** affiliated with, endorsed by, or
+**Space Jockey is unofficial.** It is **not** affiliated with, endorsed by, or
 sponsored by Space Exploration Technologies Corp. (“SpaceX”) or any related
 entity. This plugin does **not** ship SpaceX logos, wordmarks, or brand assets.
 Mission/vehicle names and trademarks mentioned in launch data belong to their
@@ -28,8 +35,10 @@ plugin links to LL2-hosted images and does not redistribute those binaries.
 ### From a git remote (once published)
 
 ```sh
-omarchy plugin add https://github.com/<you>/omarchy-launch-desk.git --enable
-omarchy bar move harris.launch-desk --section right
+omarchy plugin add https://github.com/kenhara/omarchy-space-jockey.git --enable
+# After Harris renames the GitHub repo:
+# omarchy plugin add https://github.com/kenhara/omarchy-space-jockey.git --enable
+omarchy bar move harris.space-jockey --section right
 ```
 
 ### Local copy (this tree)
@@ -41,13 +50,13 @@ then rescan:
 ```sh
 # From a clone of this repo (repo root = plugin root)
 mkdir -p ~/.config/omarchy/plugins
-cp -a . ~/.config/omarchy/plugins/harris.launch-desk
+cp -a . ~/.config/omarchy/plugins/harris.space-jockey
 
-omarchy plugin validate ~/.config/omarchy/plugins/harris.launch-desk
+omarchy plugin validate ~/.config/omarchy/plugins/harris.space-jockey
 omarchy-shell shell rescanPlugins
 
 # Ensure the bar widget is enabled / placed
-omarchy bar move harris.launch-desk --section right
+omarchy bar move harris.space-jockey --section right
 ```
 
 Hot reload applies on save under `~/.config/omarchy/plugins/`.
@@ -132,19 +141,19 @@ but audio/video keep playing via MediaPlayer + `stream-proxy.py`.
 ### IPC
 
 ```sh
-omarchy-shell shell toggle harris.launch-desk
-omarchy-shell shell summon harris.launch-desk '{}'
-omarchy-shell shell hide harris.launch-desk
+omarchy-shell shell toggle harris.space-jockey
+omarchy-shell shell summon harris.space-jockey '{}'
+omarchy-shell shell hide harris.space-jockey
 ```
 
 **Summon payloads (intended contract):**
 
 ```sh
 # Start Watch for the next launch (opens panel when the payload reaches us)
-omarchy-shell shell summon harris.launch-desk '{"watch":true}'
+omarchy-shell shell summon harris.space-jockey '{"watch":true}'
 
 # Expand mission detail for a Launch Library 2 id
-omarchy-shell shell summon harris.launch-desk '{"launchId":"…"}'
+omarchy-shell shell summon harris.space-jockey '{"launchId":"…"}'
 ```
 
 `BarWidget.open(payloadJson)` / `handleSummonPayload(obj)` parse a JSON string
@@ -157,12 +166,12 @@ or the keys above. Empty `'{}'` remains the safe open/summon.
 
 ### Optional Hyprland bind
 
-Paste into your own Hypr config if you want a key — **Launch Desk does not
+Paste into your own Hypr config if you want a key — **Space Jockey does not
 edit** `~/.config/hypr/` or `shell.json` for you:
 
 ```ini
 # hyprland.conf / binds.conf (example only)
-bind = SUPER, L, exec, omarchy-shell shell toggle harris.launch-desk
+bind = SUPER, L, exec, omarchy-shell shell toggle harris.space-jockey
 ```
 
 ## Configure
@@ -172,7 +181,7 @@ Widget settings (`shell.json` / bar widget schema):
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
 | `refreshIntervalSec` | integer | `1800` | Poll interval in seconds. **Minimum 600** so the free Launch Library 2 tier (15 req/hour) is never hammered. |
-| `notifyMilestones` | bool | `false` | Opt-in `notify-send` once per launch id at **T−10** and **T−0** (debounced in `~/.cache/launch-desk/cache.json`). |
+| `notifyMilestones` | bool | `false` | Opt-in `notify-send` once per launch id at **T−10** and **T−0** (debounced in `~/.cache/space-jockey/cache.json`). |
 | `barShowMissionName` | bool | `false` | Prefix the bar countdown with a short mission name. |
 | `stickyWatch` | bool | `false` | Keep Watch playing when the panel hides — Meet-style PiP (see above). |
 | `watchQuality` | enum | `best` | `best`, `720`, or `480` — passed to `scripts/stream-proxy.py` as yt-dlp height preference. |
@@ -182,13 +191,13 @@ Widget settings (`shell.json` / bar widget schema):
 ## Remove
 
 ```sh
-omarchy plugin remove harris.launch-desk
+omarchy plugin remove harris.space-jockey
 ```
 
 Optional cache cleanup:
 
 ```sh
-rm -rf ~/.cache/launch-desk
+rm -rf ~/.cache/space-jockey
 ```
 
 ## Data & network
@@ -218,12 +227,12 @@ Bundled `data/sample-cache.json` includes offline past rows from
 When you open the panel or expand the next / upcoming / past card:
 
 5. `GET /launches/{id}/` — **one detailed fetch per id**, then cached in
-   `~/.cache/launch-desk/cache.json` and in-memory `launchDetails`.
+   `~/.cache/space-jockey/cache.json` and in-memory `launchDetails`.
 
 Do **not** detailed-fetch every upcoming/past row. Stay under the free tier
 (**15 req/hour**).
 
-**Cache path:** `~/.cache/launch-desk/cache.json`  
+**Cache path:** `~/.cache/space-jockey/cache.json`  
 Offline fixtures: `data/sample-cache.json`, plus
 `data/sample-detail-crew.json` / `data/sample-detail-starlink.json` for UI demos.
 
@@ -243,7 +252,7 @@ process. Pure QML + Qt network (+ optional local `yt-dlp` helper for Watch).
 - Network: `ll.thespacedevs.com` for launch data; when Watch is used,
   `yt-dlp` contacts the webcast host (YouTube / X / etc.) and the helper
   binds **127.0.0.1 only**.
-- Disk: read/write `~/.cache/launch-desk/cache.json`; read bundled samples.
+- Disk: read/write `~/.cache/space-jockey/cache.json`; read bundled samples.
 - Opens user-selected webcast URLs in the default browser as a fallback.
 - Optional `notify-send` toasts when `notifyMilestones` is enabled (FreeDesktop Notifications).
 - Optional `systemd-inhibit --what=idle` while `stickyWatch` Watch is playing (user-session inhibit only; not used when sticky is off).

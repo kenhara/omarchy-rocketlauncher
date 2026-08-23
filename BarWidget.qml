@@ -3,14 +3,14 @@ import Quickshell
 import qs.Commons
 import qs.Ui
 
-// Launch Desk bar entry — clock / Minesweeper pattern:
+// Space Jockey bar entry — clock / Minesweeper pattern:
 // BarWidget loads nested Panel.qml via Loader. kinds: ["bar-widget"] only.
 //
 // If qs.Ui / qs.Commons import paths differ on a given Omarchy build, mirror
 // the community BarWidget / WidgetButton / Style tokens from research §3–9.
 BarWidget {
   id: root
-  moduleName: "harris.launch-desk"
+  moduleName: "harris.space-jockey"
 
   // The bar identifies a panel by the widget in its slot, so open state and
   // popout hand-off must be readable from here (not only from the panel).
@@ -213,7 +213,7 @@ BarWidget {
     horizontalMargin: 8.5
     tooltipText: {
       var n = launchStore.nextLaunch
-      var tip = "Launch Desk"
+      var tip = "Space Jockey — rocket pilot"
       if (n)
         tip += " — " + (n.mission_name || n.name || "next launch")
       if (launchStore.stickyWatch && launchStore.watching)

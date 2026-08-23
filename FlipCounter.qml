@@ -1,7 +1,7 @@
 import QtQuick
 import qs.Commons
 
-// Mechanical digit-flip counter for the Launch Desk stats strip.
+// Mechanical digit-flip counter for the Space Jockey stats strip.
 // Theme-aware by default; optional accentColor for secondary chrome.
 Item {
   id: root

@@ -1,4 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="800" viewBox="0 0 1200 800" role="img" aria-label="Launch Desk marketplace preview">
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="800" viewBox="0 0 1200 800" role="img" aria-label="Space Jockey marketplace preview">
   <defs>
     <linearGradient id="desk" x1="0" y1="0" x2="0" y2="1">
       <stop offset="0%" stop-color="#0c0c10"/>
@@ -21,7 +21,7 @@
   <circle cx="980" cy="220" r="0.9" fill="#f0f0fa" opacity="0.3"/>
   <circle cx="300" cy="520" r="1.2" fill="#f0f0fa" opacity="0.25"/>
   <circle cx="640" cy="640" r="1" fill="#f0f0fa" opacity="0.28"/>
-  <text x="600" y="420" text-anchor="middle" fill="#f0f0fa" opacity="0.14" font-family="Arial, Helvetica, sans-serif" font-size="18" letter-spacing="8">OMARCHY · LAUNCH DESK</text>
+  <text x="600" y="420" text-anchor="middle" fill="#f0f0fa" opacity="0.14" font-family="Arial, Helvetica, sans-serif" font-size="18" letter-spacing="8">OMARCHY · SPACE JOCKEY</text>
 
   <!-- Top bar -->
   <rect x="0" y="0" width="1200" height="44" fill="#0c0c0e" opacity="0.92"/>
@@ -36,7 +36,7 @@
   <g filter="url(#soft)">
     <rect x="780" y="58" width="390" height="700" rx="14" fill="url(#panelGrad)" stroke="#2a2a30"/>
   </g>
-  <text x="804" y="92" fill="#f0f0fa" font-family="Arial, Helvetica, sans-serif" font-size="14" font-weight="700" letter-spacing="4">LAUNCH DESK</text>
+  <text x="804" y="92" fill="#f0f0fa" font-family="Arial, Helvetica, sans-serif" font-size="14" font-weight="700" letter-spacing="4">SPACE JOCKEY</text>
   <text x="804" y="112" fill="#f0f0fa" opacity="0.4" font-family="Arial, Helvetica, sans-serif" font-size="10">updated 11h ago · sample</text>
 
   <!-- Flip digits -->
