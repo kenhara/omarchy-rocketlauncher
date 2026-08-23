@@ -11,7 +11,8 @@ Item {
   property color foreground: Color.foreground
   // Digit well: foreground alpha (theme-native); Panel may override.
   property color accentColor: Qt.rgba(Color.foreground.r, Color.foreground.g, Color.foreground.b, 0.12)
-  property string fontFamily: Style.font.family
+  property string fontFamily: "monospace"
+  // digitCount: Panel uses 4 for an intentional odometer look (L4); default 3 for compact embeds.
   property int digitCount: 3
   property bool animate: true
 

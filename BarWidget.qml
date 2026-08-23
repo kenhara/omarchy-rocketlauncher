@@ -23,7 +23,7 @@ BarWidget {
 
   // Theme tokens from the active bar (Minesweeper / Coin Toss contract).
   readonly property color foreground: root.bar ? root.bar.foreground : Color.foreground
-  readonly property string fontFamily: root.bar ? root.bar.fontFamily : Style.font.family
+  readonly property string fontFamily: root.bar ? root.bar.fontFamily : "monospace"
 
   property int refreshIntervalSec: {
     var n = 1800
@@ -128,6 +128,10 @@ BarWidget {
   }
 
   function toggleWatchPlayPause() {
+    if (stickyWatchPlayer.active) {
+      stickyWatchPlayer.togglePlayPause()
+      return
+    }
     if (panelLoader.item && typeof panelLoader.item.toggleWatchPlayPause === "function")
       panelLoader.item.toggleWatchPlayPause()
   }
@@ -156,6 +160,30 @@ BarWidget {
     if ("anchorItem" in target) target.anchorItem = button
     if ("hostWidget" in target) target.hostWidget = root
     if ("store" in target) target.store = launchStore
+    if ("watchPlayer" in target) target.watchPlayer = stickyWatchPlayer
+    root.syncWatchChrome()
+  }
+
+  // H3: WatchPlayer lives here so MediaPlayer outlives KeyboardPanel.
+  // When the panel is open, reparent into the panel slot; when closed with
+  // stickyWatch, keep active with chrome hidden so playback continues.
+  function syncWatchChrome() {
+    var panel = panelLoader.item
+    var slot = panel && panel.watchSlot ? panel.watchSlot : null
+    if (root.opened && slot) {
+      stickyWatchPlayer.parent = slot
+      stickyWatchPlayer.x = 0
+      stickyWatchPlayer.y = 0
+      stickyWatchPlayer.width = slot.width
+      stickyWatchPlayer.chromeVisible = true
+    } else {
+      stickyWatchPlayer.parent = root
+      stickyWatchPlayer.x = 0
+      stickyWatchPlayer.y = 0
+      stickyWatchPlayer.width = 320
+      // Sticky background: keep MediaPlayer, hide chrome.
+      stickyWatchPlayer.chromeVisible = false
+    }
   }
 
   function syncStoreSettings() {
@@ -176,7 +204,10 @@ BarWidget {
     injectPanel()
     syncStoreSettings()
   }
-  onOpenedChanged: launchStore.panelOpen = root.opened
+  onOpenedChanged: {
+    launchStore.panelOpen = root.opened
+    root.syncWatchChrome()
+  }
   onRefreshIntervalSecChanged: syncStoreSettings()
   onNotifyMilestonesChanged: syncStoreSettings()
   onBarShowMissionNameChanged: syncStoreSettings()
@@ -187,6 +218,25 @@ BarWidget {
 
   LaunchStore {
     id: launchStore
+  }
+
+  // Hoisted WatchPlayer (H3 stickyWatch) — outlives KeyboardPanel / panel hide.
+  WatchPlayer {
+    id: stickyWatchPlayer
+    width: 320
+    chromeVisible: false
+    active: launchStore.watching
+    streamUrl: launchStore.watchStreamUrl
+    originalUrl: launchStore.watchUrl
+    featureImage: launchStore.watchFeatureImage
+    statusText: launchStore.watchStatus
+    muted: launchStore.watchMuted
+    foreground: root.foreground
+    surfaceColor: Qt.rgba(root.foreground.r, root.foreground.g, root.foreground.b, 0.08)
+    fontFamily: root.fontFamily
+    onOpenOriginal: launchStore.openWatchOriginal()
+    onCloseRequested: launchStore.closeWatch()
+    onMuteToggled: launchStore.watchMuted = muted
   }
 
   Component.onCompleted: {

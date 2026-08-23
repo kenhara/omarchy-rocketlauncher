@@ -9,7 +9,7 @@ Item {
   property var detail: null
   property color foreground: Color.foreground
   property color surfaceColor: Qt.rgba(Color.foreground.r, Color.foreground.g, Color.foreground.b, 0.06)
-  property string fontFamily: Style.font.family
+  property string fontFamily: "monospace"
   property bool expanded: true
 
   readonly property bool hasDetail: !!(detail && (detail.description || detail.pad_name || detail.landing_summary))

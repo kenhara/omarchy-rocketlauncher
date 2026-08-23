@@ -13,7 +13,7 @@ Item {
   property string badgeKind: "muted"   // go | tbd | live | ok | muted
   property color foreground: Color.foreground
   property color surfaceColor: Qt.rgba(Color.foreground.r, Color.foreground.g, Color.foreground.b, 0.06)
-  property string fontFamily: Style.font.family
+  property string fontFamily: "monospace"
   property bool showWatch: false
   property bool compact: false
   // Only true when parent wires an action (detail expand, etc.)

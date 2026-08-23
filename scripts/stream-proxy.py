@@ -150,11 +150,15 @@ def main() -> int:
     media = resolved["url"]
     headers = resolved["headers"]
 
-    # HLS / progressive often works as DIRECT for Qt Multimedia
-    if args.direct or media.endswith(".m3u8") or "m3u8" in media:
+    def _is_hls(u: str) -> bool:
+        # Path/extension check only — avoid substring false positives in query strings.
+        path = (u or "").split("?", 1)[0].split("#", 1)[0].lower()
+        return path.endswith(".m3u8")
+
+    # One path for HLS: DIRECT + return. Otherwise READY via localhost proxy only.
+    if args.direct or _is_hls(media):
         print(f"DIRECT {media}", flush=True)
-        if args.direct:
-            return 0
+        return 0
 
     _Handler.media_url = media
     _Handler.media_headers = headers

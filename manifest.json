@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "harris.space-jockey",
   "name": "Space Jockey",
-  "version": "1.4.2",
+  "version": "1.5.0",
   "author": "Harris Kenny",
   "license": "MIT",
   "description": "Space Jockey — rocket-pilot Falcon & Starship board for Omarchy: flip-digit stats, countdown, mission detail, Watch. Unofficial. Launch data via The Space Devs (LL2).",

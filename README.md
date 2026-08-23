@@ -1,5 +1,7 @@
 # Space Jockey
 
+![Space Jockey](preview.png)
+
 Rocket-pilot Falcon & Starship board for Omarchy — flip-digit stats, countdown,
 ongoing missions, past missions, expandable mission detail, and in-panel Watch. Built as a
 native Quattro `bar-widget` (not Electron). Named for Heinlein’s Space Jockey vibe
@@ -8,19 +10,19 @@ native Quattro `bar-widget` (not Electron). Named for Heinlein’s Space Jockey 
 **ID:** `harris.space-jockey`  
 **Author:** Harris Kenny  
 **License:** MIT  
-**Version:** 1.4.2
+**Version:** 1.5.0  
+**Repo:** https://github.com/kenhara/omarchy-space-jockey
+
+### 1.5.0
+- Audit fixes: panel Flickable scroll, stickyWatch MediaPlayer hoist, resilient Watch after detail fetch, sample-cache / stream-proxy / README cleanup.
+- Font fallbacks use concrete `"monospace"` when bar theme font is unavailable.
 
 ### 1.4.2
 - Renamed to **Space Jockey** (`harris.space-jockey`); cache → `~/.cache/space-jockey`.
 - Local folder + GitHub: `kenhara/omarchy-space-jockey`.
 
-## Repository
-
-**Local rename done** (folder `omarchy-space-jockey`, id `harris.space-jockey`).
-GitHub: **https://github.com/kenhara/omarchy-space-jockey**
-below use the *suggested* name — use the current remote URL until the rename lands.
-
 ## Unofficial disclaimer
+
 
 **Space Jockey is unofficial.** It is **not** affiliated with, endorsed by, or
 sponsored by Space Exploration Technologies Corp. (“SpaceX”) or any related
@@ -32,30 +34,24 @@ plugin links to LL2-hosted images and does not redistribute those binaries.
 
 ## Install
 
-### From a git remote (once published)
+### From GitHub
 
 ```sh
 omarchy plugin add https://github.com/kenhara/omarchy-space-jockey.git --enable
-# After Harris renames the GitHub repo:
-# omarchy plugin add https://github.com/kenhara/omarchy-space-jockey.git --enable
 omarchy bar move harris.space-jockey --section right
 ```
 
-### Local copy (this tree)
+### Local copy
 
 The **git repo root is the plugin** (`manifest.json` at root). On an Omarchy
-machine, copy this directory into your plugins folder under the permanent id,
-then rescan:
+machine:
 
 ```sh
-# From a clone of this repo (repo root = plugin root)
 mkdir -p ~/.config/omarchy/plugins
 cp -a . ~/.config/omarchy/plugins/harris.space-jockey
 
 omarchy plugin validate ~/.config/omarchy/plugins/harris.space-jockey
 omarchy-shell shell rescanPlugins
-
-# Ensure the bar widget is enabled / placed
 omarchy bar move harris.space-jockey --section right
 ```
 
@@ -124,9 +120,11 @@ bundles binaries and never runs remote installers.
 
 ### stickyWatch (Meet-style PiP)
 
-Schema default is **`false`** (pause-on-hide). When **`true`**, the webcast
-**stays up while you work, like Meet PiP** — Esc / click-away hides the panel
-but audio/video keep playing via MediaPlayer + `stream-proxy.py`.
+Schema default is **`false`** (pause-on-hide). When **`true`**, Watch aims to
+**stay up while you work, like Meet PiP** — Esc / click-away hides the panel
+but MediaPlayer + `stream-proxy.py` keep running from a **BarWidget-hoisted**
+player (outlives the keyboard panel). Treat sticky playback as
+**best-effort** until verified on a live Omarchy shell / UTM VM.
 
 - **`stickyWatch: false` (default):** Esc / hide **pauses** Watch, clears the
   stream URL, and **stops** `stream-proxy.py`. Reopening does **not**

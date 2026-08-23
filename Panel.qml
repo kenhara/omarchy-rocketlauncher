@@ -12,10 +12,13 @@ Panel {
   property var anchorItem: null
   property var hostWidget: null
   property var store: null
+  // H3: BarWidget-owned WatchPlayer; reparented into watchSlot while panel is open.
+  property var watchPlayer: null
+  property alias watchSlot: watchSlotItem
 
   readonly property var barIdentity: hostWidget || root
   readonly property color contentForeground: bar ? bar.foreground : Color.foreground
-  readonly property string contentFontFamily: bar ? bar.fontFamily : Style.font.family
+  readonly property string contentFontFamily: bar ? bar.fontFamily : "monospace"
   // Theme-first surfaces (Coverglow / Coin Toss pattern). Brand accents = subtle alpha only.
   readonly property color themeBackground: {
     try {
@@ -42,10 +45,7 @@ Panel {
       liveStore.fetchLaunchDetail(liveStore.nextLaunch.id)
       liveStore.detailExpanded = true
     }
-    if (!root.opened && liveStore) {
-      // stickyWatch=false → pause + stop proxy; stickyWatch=true → keep playback.
-      liveStore.pauseWatchOnHide()
-    }
+    // L2: pauseWatchOnHide is owned by LaunchStore.onPanelOpenChanged (via BarWidget).
   }
 
   function switchPanel(direction) {
@@ -60,8 +60,8 @@ Panel {
   }
 
   function toggleWatchPlayPause() {
-    if (root.isWatching && watchPlayer.active) {
-      watchPlayer.togglePlayPause()
+    if (root.isWatching && root.watchPlayer && root.watchPlayer.active) {
+      root.watchPlayer.togglePlayPause()
       return
     }
     if (liveStore)
@@ -83,8 +83,8 @@ Panel {
     var text = String(event.text || "").toLowerCase()
     // Space — play/pause (or start Watch for next launch)
     if (key === Qt.Key_Space) {
-      if (root.isWatching && watchPlayer.active) {
-        watchPlayer.togglePlayPause()
+      if (root.isWatching && root.watchPlayer && root.watchPlayer.active) {
+        root.watchPlayer.togglePlayPause()
       } else if (liveStore) {
         liveStore.openWatch(liveStore.nextLaunch)
       }
@@ -158,10 +158,10 @@ Panel {
     open: root.opened
     focusTarget: keyCatcher
     contentWidth: panel.fittedContentWidth(Style.space(360))
-    contentHeight: panel.fittedContentHeight(Math.min(
-      column.implicitHeight,
+    // H1: fittedContentHeight caps the viewport; Flickable scrolls tall column content.
+    contentHeight: panel.fittedContentHeight(
       root.isWatching ? root.panelWatchHeight : root.panelBaseHeight
-    ))
+    )
     popoutSwitching: root.popoutSwitching
     popoutSwitchClosing: root.popoutSwitchClosing
 
@@ -235,12 +235,19 @@ Panel {
         }
       }
 
-      Column {
-        id: column
-        anchors.left: parent.left
-        anchors.right: parent.right
-        anchors.top: parent.top
-        spacing: Style.space(14)
+      Flickable {
+        id: panelFlick
+        anchors.fill: parent
+        clip: true
+        boundsBehavior: Flickable.StopAtBounds
+        contentWidth: width
+        contentHeight: column.implicitHeight
+        flickableDirection: Flickable.VerticalFlick
+
+        Column {
+          id: column
+          width: panelFlick.width
+          spacing: Style.space(14)
 
         // 1. Header
         Column {
@@ -275,6 +282,7 @@ Panel {
           width: parent.width
           spacing: Style.space(12)
 
+          // L4: 4-digit FlipCounter is intentional (odometer look), not a bug.
           FlipCounter {
             width: (parent.width - parent.spacing * 2) / 3
             value: liveStore ? liveStore.stats.total_launches : 0
@@ -382,7 +390,12 @@ Panel {
 
           Text {
             width: parent.width
-            visible: !!(liveStore && liveStore.detailLoading)
+            visible: {
+              if (!liveStore || !liveStore.detailLoading) return false
+              var lid = liveStore.detailLoadingId || liveStore.selectedLaunchId
+              var nid = liveStore.nextLaunch ? liveStore.nextLaunch.id : ""
+              return lid === nid || lid === liveStore.selectedLaunchId
+            }
             text: "Loading mission detail…"
             color: root.contentForeground
             opacity: 0.45
@@ -400,27 +413,19 @@ Panel {
             fontFamily: root.contentFontFamily
           }
 
-          WatchPlayer {
-            id: watchPlayer
+          // H3: slot for BarWidget-hoisted WatchPlayer (reparented while panel open).
+          Item {
+            id: watchSlotItem
             width: parent.width
-            // Stay active while watching — including stickyWatch background (panel closed).
-            active: root.isWatching
-            streamUrl: liveStore ? liveStore.watchStreamUrl : ""
-            originalUrl: liveStore ? liveStore.watchUrl : ""
-            featureImage: liveStore ? liveStore.watchFeatureImage : ""
-            statusText: liveStore ? liveStore.watchStatus : "idle"
-            muted: liveStore ? liveStore.watchMuted : false
-            foreground: root.contentForeground
-            surfaceColor: root.surfaceColor
-            fontFamily: root.contentFontFamily
-            onOpenOriginal: {
-              if (liveStore) liveStore.openWatchOriginal()
+            height: {
+              if (!root.watchPlayer || !root.watchPlayer.active || !root.watchPlayer.chromeVisible)
+                return 0
+              return root.watchPlayer.implicitHeight
             }
-            onCloseRequested: {
-              if (liveStore) liveStore.closeWatch()
-            }
-            onMuteToggled: {
-              if (liveStore) liveStore.watchMuted = muted
+            visible: height > 0
+            onWidthChanged: {
+              if (root.watchPlayer && root.watchPlayer.parent === watchSlotItem)
+                root.watchPlayer.width = width
             }
           }
         }
@@ -495,7 +500,7 @@ Panel {
                 meta: {
                   if (!modelData.net) return ""
                   if (!liveStore) return modelData.net
-                  var tip = "NET " + liveStore.formatNetShort(modelData.net)
+                  var tip = "NET " + liveStore.formatNetShort(modelData.net) + " UTC"
                   if (liveStore.selectedLaunchId === modelData.id && liveStore.detailExpanded)
                     tip += "  ·  tap to collapse"
                   else
@@ -599,7 +604,7 @@ Panel {
                 meta: {
                   if (!modelData.net) return ""
                   if (!liveStore) return modelData.net
-                  var tip = liveStore.formatNetShort(modelData.net)
+                  var tip = liveStore.formatNetShort(modelData.net) + " UTC"
                   if (liveStore.selectedLaunchId === modelData.id && liveStore.detailExpanded)
                     tip += "  ·  tap to collapse"
                   else
@@ -645,7 +650,7 @@ Panel {
             var sticky = liveStore && liveStore.stickyWatch
             var base = "Esc closes · Space play/pause · M mute · O open original · S stop Watch"
             if (sticky)
-              base += " · stickyWatch: Esc keeps playback"
+              base += " · stickyWatch: Esc keeps playback (best-effort; verify on live Omarchy)"
             else
               base += " · Watch embeds when yt-dlp resolves (YouTube/HLS); X → Open original"
             return base
@@ -656,7 +661,8 @@ Panel {
           font.family: root.contentFontFamily
           font.pixelSize: Style.font.caption
         }
-      }
+        } // Column
+      } // Flickable
     }
   }
 }

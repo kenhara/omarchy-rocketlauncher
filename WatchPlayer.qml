@@ -13,9 +13,11 @@ Item {
   property string statusText: ""       // resolving | playing | fallback | error | idle
   property color foreground: Color.foreground
   property color surfaceColor: Qt.rgba(Color.foreground.r, Color.foreground.g, Color.foreground.b, 0.08)
-  property string fontFamily: Style.font.family
+  property string fontFamily: "monospace"
   property bool muted: false
   property bool active: false
+  // When false, MediaPlayer can keep playing (stickyWatch) without panel chrome.
+  property bool chromeVisible: true
 
   signal openOriginal()
   signal closeRequested()
@@ -26,8 +28,8 @@ Item {
   readonly property bool hasStream: streamUrl.length > 0 && !isFallback
 
   implicitWidth: Style.space(320)
-  implicitHeight: active ? (videoFrame.height + controls.height + Style.space(8)) : 0
-  visible: active
+  implicitHeight: (active && chromeVisible) ? (videoFrame.height + controls.height + Style.space(8)) : 0
+  visible: active && chromeVisible
   clip: true
 
   readonly property bool isPlaying: mediaPlayer.playbackState === MediaPlayer.PlayingState

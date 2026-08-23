@@ -52,7 +52,13 @@ QtObject {
   property var launchDetails: ({})
   property string selectedLaunchId: ""
   property bool detailLoading: false
+  property string detailLoadingId: ""
+  property string pendingDetailId: ""
+  property bool pendingDetailExpand: true
   property bool detailExpanded: false
+  // H2: right-click Watch before list-mode detail has vid_urls.
+  property bool pendingWatchAfterDetail: false
+  property string pendingWatchLaunchId: ""
 
   // In-panel Watch (Normarchy: yt-dlp → localhost → Qt Multimedia)
   property bool watching: false
@@ -545,14 +551,20 @@ QtObject {
   }
 
   function isHlsUrl(url) {
-    var u = String(url || "").toLowerCase()
-    return u.indexOf(".m3u8") >= 0
+    // Path/extension .m3u8 only (not substring match on query).
+    var u = String(url || "").split("?")[0].split("#")[0].toLowerCase()
+    return u.length >= 5 && u.substring(u.length - 5) === ".m3u8"
   }
 
   function openUrlExternal(url) {
     if (!url) return false
     try {
-      Qt.openUrlExternally(url)
+      // Qt.openUrlExternally returns bool on modern Qt; fall back to xdg-open when false.
+      var ok = Qt.openUrlExternally(url)
+      if (ok === false) {
+        openUrlProc.command = ["xdg-open", url]
+        openUrlProc.running = true
+      }
       return true
     } catch (e) {
       openUrlProc.command = ["xdg-open", url]
@@ -740,9 +752,24 @@ QtObject {
 
   function openWatch(launch) {
     var L = launch || store.nextLaunch
+    if (!L) return false
     var url = officialWebcast(L)
-    if (!url) return false
+    // H2: list mode often omits vid_urls — fetch detail, then start Watch.
+    if (!url) {
+      if (L.id) {
+        store.pendingWatchAfterDetail = true
+        store.pendingWatchLaunchId = String(L.id)
+        store.watching = true
+        store.watchStatus = "resolving"
+        store.watchFeatureImage = featureImageFor(L)
+        store.fetchLaunchDetail(L.id, { expand: store.panelOpen })
+        return true
+      }
+      return false
+    }
 
+    store.pendingWatchAfterDetail = false
+    store.pendingWatchLaunchId = ""
     store.watchPausedByHide = false
     store.watchUrl = url
     store.watchFeatureImage = featureImageFor(L)
@@ -774,15 +801,14 @@ QtObject {
     return openUrlExternal(url)
   }
 
-  // Right-click bar: start in-panel Watch; if no webcast URL, open original when known.
+  // Right-click bar: start in-panel Watch; if no webcast URL yet, openWatch
+  // queues a detail fetch (H2) and starts Watch when vid_urls arrive.
   function openWatchForNextOrOriginal() {
     var L = store.nextLaunch
+    if (!L) return false
     var url = store.officialWebcast(L)
-    if (!url) {
-      if (store.watchUrl)
-        return store.openUrlExternal(store.watchUrl)
-      return false
-    }
+    if (!url && store.watchUrl)
+      return store.openUrlExternal(store.watchUrl)
     return store.openWatch(L)
   }
 
@@ -801,32 +827,113 @@ QtObject {
     var n = store.nextLaunch
     if (!n || !n.id) return false
     store.detailExpanded = true
-    return fetchLaunchDetail(n.id)
+    return fetchLaunchDetail(n.id, { expand: true })
   }
 
-  function fetchLaunchDetail(id) {
+  function applyDetailToLists(id, detail) {
+    if (store.nextLaunch && store.nextLaunch.id === id)
+      store.nextLaunch = mergeDetailOntoLaunch(store.nextLaunch, detail)
+    var up = []
+    for (var i = 0; i < store.upcoming.length; i++) {
+      var row = store.upcoming[i]
+      if (row && row.id === id)
+        up.push(mergeDetailOntoLaunch(row, detail))
+      else
+        up.push(row)
+    }
+    store.upcoming = up
+    var pastRows = []
+    for (var pi = 0; pi < store.past.length; pi++) {
+      var prow = store.past[pi]
+      if (prow && prow.id === id)
+        pastRows.push(mergeDetailOntoLaunch(prow, detail))
+      else
+        pastRows.push(prow)
+    }
+    store.past = pastRows
+  }
+
+  function maybeStartPendingWatch(id) {
+    if (!store.pendingWatchAfterDetail) return
+    if (String(store.pendingWatchLaunchId) !== String(id)) return
+    store.pendingWatchAfterDetail = false
+    store.pendingWatchLaunchId = ""
+    var L = null
+    if (store.nextLaunch && store.nextLaunch.id === id)
+      L = store.nextLaunch
+    else {
+      for (var i = 0; i < store.upcoming.length; i++) {
+        if (store.upcoming[i] && store.upcoming[i].id === id) {
+          L = store.upcoming[i]
+          break
+        }
+      }
+    }
+    if (!L)
+      L = store.detailFor(id)
+    if (L && officialWebcast(L))
+      store.openWatch(L)
+    else {
+      store.watchStatus = "fallback"
+      store.watching = true
+    }
+  }
+
+  function drainPendingDetail() {
+    var pid = store.pendingDetailId
+    if (!pid) return
+    var expand = store.pendingDetailExpand
+    store.pendingDetailId = ""
+    store.fetchLaunchDetail(pid, { expand: expand })
+  }
+
+  // opts.expand (default true): update selectedLaunchId / detailExpanded for UI.
+  // Quiet eager fetches pass { expand: false }.
+  function fetchLaunchDetail(id, opts) {
     id = String(id || "")
     if (!id) return false
-    store.selectedLaunchId = id
-    store.detailExpanded = true
+    opts = opts || {}
+    var expand = opts.expand !== false
 
     var cached = store.launchDetails[id]
-    if (cached && cached.detailed_at && (cached.description || cached.pad_name || cached.landing_summary || (cached.crew && cached.crew.length))) {
-      if (store.nextLaunch && store.nextLaunch.id === id)
-        store.nextLaunch = mergeDetailOntoLaunch(store.nextLaunch, cached)
+    if (cached && cached.detailed_at && (cached.description || cached.pad_name || cached.landing_summary || (cached.crew && cached.crew.length) || (cached.vid_urls && cached.vid_urls.length))) {
+      if (expand) {
+        store.selectedLaunchId = id
+        store.detailExpanded = true
+      }
+      store.applyDetailToLists(id, cached)
       store.dataChanged()
+      store.maybeStartPendingWatch(id)
       return true
     }
 
-    if (store.detailLoading) return false
+    // M3: guard detailLoading BEFORE mutating selection; queue if busy.
+    if (store.detailLoading) {
+      store.pendingDetailId = id
+      store.pendingDetailExpand = expand
+      if (expand) {
+        store.selectedLaunchId = id
+        store.detailExpanded = true
+      }
+      return false
+    }
+
+    if (expand) {
+      store.selectedLaunchId = id
+      store.detailExpanded = true
+    }
     store.detailLoading = true
+    store.detailLoadingId = id
     // One detailed GET per id — free tier ≤15/h; list polls stay on mode=list.
     httpGet(store.apiBase + "/launches/" + id + "/", function(ok, body) {
       store.detailLoading = false
+      store.detailLoadingId = ""
       if (!ok) {
         store.lastError = "detail fetch failed"
         // Offline / rate-limit: keep any partial fields already on the launch
         store.dataChanged()
+        store.maybeStartPendingWatch(id)
+        store.drainPendingDetail()
         return
       }
       try {
@@ -834,35 +941,18 @@ QtObject {
         var detail = slimDetail(raw)
         if (!detail) {
           store.lastError = "detail parse empty"
+          store.drainPendingDetail()
           return
         }
         rememberDetail(detail)
-        if (store.nextLaunch && store.nextLaunch.id === id)
-          store.nextLaunch = mergeDetailOntoLaunch(store.nextLaunch, detail)
-        // Also refresh matching upcoming / past rows
-        var up = []
-        for (var i = 0; i < store.upcoming.length; i++) {
-          var row = store.upcoming[i]
-          if (row && row.id === id)
-            up.push(mergeDetailOntoLaunch(row, detail))
-          else
-            up.push(row)
-        }
-        store.upcoming = up
-        var pastRows = []
-        for (var pi = 0; pi < store.past.length; pi++) {
-          var prow = store.past[pi]
-          if (prow && prow.id === id)
-            pastRows.push(mergeDetailOntoLaunch(prow, detail))
-          else
-            pastRows.push(prow)
-        }
-        store.past = pastRows
+        store.applyDetailToLists(id, detail)
         store.dataChanged()
         persistToDisk()
+        store.maybeStartPendingWatch(id)
       } catch (e) {
         store.lastError = "detail parse failed"
       }
+      store.drainPendingDetail()
     })
     return true
   }
@@ -874,9 +964,9 @@ QtObject {
     var precision = String(launch.net_precision || "").toLowerCase()
     // Fuzzy NET when precision is coarse
     if (precision.indexOf("day") >= 0 || precision.indexOf("month") >= 0 || precision.indexOf("year") >= 0)
-      return "NET " + formatNetShort(launch.net)
+      return "NET " + formatNetShort(launch.net) + " UTC"
     var delta = Math.floor((netMs - store.nowMs) / 1000)
-    if (delta < -3600) return "NET " + formatNetShort(launch.net)
+    if (delta < -3600) return "NET " + formatNetShort(launch.net) + " UTC"
     if (delta < 0) return "T+" + formatHMS(-delta)
     return "T-" + formatHMS(delta)
   }
@@ -891,6 +981,7 @@ QtObject {
     return pad(h) + ":" + pad(m) + ":" + pad(sec)
   }
 
+  // NET calendar day in UTC (callers may append " UTC"; countdown uses this for fuzzy NET).
   function formatNetShort(iso) {
     var d = new Date(iso)
     if (isNaN(d.getTime())) return "—"
@@ -1116,8 +1207,16 @@ QtObject {
       upcoming: up,
       ongoing: on
     }
+    var prevId = store.nextLaunch && store.nextLaunch.id ? String(store.nextLaunch.id) : ""
     applyPayload(payload, "network")
     persistToDisk()
+    // H2: eager soft-fetch next detail when id changes so Watch has vid_urls.
+    var newId = store.nextLaunch && store.nextLaunch.id ? String(store.nextLaunch.id) : ""
+    if (newId && newId !== prevId)
+      store.fetchLaunchDetail(newId, { expand: false })
+    else if (newId && (!store.nextLaunch.vid_urls || !store.nextLaunch.vid_urls.length)
+             && !store.launchDetails[newId])
+      store.fetchLaunchDetail(newId, { expand: false })
   }
 
   function httpGet(url, cb) {
