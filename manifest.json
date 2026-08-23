@@ -2,10 +2,10 @@
   "schemaVersion": 1,
   "id": "harris.space-jockey",
   "name": "Space Jockey",
-  "version": "1.5.0",
+  "version": "1.5.1",
   "author": "Harris Kenny",
   "license": "MIT",
-  "description": "Space Jockey — rocket-pilot Falcon & Starship board for Omarchy: flip-digit stats, countdown, mission detail, Watch. Unofficial. Launch data via The Space Devs (LL2).",
+  "description": "Space Jockey on your Omarchy bar \u2014 flip-digit Falcon & Starship stats, countdown, Watch. Unofficial. Launch data via The Space Devs (LL2).",
   "kinds": [
     "bar-widget"
   ],
@@ -24,7 +24,7 @@
   ],
   "barWidget": {
     "displayName": "Space Jockey",
-    "description": "Rocket-pilot flip-digit Falcon & Starship stats, next NET countdown, mission detail, ongoing Crew Dragon, and Watch",
+    "description": "Space Jockey on your Omarchy bar \u2014 flip-digit Falcon & Starship stats, countdown, Watch.",
     "category": "Fun",
     "allowMultiple": false,
     "defaultSection": "right",
@@ -51,7 +51,7 @@
         "key": "refreshIntervalSec",
         "type": "integer",
         "label": "Refresh interval (seconds)",
-        "description": "How often to poll Launch Library 2. Free tier is 15 req/hour — keep this ≥ 600.",
+        "description": "How often to poll Launch Library 2. Free tier is 15 req/hour \u2014 keep this \u2265 600.",
         "min": 600,
         "max": 86400,
         "step": 60,
@@ -60,8 +60,8 @@
       {
         "key": "notifyMilestones",
         "type": "boolean",
-        "label": "Notify at T−10 and T−0",
-        "description": "Opt-in desktop toasts (notify-send) once per launch id when countdown crosses T−10 (~10 min) and T−0. Off by default.",
+        "label": "Notify at T\u221210 and T\u22120",
+        "description": "Opt-in desktop toasts (notify-send) once per launch id when countdown crosses T\u221210 (~10 min) and T\u22120. Off by default.",
         "defaultValue": false
       },
       {

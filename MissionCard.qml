@@ -55,11 +55,14 @@ Item {
     radius: root.cardRadius
     color: root.surfaceColor
     border.width: 1
-    border.color: Qt.rgba(root.foreground.r, root.foreground.g, root.foreground.b, 0.08)
+    border.color: Qt.rgba(root.foreground.r, root.foreground.g, root.foreground.b,
+      (root.interactive && cardMa.containsMouse) ? 0.16 : 0.08)
 
     MouseArea {
+      id: cardMa
       anchors.fill: parent
       enabled: root.interactive
+      hoverEnabled: root.interactive
       cursorShape: root.interactive ? Qt.PointingHandCursor : Qt.ArrowCursor
       onClicked: root.clicked()
     }
@@ -142,7 +145,7 @@ Item {
         width: Style.space(72)
         height: Style.space(28)
         radius: Math.max(3, Style.cornerRadius - 3)
-        color: root.foreground
+        color: watchMa.containsMouse ? Qt.lighter(root.foreground, 1.12) : root.foreground
         anchors.verticalCenter: parent.verticalCenter
 
         Text {
@@ -156,7 +159,9 @@ Item {
         }
 
         MouseArea {
+          id: watchMa
           anchors.fill: parent
+          hoverEnabled: true
           cursorShape: Qt.PointingHandCursor
           onClicked: root.watchClicked()
         }

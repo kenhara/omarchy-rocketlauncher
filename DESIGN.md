@@ -1,5 +1,7 @@
 # Space Jockey — design rationale
 
+**Version:** 1.5.1
+
 ## Why this shape wins on Omarchy
 
 Marketplace standouts (Coin Toss, Game of Life, Coverglow, Agents, Minesweeper)
@@ -16,7 +18,7 @@ Space Jockey follows that cluster exactly:
 | Schema knobs | `refreshIntervalSec` (min 600) so power users tune without editing QML |
 | Subtle motion, pause when hidden | Digit flips + starfield/scanline only while open |
 | Zero privilege | Pure QML + `XMLHttpRequest` + optional `xdg-open` — aim for security baseline `passed` |
-| Strong pitch | “Space Jockey on your Omarchy bar — flip-digit Falcon & Starship stats, countdown, Watch.” |
+| Strong pitch (≤15 words) | “Space Jockey on your Omarchy bar — flip-digit Falcon & Starship stats, countdown, Watch.” |
 
 ## Product choices
 

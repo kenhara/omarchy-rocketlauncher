@@ -68,15 +68,6 @@ Panel {
       liveStore.openWatch(liveStore.nextLaunch)
   }
 
-  // Same contract as BarWidget / LaunchStore — used if nested Panel ever receives payload.
-  function handleSummonPayload(obj) {
-    if (!liveStore) return false
-    var acted = liveStore.handleSummonPayload(obj)
-    if (acted && !root.opened)
-      root.open()
-    return acted
-  }
-
   function handleWatchKeys(event) {
     if (!event) return false
     var key = event.key
@@ -139,6 +130,11 @@ Panel {
       return
     }
     liveStore.fetchLaunchDetail(id)
+  }
+
+  function openExternalLink(url) {
+    if (liveStore) return liveStore.openUrlExternal(url)
+    return false
   }
 
   function detailForId(id) {
@@ -411,6 +407,7 @@ Panel {
             foreground: root.contentForeground
             surfaceColor: root.surfaceColor
             fontFamily: root.contentFontFamily
+            onOpenLink: function(url) { root.openExternalLink(url) }
           }
 
           // H3: slot for BarWidget-hoisted WatchPlayer (reparented while panel open).
@@ -528,6 +525,7 @@ Panel {
                 foreground: root.contentForeground
                 surfaceColor: root.surfaceColor
                 fontFamily: root.contentFontFamily
+            onOpenLink: function(url) { root.openExternalLink(url) }
               }
             }
           }
@@ -629,6 +627,7 @@ Panel {
                 foreground: root.contentForeground
                 surfaceColor: root.surfaceColor
                 fontFamily: root.contentFontFamily
+            onOpenLink: function(url) { root.openExternalLink(url) }
               }
             }
           }

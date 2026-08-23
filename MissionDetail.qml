@@ -12,6 +12,8 @@ Item {
   property string fontFamily: "monospace"
   property bool expanded: true
 
+  signal openLink(string url)
+
   readonly property bool hasDetail: !!(detail && (detail.description || detail.pad_name || detail.landing_summary))
   readonly property var crewList: (detail && detail.crew) ? detail.crew : []
   readonly property bool hasCrew: crewList && crewList.length > 0
@@ -100,6 +102,7 @@ Item {
           width: parent.width
           visible: !!(root.detail && root.detail.mission_type)
           text: root.detail ? (root.detail.mission_type || "") : ""
+          textFormat: Text.PlainText
           color: root.foreground
           opacity: 0.7
           font.family: root.fontFamily
@@ -111,6 +114,7 @@ Item {
         Text {
           width: parent.width
           visible: !!(root.detail && (root.detail.orbit || root.detail.spacecraft_name))
+          textFormat: Text.PlainText
           text: {
             if (!root.detail) return ""
             var bits = []
@@ -136,6 +140,7 @@ Item {
       width: parent.width
       visible: !!(root.detail && root.detail.description)
       text: root.detail ? (root.detail.description || "") : ""
+      textFormat: Text.PlainText
       wrapMode: Text.WordWrap
       color: root.foreground
       opacity: 0.7
@@ -159,6 +164,7 @@ Item {
             t += "  ·  " + root.detail.location_name
           return t
         }
+        textFormat: Text.PlainText
         wrapMode: Text.WordWrap
         color: root.foreground
         opacity: 0.5
@@ -179,6 +185,7 @@ Item {
           }
           return t
         }
+        textFormat: Text.PlainText
         wrapMode: Text.WordWrap
         color: root.foreground
         opacity: 0.5
@@ -190,6 +197,7 @@ Item {
         width: parent.width
         visible: !!(root.detail && root.detail.vehicle)
         text: "Vehicle  " + (root.detail ? (root.detail.vehicle || "") : "")
+        textFormat: Text.PlainText
         color: root.foreground
         opacity: 0.5
         font.family: root.fontFamily
@@ -269,6 +277,7 @@ Item {
               width: parent.width
               horizontalAlignment: Text.AlignHCenter
               text: (modelData && modelData.name) ? modelData.name : ""
+              textFormat: Text.PlainText
               wrapMode: Text.WordWrap
               maximumLineCount: 2
               elide: Text.ElideRight
@@ -281,6 +290,7 @@ Item {
             Text {
               width: parent.width
               horizontalAlignment: Text.AlignHCenter
+              textFormat: Text.PlainText
               text: {
                 if (!modelData) return ""
                 var bits = []
@@ -300,10 +310,11 @@ Item {
             MouseArea {
               anchors.fill: parent
               enabled: parent.linkUrl.length > 0
+              hoverEnabled: true
               cursorShape: enabled ? Qt.PointingHandCursor : Qt.ArrowCursor
               onClicked: {
                 if (parent.linkUrl.length)
-                  Qt.openUrlExternally(parent.linkUrl)
+                  root.openLink(parent.linkUrl)
               }
             }
           }

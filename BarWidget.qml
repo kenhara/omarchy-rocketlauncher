@@ -102,16 +102,9 @@ BarWidget {
   implicitWidth: button.implicitWidth
   implicitHeight: button.implicitHeight
 
-  // Breakout-style summon: host may pass a JSON string. Quattro bar-widget
-  // summon currently drops payloads (shell opens the widget only) — still
-  // parse when open()/call reaches us so the contract is ready.
-  function handleSummonPayload(obj) {
-    return launchStore.handleSummonPayload(obj)
-  }
-
-  function open(payloadJson) {
-    if (payloadJson !== undefined && payloadJson !== null && String(payloadJson).length)
-      root.handleSummonPayload(payloadJson)
+  // Local bar actions only — bar-widget-only plugins are not summonable with
+  // payloads; middle-click = onBarMiddleClick, right-click = onBarRightClick.
+  function open() {
     if (panelLoader.item) panelLoader.item.open()
   }
 

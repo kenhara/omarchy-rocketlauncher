@@ -10,8 +10,11 @@ native Quattro `bar-widget` (not Electron). Named for Heinlein’s Space Jockey 
 **ID:** `harris.space-jockey`  
 **Author:** Harris Kenny  
 **License:** MIT  
-**Version:** 1.5.0  
+**Version:** 1.5.1  
 **Repo:** https://github.com/kenhara/omarchy-space-jockey
+
+### 1.5.1
+- Pre-ship checklist: LICENSE second Software unquoted; FileView cache without mkdir race; drop dead `dataChanged` + invented summon handlers; https-only openUrl with honest toasts; PlainText on remote mission fields; button hover; version/UA sync.
 
 ### 1.5.0
 - Audit fixes: panel Flickable scroll, stickyWatch MediaPlayer hoist, resilient Watch after detail fetch, sample-cache / stream-proxy / README cleanup.
@@ -140,27 +143,13 @@ player (outlives the keyboard panel). Treat sticky playback as
 
 ```sh
 omarchy-shell shell toggle harris.space-jockey
-omarchy-shell shell summon harris.space-jockey '{}'
 omarchy-shell shell hide harris.space-jockey
 ```
 
-**Summon payloads (intended contract):**
-
-```sh
-# Start Watch for the next launch (opens panel when the payload reaches us)
-omarchy-shell shell summon harris.space-jockey '{"watch":true}'
-
-# Expand mission detail for a Launch Library 2 id
-omarchy-shell shell summon harris.space-jockey '{"launchId":"…"}'
-```
-
-`BarWidget.open(payloadJson)` / `handleSummonPayload(obj)` parse a JSON string
-the way Breakout does (`{"level":3}`). **Honest limitation:** Quattro’s
-`shell summon` path for **bar-widget-only** plugins currently **drops** the
-payload and only opens the widget (Breakout works because it is also a
-`panel` kind). The handlers are wired and ready; until the host forwards
-payloads (or you `call` into a loaded widget), use left/middle/right clicks
-or the keys above. Empty `'{}'` remains the safe open/summon.
+Space Jockey is **`bar-widget` only** — use left / middle / right clicks on the
+bar (and the keys above) rather than inventing summon payloads. Middle-click
+play/pauses Watch when active, otherwise refreshes launch data; right-click
+starts Watch for the next launch.
 
 ### Optional Hyprland bind
 

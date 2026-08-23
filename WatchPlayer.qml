@@ -180,7 +180,7 @@ Item {
         width: Style.space(64)
         height: Style.space(28)
         radius: Math.max(3, Style.cornerRadius - 3)
-        color: root.foreground
+        color: playMa.containsMouse && root.hasStream ? Qt.lighter(root.foreground, 1.12) : root.foreground
         opacity: root.hasStream ? 1 : 0.35
 
         Text {
@@ -194,8 +194,10 @@ Item {
         }
 
         MouseArea {
+          id: playMa
           anchors.fill: parent
           enabled: root.hasStream
+          hoverEnabled: true
           cursorShape: enabled ? Qt.PointingHandCursor : Qt.ArrowCursor
           onClicked: {
             if (mediaPlayer.playbackState === MediaPlayer.PlayingState)
@@ -211,7 +213,7 @@ Item {
         width: Style.space(64)
         height: Style.space(28)
         radius: Math.max(3, Style.cornerRadius - 3)
-        color: Qt.rgba(root.foreground.r, root.foreground.g, root.foreground.b, 0.14)
+        color: Qt.rgba(root.foreground.r, root.foreground.g, root.foreground.b, muteMa.containsMouse ? 0.22 : 0.14)
 
         Text {
           anchors.centerIn: parent
@@ -224,7 +226,9 @@ Item {
         }
 
         MouseArea {
+          id: muteMa
           anchors.fill: parent
+          hoverEnabled: true
           cursorShape: Qt.PointingHandCursor
           onClicked: {
             root.muted = !root.muted
@@ -237,7 +241,7 @@ Item {
         width: Style.space(110)
         height: Style.space(28)
         radius: Math.max(3, Style.cornerRadius - 3)
-        color: Qt.rgba(root.foreground.r, root.foreground.g, root.foreground.b, 0.14)
+        color: Qt.rgba(root.foreground.r, root.foreground.g, root.foreground.b, openMa.containsMouse ? 0.22 : 0.14)
 
         Text {
           anchors.centerIn: parent
@@ -250,7 +254,9 @@ Item {
         }
 
         MouseArea {
+          id: openMa
           anchors.fill: parent
+          hoverEnabled: true
           cursorShape: Qt.PointingHandCursor
           onClicked: root.openOriginal()
         }
@@ -263,7 +269,7 @@ Item {
         width: Style.space(28)
         height: Style.space(28)
         radius: Math.max(3, Style.cornerRadius - 3)
-        color: Qt.rgba(root.foreground.r, root.foreground.g, root.foreground.b, 0.1)
+        color: Qt.rgba(root.foreground.r, root.foreground.g, root.foreground.b, closeMa.containsMouse ? 0.2 : 0.1)
 
         Text {
           anchors.centerIn: parent
@@ -274,7 +280,9 @@ Item {
         }
 
         MouseArea {
+          id: closeMa
           anchors.fill: parent
+          hoverEnabled: true
           cursorShape: Qt.PointingHandCursor
           onClicked: root.closeRequested()
         }

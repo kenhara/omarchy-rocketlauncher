@@ -30,6 +30,10 @@ QtObject {
     .replace(/\/$/, "")
   readonly property string samplePath: pluginDir + "/data/sample-cache.json"
 
+  readonly property string pluginVersion: "1.5.1"
+  readonly property string userAgent: "Space-Jockey/" + pluginVersion + " (Omarchy unofficial; harris.space-jockey)"
+
+
   property var stats: ({
     total_launches: 0,
     successful_landings: 0,
@@ -95,7 +99,6 @@ QtObject {
     return parts.join(" ")
   }
 
-  signal dataChanged()
 
   onPanelOpenChanged: {
     if (!store.panelOpen)
@@ -136,31 +139,6 @@ QtObject {
     return "best"
   }
 
-  // Intended IPC summon contract (Breakout-style JSON object). Host may pass a
-  // JSON string; bar-widget-only Quattro currently drops summon payloads — see README.
-  function handleSummonPayload(obj) {
-    if (obj === undefined || obj === null || obj === "")
-      return false
-    if (typeof obj === "string") {
-      var raw = String(obj).trim()
-      if (!raw.length) return false
-      try { obj = JSON.parse(raw) } catch (e) { return false }
-    }
-    if (typeof obj !== "object") return false
-    var acted = false
-    if (obj.watch === true || obj.watch === "true" || obj.watch === 1) {
-      store.openWatch(store.nextLaunch)
-      acted = true
-    }
-    if (obj.launchId !== undefined && obj.launchId !== null && String(obj.launchId).length) {
-      var id = String(obj.launchId)
-      store.selectedLaunchId = id
-      store.detailExpanded = true
-      store.fetchLaunchDetail(id)
-      acted = true
-    }
-    return acted
-  }
 
   function parseName(name) {
     name = String(name || "")
@@ -498,7 +476,6 @@ QtObject {
     store.lastError = ""
     if (obj.notified_milestones && typeof obj.notified_milestones === "object")
       store.notifiedMilestones = obj.notified_milestones
-    store.dataChanged()
     return true
   }
 
@@ -556,21 +533,30 @@ QtObject {
     return u.length >= 5 && u.substring(u.length - 5) === ".m3u8"
   }
 
+  function sanitizeOpenUrl(url) {
+    var u = String(url || "").trim()
+    if (!u.length) return ""
+    // Remote / webcast / wiki links — https only (no javascript:/file: surprises).
+    if (u.toLowerCase().indexOf("https://") !== 0) return ""
+    return u
+  }
+
   function openUrlExternal(url) {
-    if (!url) return false
-    try {
-      // Qt.openUrlExternally returns bool on modern Qt; fall back to xdg-open when false.
-      var ok = Qt.openUrlExternally(url)
-      if (ok === false) {
-        openUrlProc.command = ["xdg-open", url]
-        openUrlProc.running = true
-      }
-      return true
-    } catch (e) {
-      openUrlProc.command = ["xdg-open", url]
-      openUrlProc.running = true
-      return true
+    var u = store.sanitizeOpenUrl(url)
+    if (!u.length) {
+      store.notifySend("Space Jockey", String(url || "").trim().length ? "Refused — https only" : "No URL")
+      return false
     }
+    try {
+      var ok = Qt.openUrlExternally(u)
+      if (ok !== false) {
+        store.notifySend("Space Jockey", "Opened")
+        return true
+      }
+    } catch (e) {}
+    openUrlProc.command = ["xdg-open", u]
+    openUrlProc.running = true
+    return true
   }
 
   function pauseWatchOnHide() {
@@ -902,8 +888,7 @@ QtObject {
         store.detailExpanded = true
       }
       store.applyDetailToLists(id, cached)
-      store.dataChanged()
-      store.maybeStartPendingWatch(id)
+        store.maybeStartPendingWatch(id)
       return true
     }
 
@@ -931,8 +916,7 @@ QtObject {
       if (!ok) {
         store.lastError = "detail fetch failed"
         // Offline / rate-limit: keep any partial fields already on the launch
-        store.dataChanged()
-        store.maybeStartPendingWatch(id)
+            store.maybeStartPendingWatch(id)
         store.drainPendingDetail()
         return
       }
@@ -946,8 +930,7 @@ QtObject {
         }
         rememberDetail(detail)
         store.applyDetailToLists(id, detail)
-        store.dataChanged()
-        persistToDisk()
+            persistToDisk()
         store.maybeStartPendingWatch(id)
       } catch (e) {
         store.lastError = "detail parse failed"
@@ -1043,16 +1026,13 @@ QtObject {
   }
 
   function persistToDisk() {
+    // FileView.setText mkpath — no mkdir Process + Qt.callLater race.
     var body = JSON.stringify(buildCacheObject(), null, 2) + "\n"
-    ensureCacheDir.running = true
-    // FileView.setText after mkdir; slightly deferred
-    Qt.callLater(function() {
-      try {
-        cacheFile.setText(body)
-      } catch (e) {
-        // Disk may be unwritable — stay on sample / memory.
-      }
-    })
+    try {
+      cacheFile.setText(body)
+    } catch (e) {
+      // Disk may be unwritable — stay on sample / memory.
+    }
   }
 
   function bootstrap() {
@@ -1097,16 +1077,14 @@ QtObject {
     // Bundled / disk sample already applied → mark loaded without a network hit.
     if (store.past && store.past.length > 0) {
       store.pastLoaded = true
-      store.dataChanged()
-      return true
+        return true
     }
     store.pastLoading = true
     httpGet(store.apiBase + "/launches/previous/?lsp__id=" + store.agencyId + "&limit=5&mode=list", function(ok, body) {
       store.pastLoading = false
       if (!ok) {
         store.lastError = "past fetch failed"
-        store.dataChanged()
-        return
+            return
       }
       try {
         var raw = JSON.parse(body)
@@ -1116,12 +1094,10 @@ QtObject {
           past.push(slimLaunch(rows[i]))
         store.past = past
         store.pastLoaded = true
-        store.dataChanged()
-        persistToDisk()
+            persistToDisk()
       } catch (e) {
         store.lastError = "past parse failed"
-        store.dataChanged()
-      }
+          }
     })
     return true
   }
@@ -1229,6 +1205,7 @@ QtObject {
     try {
       xhr.open("GET", url)
       xhr.setRequestHeader("Accept", "application/json")
+      xhr.setRequestHeader("User-Agent", store.userAgent)
       xhr.send()
     } catch (e) {
       cb(false, "")
@@ -1282,14 +1259,14 @@ QtObject {
   }
 
   Process {
-    id: ensureCacheDir
-    command: ["mkdir", "-p", store.cacheDir]
-    running: false
-  }
-
-  Process {
     id: openUrlProc
     running: false
+    onExited: function(exitCode, exitStatus) {
+      if (exitCode === 0)
+        store.notifySend("Space Jockey", "Opened")
+      else
+        store.notifySend("Space Jockey", "Open failed")
+    }
   }
 
   Process {
