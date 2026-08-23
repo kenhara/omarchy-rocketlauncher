@@ -1,6 +1,6 @@
 # Space Jockey — design rationale
 
-**Version:** 1.5.1
+**Version:** 1.5.2
 
 ## Why this shape wins on Omarchy
 

@@ -10,8 +10,11 @@ native Quattro `bar-widget` (not Electron). Named for Heinlein’s Space Jockey 
 **ID:** `harris.space-jockey`  
 **Author:** Harris Kenny  
 **License:** MIT  
-**Version:** 1.5.1  
+**Version:** 1.5.2  
 **Repo:** https://github.com/kenhara/omarchy-space-jockey
+
+### 1.5.2
+- Discoverability: category **Widgets**; expanded `keywords` + `barWidget.aliases`; honest search note.
 
 ### 1.5.1
 - Pre-ship checklist: LICENSE second Software unquoted; FileView cache without mkdir race; drop dead `dataChanged` + invented summon handlers; https-only openUrl with honest toasts; PlainText on remote mission fields; button hover; version/UA sync.
@@ -34,6 +37,15 @@ Mission/vehicle names and trademarks mentioned in launch data belong to their
 respective owners. Launch schedules and imagery metadata come from
 [Launch Library 2](https://ll.thespacedevs.com/docs/) (The Space Devs); the
 plugin links to LL2-hosted images and does not redistribute those binaries.
+
+## Discoverability
+
+Marketplace filing: **Widgets** · tags `bar, media, quickshell`.
+
+Top-level `keywords` in `manifest.json` may help marketplace/search (SpaceX,
+NASA, Falcon, Starship, LL2, webcast, etc.). `barWidget.aliases` are for
+discovery docs and human search — the bar loader may not index them. Display
+name stays **Space Jockey** (brand-free).
 
 ## Install
 
