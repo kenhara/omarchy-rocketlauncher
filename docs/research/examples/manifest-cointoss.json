@@ -1,0 +1,81 @@
+{
+  "schemaVersion": 1,
+  "id": "com.aktivesolutions.cointoss",
+  "name": "Coin Toss",
+  "version": "0.1.0",
+  "author": "keboy",
+  "license": "MIT",
+  "description": "Settle anything from the bar. Type the question, hit space, watch the coin spin — the toss comes from /dev/urandom, and every verdict is kept so you can't quietly re-roll until you like the answer.",
+  "kinds": [
+    "bar-widget"
+  ],
+  "entryPoints": {
+    "barWidget": "BarWidget.qml"
+  },
+  "barWidget": {
+    "displayName": "Coin Toss",
+    "description": "Flip a fair coin for whatever you're stuck on, and keep the verdict",
+    "category": "Other",
+    "allowMultiple": false,
+    "defaultSection": "right",
+    "defaults": {
+      "headsLabel": "Heads",
+      "tailsLabel": "Tails",
+      "animate": true,
+      "showResultInBar": true,
+      "resultLingerSeconds": 8,
+      "historyLimit": 20,
+      "notify": false
+    },
+    "schema": [
+      {
+        "key": "headsLabel",
+        "type": "string",
+        "label": "Heads reads as",
+        "defaultValue": "Heads"
+      },
+      {
+        "key": "tailsLabel",
+        "type": "string",
+        "label": "Tails reads as",
+        "defaultValue": "Tails"
+      },
+      {
+        "key": "animate",
+        "type": "boolean",
+        "label": "Spin the coin (off = instant verdict)",
+        "defaultValue": true
+      },
+      {
+        "key": "showResultInBar",
+        "type": "boolean",
+        "label": "Show the verdict next to the bar icon",
+        "defaultValue": true
+      },
+      {
+        "key": "resultLingerSeconds",
+        "type": "integer",
+        "label": "Seconds the bar keeps the verdict (0 = until the next toss)",
+        "min": 0,
+        "max": 600,
+        "step": 1,
+        "defaultValue": 8
+      },
+      {
+        "key": "historyLimit",
+        "type": "integer",
+        "label": "Verdicts to remember",
+        "min": 0,
+        "max": 200,
+        "step": 1,
+        "defaultValue": 20
+      },
+      {
+        "key": "notify",
+        "type": "boolean",
+        "label": "Send a notification on every toss",
+        "defaultValue": false
+      }
+    ]
+  }
+}

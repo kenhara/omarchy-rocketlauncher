@@ -1,0 +1,127 @@
+{
+  "schemaVersion": 1,
+  "id": "lacuna.crt-overlay",
+  "name": "Lacuna CRT Overlay",
+  "version": "0.1.0-beta.5.dev.0",
+  "author": "Lacuna",
+  "description": "Subtle CRT scanlines with a slow broad static band for animated wallpaper ambience.",
+  "kinds": [
+    "overlay"
+  ],
+  "activation": "persistent",
+  "keepLoaded": true,
+  "entryPoints": {
+    "overlay": "Overlay.qml"
+  },
+  "defaults": {
+    "effectEnabled": true,
+    "foregroundOverlay": false,
+    "intensity": 0.58,
+    "speed": 1,
+    "scanlineSpacing": 3,
+    "staticBandHeight": 150,
+    "staticAmount": 0.24,
+    "glowAmount": 0.22,
+    "bloomPulse": true,
+    "bloomPulseAmount": 0.52,
+    "bloomPulseInterval": 18000,
+    "distortion": true,
+    "distortionAmount": 0.45,
+    "vignette": true
+  },
+  "schema": [
+    {
+      "key": "effectEnabled",
+      "type": "boolean",
+      "label": "Effect enabled",
+      "defaultValue": true
+    },
+    {
+      "key": "foregroundOverlay",
+      "type": "boolean",
+      "label": "Foreground overlay",
+      "defaultValue": false
+    },
+    {
+      "key": "intensity",
+      "type": "number",
+      "label": "Intensity",
+      "defaultValue": 0.58
+    },
+    {
+      "key": "speed",
+      "type": "number",
+      "label": "Speed",
+      "defaultValue": 1
+    },
+    {
+      "key": "scanlineSpacing",
+      "type": "number",
+      "label": "Scanline spacing",
+      "defaultValue": 3
+    },
+    {
+      "key": "staticBandHeight",
+      "type": "number",
+      "label": "Static band height",
+      "defaultValue": 150
+    },
+    {
+      "key": "staticAmount",
+      "type": "number",
+      "label": "Static amount",
+      "defaultValue": 0.24
+    },
+    {
+      "key": "glowAmount",
+      "type": "number",
+      "label": "Glow amount",
+      "defaultValue": 0.22
+    },
+    {
+      "key": "bloomPulse",
+      "type": "boolean",
+      "label": "Bloom pulse",
+      "defaultValue": true
+    },
+    {
+      "key": "bloomPulseAmount",
+      "type": "number",
+      "label": "Bloom pulse amount",
+      "defaultValue": 0.52
+    },
+    {
+      "key": "bloomPulseInterval",
+      "type": "number",
+      "label": "Bloom pulse interval",
+      "defaultValue": 18000
+    },
+    {
+      "key": "distortion",
+      "type": "boolean",
+      "label": "Foreground distortion",
+      "defaultValue": true
+    },
+    {
+      "key": "distortionAmount",
+      "type": "number",
+      "label": "Distortion amount",
+      "defaultValue": 0.45
+    },
+    {
+      "key": "vignette",
+      "type": "boolean",
+      "label": "Vignette",
+      "defaultValue": true
+    }
+  ],
+  "lacuna": {
+    "standalone": true,
+    "bundle": "standalone",
+    "requires": [],
+    "recommends": [
+      "lacuna.ambience-host"
+    ],
+    "stability": "beta"
+  }
+}

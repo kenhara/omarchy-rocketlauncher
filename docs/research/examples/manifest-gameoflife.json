@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "id": "io.github.guillechuma.gameoflife",
+  "name": "Game of Life",
+  "version": "0.1.1",
+  "author": "Guillermo Chumaceiro",
+  "license": "MIT",
+  "description": "Bring Conway's classic Game of Life to your Omarchy bar with a theme-synced, retro LED matrix.",
+  "kinds": ["bar-widget"],
+  "entryPoints": { "barWidget": "BarWidget.qml" },
+  "barWidget": {
+    "displayName": "Game of Life",
+    "category": "Fun",
+    "allowMultiple": false,
+    "defaultSection": "right",
+    "defaults": {
+      "cols": 48,
+      "rows": 32,
+      "speed": 8,
+      "wrap": true,
+      "trail": 0.35
+    },
+    "schema": [
+      { "key": "cols",  "type": "number",  "label": "Grid columns",       "description": "Cells horizontally (8–64).",       "defaultValue": 48 },
+      { "key": "rows",  "type": "number",  "label": "Grid rows",          "description": "Cells vertically (8–40).",         "defaultValue": 32 },
+      { "key": "speed", "type": "number",  "label": "Steps per second",    "description": "Simulation speed while playing (1–60).", "defaultValue": 8 },
+      { "key": "wrap",  "type": "boolean", "label": "Wrap edges",          "description": "Loop edges (torus).",           "defaultValue": true },
+      { "key": "trail", "type": "number",  "label": "Trail persistence",   "description": "0 = none, 1 = long CRT fade.",  "defaultValue": 0.35 }
+    ]
+  }
+}

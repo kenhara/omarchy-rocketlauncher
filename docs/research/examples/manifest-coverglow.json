@@ -1,0 +1,43 @@
+{
+  "schemaVersion": 1,
+  "id": "io.github.adityavijayvargiya01.coverglow",
+  "name": "Coverglow",
+  "version": "1.0.0",
+  "author": "Aditya Vijayvargiya",
+  "license": "MIT",
+  "homepage": "https://github.com/Adityavijayvargiya01/coverglow",
+  "repository": "https://github.com/Adityavijayvargiya01/coverglow",
+  "description": "Cover-art themed now-playing popup for any MPRIS source — pixels, chrome, and controls follow the album",
+  "kinds": ["bar-widget"],
+  "entryPoints": {
+    "barWidget": "Panel.qml"
+  },
+  "barWidget": {
+    "displayName": "Coverglow",
+    "description": "Now-playing popup that picks up the cover color, with vertical and horizontal layouts",
+    "category": "Media",
+    "allowMultiple": false,
+    "defaultSection": "right",
+    "defaults": {
+      "layout": "vertical",
+      "edgeGap": 18
+    },
+    "schema": [
+      {
+        "key": "layout",
+        "type": "enum",
+        "label": "Popup layout",
+        "options": ["vertical", "horizontal"],
+        "defaultValue": "vertical"
+      },
+      {
+        "key": "edgeGap",
+        "type": "integer",
+        "label": "Gap from screen edge (left/right/top)",
+        "min": 0,
+        "max": 48,
+        "defaultValue": 18
+      }
+    ]
+  }
+}

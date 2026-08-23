@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Launch Desk — Preview</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&family=Share+Tech+Mono&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg: #000000;
+    --bg-deep: #0a0a0c;
+    --fg: rgba(240, 240, 250, 1);
+    --fg-dim: rgba(240, 240, 250, 0.55);
+    --fg-mute: rgba(240, 240, 250, 0.4);
+    --fg-faint: rgba(240, 240, 250, 0.35);
+    --surface: rgba(37, 38, 40, 0.92);
+    --surface-card: rgba(25, 25, 28, 0.92);
+    --digit-well: rgb(37, 38, 40);
+    --bar-h: 36px;
+    --panel-w: 360px;
+    --go-bg: rgba(125, 255, 160, 0.18);
+    --go-fg: #7dffa0;
+    --ok-bg: rgba(138, 196, 255, 0.16);
+    --ok-fg: #8ac4ff;
+    --live-bg: rgba(255, 138, 138, 0.22);
+    --live-fg: #ff8a8a;
+    --tbd-bg: rgba(240, 240, 250, 0.14);
+    --tbd-fg: #ffd27a;
+    --muted-bg: rgba(240, 240, 250, 0.12);
+    --font: system-ui, -apple-system, "Segoe UI", sans-serif;
+    --mono: "Share Tech Mono", ui-monospace, monospace;
+    --display: "Orbitron", system-ui, sans-serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body {
+    height: 100%;
+    background: var(--bg);
+    color: var(--fg);
+    font-family: var(--font);
+    overflow: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+  body {
+    background:
+      radial-gradient(ellipse 80% 50% at 70% 20%, rgba(40, 50, 80, 0.18), transparent 55%),
+      radial-gradient(ellipse 60% 40% at 20% 80%, rgba(30, 40, 60, 0.12), transparent 50%),
+      linear-gradient(180deg, var(--bg-deep) 0%, var(--bg) 100%);
+  }
+  .preview-banner {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    height: 28px; display: flex; align-items: center; justify-content: center;
+    background: linear-gradient(90deg, #1a1a22, #121218, #1a1a22);
+    border-bottom: 1px solid rgba(240, 240, 250, 0.08);
+    font-size: 11px; letter-spacing: 0.06em; color: rgba(240, 240, 250, 0.55);
+    font-family: var(--mono);
+  }
+  .preview-banner strong { color: rgba(240, 240, 250, 0.85); font-weight: 600; margin-right: 0.4em; }
+  .desktop-hint {
+    position: absolute; inset: 0; top: calc(28px + var(--bar-h));
+    display: flex; align-items: center; justify-content: center;
+    pointer-events: none; opacity: 0.18; font-family: var(--display);
+    font-size: 13px; letter-spacing: 0.35em; text-transform: uppercase; color: var(--fg);
+  }
+  .omarchy-bar {
+    position: fixed; top: 28px; left: 0; right: 0; z-index: 90;
+    height: var(--bar-h); display: flex; align-items: center; justify-content: space-between;
+    padding: 0 10px 0 14px; background: rgba(12, 12, 14, 0.88);
+    backdrop-filter: blur(16px); border-bottom: 1px solid rgba(240, 240, 250, 0.06);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.45);
+  }
+  .bar-left { display: flex; align-items: center; gap: 14px; font-size: 12px; letter-spacing: 0.04em; color: rgba(240, 240, 250, 0.7); }
+  .bar-brand { font-family: var(--display); font-size: 11px; letter-spacing: 0.18em; color: var(--fg); opacity: 0.85; }
+  .bar-pill { opacity: 0.45; font-size: 11px; }
+  .bar-right { display: flex; align-items: center; gap: 8px; }
+  .bar-clock { font-family: var(--mono); font-size: 12px; color: rgba(240, 240, 250, 0.65); padding: 0 8px; }
+  .rocket-widget {
+    display: inline-flex; align-items: center; gap: 6px; height: 26px; padding: 0 10px;
+    border-radius: 6px; border: 1px solid transparent; background: transparent;
+    color: var(--fg); font-family: var(--font); font-size: 12px; letter-spacing: 0.02em;
+    cursor: pointer; transition: background 0.15s ease, border-color 0.15s ease;
+  }
+  .rocket-widget:hover, .rocket-widget[aria-expanded="true"] {
+    background: rgba(240, 240, 250, 0.08); border-color: rgba(240, 240, 250, 0.1);
+  }
+  .rocket-widget .glyph { font-size: 14px; line-height: 1; }
+  .rocket-widget .net-label { font-family: var(--mono); font-size: 12px; opacity: 0.9; }
+
+  .panel-anchor {
+    position: fixed; top: calc(28px + var(--bar-h) + 6px); right: 10px; z-index: 95;
+    width: var(--panel-w);
+    max-height: min(720px, calc(100vh - 28px - var(--bar-h) - 24px));
+    opacity: 0; transform: translateY(-8px) scale(0.98); pointer-events: none;
+    transition: opacity 0.18s ease, transform 0.22s cubic-bezier(0.22, 1, 0.36, 1), max-height 0.25s ease;
+  }
+  .panel-anchor.open { opacity: 1; transform: translateY(0) scale(1); pointer-events: auto; }
+  .panel-anchor.watching { max-height: min(720px, calc(100vh - 28px - var(--bar-h) - 24px)); }
+  .panel {
+    position: relative; width: 100%; max-height: inherit; overflow: hidden; border-radius: 12px;
+    background: rgba(10, 10, 12, 0.94); border: 1px solid rgba(240, 240, 250, 0.1);
+    box-shadow: 0 0 0 1px rgba(0,0,0,0.4), 0 24px 64px rgba(0,0,0,0.65), 0 2px 0 rgba(240,240,250,0.04) inset;
+  }
+  .panel-canvas { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0.35; pointer-events: none; z-index: 0; }
+  .panel-canvas.paused { opacity: 0; }
+  .panel-scroll {
+    position: relative; z-index: 1; max-height: inherit; overflow-y: auto; overflow-x: hidden;
+    padding: 16px 14px 14px; scrollbar-width: thin; scrollbar-color: rgba(240,240,250,0.15) transparent;
+  }
+  .panel-scroll::-webkit-scrollbar { width: 6px; }
+  .panel-scroll::-webkit-scrollbar-thumb { background: rgba(240,240,250,0.15); border-radius: 3px; }
+  .panel-col { display: flex; flex-direction: column; gap: 14px; }
+  .hdr-title { font-size: 14px; font-weight: 700; letter-spacing: 0.22em; text-transform: uppercase; }
+  .hdr-meta { margin-top: 4px; font-size: 10px; color: var(--fg); opacity: 0.45; letter-spacing: 0.02em; }
+  .stats-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+  .flip-counter { min-width: 0; }
+  .flip-label { font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; opacity: 0.5; margin-bottom: 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .digit-row { display: flex; gap: 3px; }
+  .digit-cell {
+    position: relative; width: 22px; height: 34px; border-radius: 3px; background: var(--digit-well);
+    overflow: hidden; display: flex; align-items: center; justify-content: center;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.04), inset 0 -1px 0 rgba(0,0,0,0.35);
+  }
+  .digit-cell::after { content: ""; position: absolute; left: 0; right: 0; top: 50%; height: 1px; background: var(--fg); opacity: 0.12; }
+  .digit-char { font-family: var(--display); font-size: 18px; font-weight: 700; line-height: 1; color: var(--fg); }
+  .digit-cell.flipping .digit-char { animation: digitFlip 0.22s cubic-bezier(0.22, 1, 0.36, 1); }
+  @keyframes digitFlip {
+    0% { transform: translateY(-16px) scale(0.92); opacity: 0.2; }
+    100% { transform: translateY(0) scale(1); opacity: 1; }
+  }
+  .stats-footnote { font-size: 10px; opacity: 0.4; line-height: 1.4; }
+  .sep { height: 1px; background: linear-gradient(90deg, transparent, rgba(240,240,250,0.12), transparent); }
+  .section-hdr { font-size: 10px; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; opacity: 0.65; margin-bottom: 8px; }
+  .section { display: flex; flex-direction: column; gap: 8px; }
+  .card {
+    position: relative; display: flex; align-items: center; gap: 10px; padding: 10px 12px;
+    border-radius: 8px; background: var(--surface-card); border: 1px solid rgba(240, 240, 250, 0.08);
+    transition: border-color 0.15s ease, background 0.15s ease; cursor: pointer;
+  }
+  .card.hero { padding: 12px; background: rgba(25, 25, 28, 0.96); border-color: rgba(240, 240, 250, 0.1); box-shadow: 0 0 24px rgba(125, 255, 160, 0.04); }
+  .card-body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+  .card-title-row { display: flex; align-items: center; gap: 8px; min-width: 0; }
+  .card-title { font-size: 13px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .card-sub { font-size: 12px; opacity: 0.55; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .card-meta { font-size: 10px; opacity: 0.4; font-family: var(--mono); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .badge { flex-shrink: 0; font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: 3px; letter-spacing: 0.04em; line-height: 1.3; }
+  .badge.go { background: var(--go-bg); color: var(--go-fg); }
+  .badge.ok { background: var(--ok-bg); color: var(--ok-fg); }
+  .badge.live { background: var(--live-bg); color: var(--live-fg); }
+  .badge.tbd { background: var(--tbd-bg); color: var(--tbd-fg); }
+  .badge.muted { background: var(--muted-bg); color: var(--fg); }
+  .watch-btn {
+    flex-shrink: 0; width: 72px; height: 28px; border: none; border-radius: 4px;
+    background: var(--fg); color: #0a0a0c; font-family: var(--font); font-size: 10px;
+    font-weight: 700; letter-spacing: 0.1em; cursor: pointer;
+  }
+  .watch-btn:hover { opacity: 0.9; }
+  .countdown-big { font-family: var(--mono); font-size: 13px; letter-spacing: 0.04em; color: var(--go-fg); opacity: 0.95 !important; }
+  .backdrop { position: fixed; inset: 0; top: calc(28px + var(--bar-h)); z-index: 80; display: none; }
+  .backdrop.on { display: block; }
+  .kbd-hint {
+    position: fixed; bottom: 16px; left: 50%; transform: translateX(-50%);
+    font-size: 11px; color: rgba(240, 240, 250, 0.28); letter-spacing: 0.04em;
+    pointer-events: none; font-family: var(--mono);
+  }
+
+  /* Mission detail */
+  .detail {
+    display: none; flex-direction: column; gap: 10px; padding: 10px 4px 4px;
+    border-left: 2px solid rgba(240,240,250,0.12); padding-left: 12px;
+  }
+  .detail.open { display: flex; }
+  .detail-top { display: flex; gap: 10px; align-items: center; }
+  .patch {
+    width: 48px; height: 48px; border-radius: 8px; background: rgba(240,240,250,0.08);
+    display: flex; align-items: center; justify-content: center; overflow: hidden; flex-shrink: 0;
+  }
+  .patch img { width: 40px; height: 40px; object-fit: contain; }
+  .detail-type { font-size: 10px; font-weight: 700; letter-spacing: 0.08em; opacity: 0.7; }
+  .detail-orbit { font-size: 10px; opacity: 0.45; margin-top: 2px; }
+  .detail-desc { font-size: 12px; line-height: 1.35; opacity: 0.7; }
+  .detail-fact { font-size: 10px; opacity: 0.5; line-height: 1.45; }
+  .crew-hdr { font-size: 10px; font-weight: 700; letter-spacing: 0.18em; opacity: 0.55; margin-top: 4px; }
+  .crew-row-h {
+    display: flex; flex-wrap: wrap; gap: 10px; align-items: flex-start;
+  }
+  .crew-card {
+    width: 72px; display: flex; flex-direction: column; align-items: center; gap: 4px; text-align: center;
+  }
+  .crew-av {
+    width: 40px; height: 40px; border-radius: 50%; background: rgba(240,240,250,0.1);
+    overflow: hidden; flex-shrink: 0; display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 700; opacity: 0.7;
+  }
+  .crew-av img { width: 100%; height: 100%; object-fit: cover; }
+  .crew-name { font-size: 10px; font-weight: 700; line-height: 1.25; }
+  .crew-role { font-size: 9px; opacity: 0.45; line-height: 1.25; }
+  .attr-footer { font-size: 10px; opacity: 0.32; line-height: 1.4; }
+  .footer-note { font-size: 10px; opacity: 0.28; line-height: 1.4; }
+
+  /* Watch player chrome */
+  .watch-player { display: none; flex-direction: column; gap: 8px; }
+  .watch-player.open { display: flex; }
+  .watch-frame {
+    position: relative; width: 100%; height: 180px; border-radius: 8px;
+    background: #000; overflow: hidden; border: 1px solid rgba(240,240,250,0.1);
+  }
+  .watch-frame img.poster { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.55; }
+  .watch-overlay {
+    position: absolute; inset: 0; display: flex; flex-direction: column;
+    align-items: center; justify-content: center; gap: 8px;
+    background: rgba(0,0,0,0.35); text-align: center; padding: 16px;
+  }
+  .watch-play {
+    width: 52px; height: 52px; border-radius: 50%; border: none;
+    background: rgba(240,240,250,0.92); color: #0a0a0c; font-size: 18px;
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+  }
+  .watch-overlay p { font-size: 11px; opacity: 0.75; line-height: 1.35; max-width: 260px; }
+  .watch-controls { display: flex; gap: 8px; flex-wrap: wrap; }
+  .chip {
+    height: 28px; padding: 0 12px; border-radius: 4px; border: none;
+    font-size: 10px; font-weight: 700; letter-spacing: 0.08em; cursor: pointer;
+    font-family: var(--font);
+  }
+  .chip.primary { background: var(--fg); color: #0a0a0c; }
+  .chip.ghost { background: rgba(240,240,250,0.14); color: var(--fg); }
+</style>
+</head>
+<body>
+
+<div class="preview-banner">
+  <strong>Preview</strong> — harris.launch-desk v1.3.0 · Unofficial · Launch data: The Space Devs (LL2)
+</div>
+
+<div class="desktop-hint">Omarchy · Launch Desk demo surface</div>
+
+<header class="omarchy-bar" role="banner">
+  <div class="bar-left">
+    <span class="bar-brand">OMARCHY</span>
+    <span class="bar-pill">workspace 1</span>
+  </div>
+  <div class="bar-right">
+    <span class="bar-clock" id="barClock">--:--</span>
+    <button type="button" class="rocket-widget" id="rocketBtn" aria-expanded="false" aria-controls="launchPanel" title="Launch Desk">
+      <span class="glyph" aria-hidden="true">🚀</span>
+      <span class="net-label" id="barNet">T-—:—:—</span>
+    </button>
+  </div>
+</header>
+
+<div class="backdrop" id="backdrop" aria-hidden="true"></div>
+
+<aside class="panel-anchor" id="panelAnchor" aria-hidden="true">
+  <div class="panel" id="launchPanel" role="dialog" aria-label="Launch Desk">
+    <canvas class="panel-canvas" id="starfield" width="360" height="720"></canvas>
+    <div class="panel-scroll">
+      <div class="panel-col">
+
+        <div>
+          <div class="hdr-title">Launch Desk</div>
+          <div class="hdr-meta" id="hdrMeta">updated — · sample</div>
+        </div>
+
+        <div class="stats-row" id="statsRow">
+          <div class="flip-counter" data-value="721" data-digits="4" data-label="Total launches"></div>
+          <div class="flip-counter" data-value="664" data-digits="4" data-label="Landings"></div>
+          <div class="flip-counter" data-value="129" data-digits="4" data-label="Pending"></div>
+        </div>
+        <div class="stats-footnote" id="statsFoot">
+          Consecutive successful launches: 206 · LL2 agency totals (not reflight counters)
+        </div>
+
+        <div class="sep"></div>
+
+        <div class="section">
+          <div class="section-hdr">Next Launch</div>
+          <div class="card hero" id="nextCard">
+            <div class="card-body">
+              <div class="card-title-row">
+                <span class="card-title" id="nextTitle">Starlink Group 10-49</span>
+                <span class="badge go" id="nextBadge">Go</span>
+              </div>
+              <div class="card-sub">
+                <span id="nextVehicle">Falcon 9 Block 5</span>
+                <span> · </span>
+                <span class="countdown-big" id="nextCountdown">T-00:00:00</span>
+              </div>
+              <div class="card-meta" id="nextMeta">NET · tap for mission detail</div>
+            </div>
+            <button type="button" class="watch-btn" id="watchBtn" title="In-panel Watch">WATCH</button>
+          </div>
+
+          <div class="detail open" id="starlinkDetail"></div>
+
+          <div class="watch-player" id="watchPlayer">
+            <div class="watch-frame">
+              <img class="poster" id="watchPoster" alt="" />
+              <div class="watch-overlay">
+                <button type="button" class="watch-play" id="watchPlayBtn" aria-label="Play">▶</button>
+                <p id="watchHint">Simulated Watch chrome — X broadcast falls back to thumbnail + Open original</p>
+              </div>
+            </div>
+            <div class="watch-controls">
+              <button type="button" class="chip primary" id="chipPlay">PAUSE</button>
+              <button type="button" class="chip ghost" id="chipMute">MUTE</button>
+              <button type="button" class="chip ghost" id="chipOpen">OPEN ORIGINAL</button>
+              <button type="button" class="chip ghost" id="chipClose">×</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="section">
+          <div class="section-hdr">Crew Detail Demo · Crew-12</div>
+          <div class="card" id="crewCard">
+            <div class="card-body">
+              <div class="card-title-row">
+                <span class="card-title">Crew-12</span>
+                <span class="badge go">Go</span>
+              </div>
+              <div class="card-sub">Falcon 9 Block 5 · Human Exploration</div>
+              <div class="card-meta">Demo of crew roster detail (sample from LL2)</div>
+            </div>
+          </div>
+          <div class="detail open" id="crewDetail"></div>
+        </div>
+
+        <div class="section" id="ongoingSection">
+          <div class="section-hdr">Ongoing Missions</div>
+          <div id="ongoingList"></div>
+        </div>
+
+        <div class="section">
+          <div class="section-hdr">Upcoming</div>
+          <div id="upcomingList"></div>
+        </div>
+
+        <div class="attr-footer">Launch data: The Space Devs (LL2) · Unofficial</div>
+        <div class="footer-note">
+          Esc closes · Space play/pause · M mute · O open original · S stop Watch · stickyWatch keeps playback when hidden
+        </div>
+
+      </div>
+    </div>
+  </div>
+</aside>
+
+<div class="kbd-hint">left 🚀 toggle · mid play/pause or refresh · right Watch · Esc close · Space/M/O/S · WATCH embeds</div>
+
+<script>
+const SAMPLE = {"meta": {"schema_version": 1, "source": "ll2", "fetched_at": "2026-08-22T17:30:00Z", "agency_id": 121, "bundled_sample": true, "note": "Offline sample built from research/samples for Launch Desk UI."}, "stats": {"total_launches": 721, "successful_launches": 706, "failed_launches": 15, "pending_launches": 129, "attempted_landings": 692, "successful_landings": 664, "failed_landings": 29, "consecutive_successful_launches": 206, "consecutive_successful_landings": 13}, "next_launch": {"id": "ad501ebd-a357-4305-90c1-c46c6feb2ecf", "name": "Falcon 9 Block 5 | Starlink Group 10-49", "mission_name": "Starlink Group 10-49", "vehicle": "Falcon 9 Block 5", "status_id": 1, "status": "Go for Launch", "status_abbrev": "Go", "net": "2026-08-25T05:49:00Z", "window_start": "2026-08-25T05:49:00Z", "window_end": "2026-08-25T09:49:00Z", "net_precision": "Minute", "image_url": "https://thespacedevs-prod.nyc3.digitaloceanspaces.com/media/images/falcon2520925_image_20221009234147.png", "thumbnail_url": "https://thespacedevs-prod.nyc3.digitaloceanspaces.com/media/images/255bauto255d__image_thumbnail_20240305192320.png", "webcast_live": false, "vid_urls": [{"url": "https://x.com/i/broadcasts/1PKqrNNknkZGb", "source": "x.com", "publisher": "SpaceX", "type": "Official Webcast", "priority": 10, "feature_image": "https://pbs.twimg.com/media/HPsY5bwb0AAtPZn.jpg"}], "mission_type": "Communications", "description": "A batch of satellites for the Starlink mega-constellation \u2014 SpaceX's satellite internet network. Falcon 9 will loft the stack to low Earth orbit.", "orbit": "LEO", "pad_name": "Space Launch Complex 40", "location_name": "Cape Canaveral SFS, FL, USA", "landing_summary": "ASDS | Of Course I Still Love You", "booster_serial": "B1090", "booster_flight": 8, "patch_url": "", "crew": [], "spacecraft_name": "", "spacecraft_serial": "", "detailed_at": "2026-08-23T08:45:00Z"}, "upcoming": [{"id": "6208f972-18ec-490f-bbe5-6f5c6cfcd48c", "name": "Falcon 9 Block 5 | Starlink Group 15-20", "mission_name": "Starlink Group 15-20", "vehicle": "Falcon 9 Block 5", "status_id": 3, "status": "Launch Successful", "status_abbrev": "Success", "net": "2026-08-22T07:25:16Z", "window_start": "2026-08-22T07:25:00Z", "window_end": "2026-08-22T11:25:00Z", "net_precision": "Second", "image_url": "https://thespacedevs-prod.nyc3.digitaloceanspaces.com/media/images/falcon2520925_image_20221009234147.png", "thumbnail_url": "https://thespacedevs-prod.nyc3.digitaloceanspaces.com/media/images/255bauto255d__image_thumbnail_20240305192320.png", "webcast_live": false, "vid_urls": []}, {"id": "ad501ebd-a357-4305-90c1-c46c6feb2ecf", "name": "Falcon 9 Block 5 | Starlink Group 10-49", "mission_name": "Starlink Group 10-49", "vehicle": "Falcon 9 Block 5", "status_id": 1, "status": "Go for Launch", "status_abbrev": "Go", "net": "2026-08-25T05:49:00Z", "window_start": "2026-08-25T05:49:00Z", "window_end": "2026-08-25T09:49:00Z", "net_precision": "Minute", "image_url": "https://thespacedevs-prod.nyc3.digitaloceanspaces.com/media/images/falcon2520925_image_20221009234147.png", "thumbnail_url": "https://thespacedevs-prod.nyc3.digitaloceanspaces.com/media/images/255bauto255d__image_thumbnail_20240305192320.png", "webcast_live": false, "vid_urls": [{"url": "https://x.com/i/broadcasts/1PKqrNNknkZGb", "source": "x.com", "publisher": "SpaceX", "type": "Official Webcast", "priority": 10, "feature_image": "https://pbs.twimg.com/media/HPsY5bwb0AAtPZn.jpg"}]}, {"id": "95653d52-bb77-4860-a815-dd7141778d17", "name": "Falcon 9 Block 5 | Starlink Group 15-22", "mission_name": "Starlink Group 15-22", "vehicle": "Falcon 9 Block 5", "status_id": 1, "status": "Go for Launch", "status_abbrev": "Go", "net": "2026-08-25T09:42:00Z", "window_start": "2026-08-25T09:42:00Z", "window_end": "2026-08-25T13:42:00Z", "net_precision": "Minute", "image_url": "https://thespacedevs-prod.nyc3.digitaloceanspaces.com/media/images/falcon2520925_image_20221009234147.png", "thumbnail_url": "https://thespacedevs-prod.nyc3.digitaloceanspaces.com/media/images/255bauto255d__image_thumbnail_20240305192320.png", "webcast_live": false, "vid_urls": []}, {"id": "521f3a1c-f977-4306-9b7f-495858719adf", "name": "Falcon Heavy | Nancy Grace Roman Space Telescope", "mission_name": "Nancy Grace Roman Space Telescope", "vehicle": "Falcon Heavy", "status_id": 1, "status": "Go for Launch", "status_abbrev": "Go", "net": "2026-08-30T11:26:00Z", "window_start": "2026-08-30T11:26:00Z", "window_end": "2026-08-30T11:26:00Z", "net_precision": "Minute", "image_url": "https://thespacedevs-prod.nyc3.digitaloceanspaces.com/media/images/falcon_heavy_image_20220129192819.jpeg", "thumbnail_url": "https://thespacedevs-prod.nyc3.digitaloceanspaces.com/media/images/255bauto255d__image_thumbnail_20240305193632.jpeg", "webcast_live": false, "vid_urls": []}, {"id": "63181269-b125-4c36-951c-c9bd9bbc4b55", "name": "Falcon 9 Block 5 | Starlink Group 15-23", "mission_name": "Starlink Group 15-23", "vehicle": "Falcon 9 Block 5", "status_id": 1, "status": "Go for Launch", "status_abbrev": "Go", "net": "2026-09-01T08:01:00Z", "window_start": "2026-09-01T08:01:00Z", "window_end": "2026-09-01T12:01:00Z", "net_precision": "Minute", "image_url": "https://thespacedevs-prod.nyc3.digitaloceanspaces.com/media/images/falcon2520925_image_20221009234147.png", "thumbnail_url": "https://thespacedevs-prod.nyc3.digitaloceanspaces.com/media/images/255bauto255d__image_thumbnail_20240305192320.png", "webcast_live": false, "vid_urls": []}], "ongoing": [{"id": 551, "name": "Crew Dragon Freedom", "serial": "C212", "config": "Crew Dragon 2", "in_space": true, "time_in_space": "P563DT6H4M44S", "time_docked": "P554DT9H57M24S", "image_url": "https://thespacedevs-prod.nyc3.digitaloceanspaces.com/media/images/spacex_dm-2_cre_image_20200504065311.jpeg", "status": "Active"}], "details": {"ad501ebd-a357-4305-90c1-c46c6feb2ecf": {"id": "ad501ebd-a357-4305-90c1-c46c6feb2ecf", "mission_name": "Starlink Group 10-49", "mission_type": "Communications", "description": "A batch of satellites for the Starlink mega-constellation \u2014 SpaceX's satellite internet network. Falcon 9 will loft the stack to low Earth orbit.", "orbit": "LEO", "vehicle": "Falcon 9 Block 5", "pad_name": "Space Launch Complex 40", "location_name": "Cape Canaveral SFS, FL, USA", "landing_summary": "ASDS | Of Course I Still Love You", "booster_serial": "B1090", "booster_flight": 8, "patch_url": "", "image_url": "https://thespacedevs-prod.nyc3.digitaloceanspaces.com/media/images/falcon2520925_image_20221009234147.png", "webcast_live": false, "vid_urls": [{"url": "https://x.com/i/broadcasts/1PKqrNNknkZGb", "source": "x.com", "publisher": "SpaceX", "type": "Official Webcast", "priority": 10, "feature_image": "https://pbs.twimg.com/media/HPsY5bwb0AAtPZn.jpg"}], "crew": [], "spacecraft_name": "", "spacecraft_serial": "", "detailed_at": "2026-08-23T08:45:00Z"}, "862b54e3-7bf8-48e5-8cd1-d77257d5fde9": {"id": "862b54e3-7bf8-48e5-8cd1-d77257d5fde9", "mission_name": "Crew-12", "mission_type": "Human Exploration", "description": "SpaceX Crew-12 is the twelfth crewed operational flight of a Crew Dragon spacecraft to the International Space Station as part of NASA's Commercial Crew Program.", "orbit": "LEO", "vehicle": "Falcon 9 Block 5", "pad_name": "Space Launch Complex 40", "location_name": "Cape Canaveral SFS, FL, USA", "landing_summary": "RTLS | Landing Zone 40", "booster_serial": "B1101", "booster_flight": 2, "patch_url": "https://thespacedevs-dev.nyc3.digitaloceanspaces.com/media/mission_patch_images/crew-12_mission_patch_20251226182237.png", "image_url": "https://thespacedevs-dev.nyc3.digitaloceanspaces.com/media/images/falcon_9_at_slc_image_20260208171226.jpg", "webcast_live": false, "vid_urls": [{"url": "https://www.youtube.com/watch?v=zCM-Kwq91cc", "source": "youtube.com", "publisher": "NASA", "type": "Official Webcast", "priority": 10, "feature_image": "https://i.ytimg.com/vi/zCM-Kwq91cc/maxresdefault.jpg"}, {"url": "https://plus.nasa.gov/scheduled-video/nasas-spacex-crew-12-launch/", "source": "plus.nasa.gov", "publisher": "NASA", "type": "Official Webcast", "priority": 11, "feature_image": "https://plus.nasa.gov/wp-content/uploads/2026/02/crew-12-day-launch-key-art-r1-horizontal-hero-16-9-without-title.jpg"}, {"url": "https://www.youtube.com/watch?v=V_5RWX-GsQo", "source": "youtube.com", "publisher": "European Space Agency, ESA", "type": "Official Webcast", "priority": 12, "feature_image": "https://i.ytimg.com/vi/V_5RWX-GsQo/maxresdefault.jpg"}, {"url": "https://www.youtube.com/watch?v=6jtNmOArHCE", "source": "youtube.com", "publisher": "European Space Agency, ESA", "type": "Official Webcast", "priority": 13, "feature_image": "https://i.ytimg.com/vi/6jtNmOArHCE/maxresdefault.jpg"}], "crew": [{"name": "Jessica Meir", "role": "Spacecraft Commander", "agency": "NASA", "image_url": "https://thespacedevs-dev.nyc3.digitaloceanspaces.com/media/images/jessica_meir_image_20200417064900.jpeg"}, {"name": "Jack Hathaway", "role": "Pilot", "agency": "NASA", "image_url": "https://thespacedevs-dev.nyc3.digitaloceanspaces.com/media/images/jack_hathaway_image_20211206185407.jpg"}, {"name": "Sophie Adenot", "role": "Flight Engineer", "agency": "ESA", "image_url": "https://thespacedevs-dev.nyc3.digitaloceanspaces.com/media/images/sophie_adenot_image_20221123150954.jpg"}, {"name": "Andrei Fedyaev", "role": "Flight Engineer", "agency": "RFSA", "image_url": "https://thespacedevs-dev.nyc3.digitaloceanspaces.com/media/images/andrei_fedyaev_image_20230207203113.jpg"}], "spacecraft_name": "Crew Dragon Freedom", "spacecraft_serial": "C212", "detailed_at": "2026-08-23T08:45:00Z"}}};
+const CREW_DETAIL = {"id": "862b54e3-7bf8-48e5-8cd1-d77257d5fde9", "mission_name": "Crew-12", "mission_type": "Human Exploration", "description": "SpaceX Crew-12 is the twelfth crewed operational flight of a Crew Dragon spacecraft to the International Space Station as part of NASA's Commercial Crew Program.", "orbit": "LEO", "vehicle": "Falcon 9 Block 5", "pad_name": "Space Launch Complex 40", "location_name": "Cape Canaveral SFS, FL, USA", "landing_summary": "RTLS | Landing Zone 40", "booster_serial": "B1101", "booster_flight": 2, "patch_url": "https://thespacedevs-dev.nyc3.digitaloceanspaces.com/media/mission_patch_images/crew-12_mission_patch_20251226182237.png", "image_url": "https://thespacedevs-dev.nyc3.digitaloceanspaces.com/media/images/falcon_9_at_slc_image_20260208171226.jpg", "webcast_live": false, "vid_urls": [{"url": "https://www.youtube.com/watch?v=zCM-Kwq91cc", "source": "youtube.com", "publisher": "NASA", "type": "Official Webcast", "priority": 10, "feature_image": "https://i.ytimg.com/vi/zCM-Kwq91cc/maxresdefault.jpg"}, {"url": "https://plus.nasa.gov/scheduled-video/nasas-spacex-crew-12-launch/", "source": "plus.nasa.gov", "publisher": "NASA", "type": "Official Webcast", "priority": 11, "feature_image": "https://plus.nasa.gov/wp-content/uploads/2026/02/crew-12-day-launch-key-art-r1-horizontal-hero-16-9-without-title.jpg"}, {"url": "https://www.youtube.com/watch?v=V_5RWX-GsQo", "source": "youtube.com", "publisher": "European Space Agency, ESA", "type": "Official Webcast", "priority": 12, "feature_image": "https://i.ytimg.com/vi/V_5RWX-GsQo/maxresdefault.jpg"}, {"url": "https://www.youtube.com/watch?v=6jtNmOArHCE", "source": "youtube.com", "publisher": "European Space Agency, ESA", "type": "Official Webcast", "priority": 13, "feature_image": "https://i.ytimg.com/vi/6jtNmOArHCE/maxresdefault.jpg"}], "crew": [{"name": "Jessica Meir", "role": "Spacecraft Commander", "agency": "NASA", "image_url": "https://thespacedevs-dev.nyc3.digitaloceanspaces.com/media/images/jessica_meir_image_20200417064900.jpeg"}, {"name": "Jack Hathaway", "role": "Pilot", "agency": "NASA", "image_url": "https://thespacedevs-dev.nyc3.digitaloceanspaces.com/media/images/jack_hathaway_image_20211206185407.jpg"}, {"name": "Sophie Adenot", "role": "Flight Engineer", "agency": "ESA", "image_url": "https://thespacedevs-dev.nyc3.digitaloceanspaces.com/media/images/sophie_adenot_image_20221123150954.jpg"}, {"name": "Andrei Fedyaev", "role": "Flight Engineer", "agency": "RFSA", "image_url": "https://thespacedevs-dev.nyc3.digitaloceanspaces.com/media/images/andrei_fedyaev_image_20230207203113.jpg"}], "spacecraft_name": "Crew Dragon Freedom", "spacecraft_serial": "C212", "detailed_at": "2026-08-23T08:45:00Z"};
+const STAR_DETAIL = {"id": "ad501ebd-a357-4305-90c1-c46c6feb2ecf", "mission_name": "Starlink Group 10-49", "mission_type": "Communications", "description": "A batch of satellites for the Starlink mega-constellation \u2014 SpaceX's satellite internet network. Falcon 9 will loft the stack to low Earth orbit.", "orbit": "LEO", "vehicle": "Falcon 9 Block 5", "pad_name": "Space Launch Complex 40", "location_name": "Cape Canaveral SFS, FL, USA", "landing_summary": "ASDS | Of Course I Still Love You", "booster_serial": "B1090", "booster_flight": 8, "patch_url": "", "image_url": "https://thespacedevs-prod.nyc3.digitaloceanspaces.com/media/images/falcon2520925_image_20221009234147.png", "webcast_live": false, "vid_urls": [{"url": "https://x.com/i/broadcasts/1PKqrNNknkZGb", "source": "x.com", "publisher": "SpaceX", "type": "Official Webcast", "priority": 10, "feature_image": "https://pbs.twimg.com/media/HPsY5bwb0AAtPZn.jpg"}], "crew": [], "spacecraft_name": "", "spacecraft_serial": "", "detailed_at": "2026-08-23T08:45:00Z"};
+
+function pad(n) { return (n < 10 ? "0" : "") + n; }
+function formatHMS(totalSec) {
+  const s = Math.max(0, Math.floor(totalSec));
+  const h = Math.floor(s / 3600), m = Math.floor((s % 3600) / 60), sec = s % 60;
+  if (h > 99) return pad(h) + ":" + pad(m);
+  return pad(h) + ":" + pad(m) + ":" + pad(sec);
+}
+function formatNetShort(iso) {
+  const d = new Date(iso);
+  if (isNaN(d.getTime())) return "—";
+  const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+  return months[d.getUTCMonth()] + " " + d.getUTCDate();
+}
+function formatCountdown(launch, nowMs) {
+  if (!launch || !launch.net) return "";
+  const netMs = Date.parse(launch.net);
+  if (!isFinite(netMs)) return "";
+  const delta = Math.floor((netMs - nowMs) / 1000);
+  if (delta < -3600) return "NET " + formatNetShort(launch.net);
+  if (delta < 0) return "T+" + formatHMS(-delta);
+  return "T-" + formatHMS(delta);
+}
+function formatIsoDuration(isoDur) {
+  const s = String(isoDur || "");
+  const m = s.match(/^P(?:(\d+)D)?(?:T(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?)?$/);
+  if (!m) return s || "—";
+  const days = Number(m[1] || 0), hours = Number(m[2] || 0);
+  if (days > 0) return days + "d " + hours + "h";
+  const mins = Number(m[3] || 0);
+  if (hours > 0) return hours + "h " + mins + "m";
+  return mins + "m";
+}
+function formatUpdated(iso) {
+  if (!iso) return "never";
+  const d = new Date(iso);
+  if (isNaN(d.getTime())) return iso;
+  return d.toISOString().replace("T", " ").replace(/\.\d+Z$/, " UTC");
+}
+function statusBadge(launch) {
+  if (!launch) return { text: "—", kind: "muted" };
+  const a = String(launch.status_abbrev || "");
+  if (launch.webcast_live) return { text: "LIVE", kind: "live" };
+  if (a === "Go" || launch.status_id === 1) return { text: "Go", kind: "go" };
+  if (a === "TBD" || launch.status_id === 2) return { text: "TBD", kind: "tbd" };
+  if (a === "Success" || launch.status_id === 3) return { text: "OK", kind: "ok" };
+  if (a) return { text: a, kind: "muted" };
+  return { text: "—", kind: "muted" };
+}
+function officialWebcast(launch) {
+  const urls = (launch && launch.vid_urls) || [];
+  const hit = urls.find(v => /Official/i.test(v.type || "")) || urls[0];
+  return hit || null;
+}
+function esc(s) {
+  return String(s || "").replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+function renderDetail(el, d, {showCrew}) {
+  if (!d) { el.innerHTML = ""; return; }
+  const patch = d.patch_url
+    ? `<div class="patch"><img src="${esc(d.patch_url)}" alt="patch" /></div>`
+    : (showCrew ? `<div class="patch">🚀</div>` : "");
+  const typeOrbit = `
+    <div>
+      <div class="detail-type">${esc(d.mission_type || "")}</div>
+      <div class="detail-orbit">${esc([d.orbit, d.spacecraft_name && (d.spacecraft_name + (d.spacecraft_serial ? " · " + d.spacecraft_serial : ""))].filter(Boolean).join(" · "))}</div>
+    </div>`;
+  let crewHtml = "";
+  if (showCrew && d.crew && d.crew.length) {
+    crewHtml = `<div class="crew-hdr">CREW</div><div class="crew-row-h">` + d.crew.map(c => `
+      <div class="crew-card">
+        <div class="crew-av">${c.image_url ? `<img src="${esc(c.image_url)}" alt="" />` : esc((c.name||"?").charAt(0))}</div>
+        <div class="crew-name">${esc(c.name)}</div>
+        <div class="crew-role">${esc([c.role, c.agency].filter(Boolean).join(" · "))}</div>
+      </div>`).join("") + `</div>`;
+  }
+  el.innerHTML = `
+    <div class="detail-top">${patch}${typeOrbit}</div>
+    <div class="detail-desc">${esc(d.description || "")}</div>
+    <div class="detail-fact">Pad  ${esc(d.pad_name || "")}${d.location_name ? " · " + esc(d.location_name) : ""}</div>
+    <div class="detail-fact">Landing  ${esc(d.landing_summary || "")}${d.booster_serial ? " · " + esc(d.booster_serial) + (d.booster_flight ? " (flight " + d.booster_flight + ")" : "") : ""}</div>
+    <div class="detail-fact">Vehicle  ${esc(d.vehicle || "")}</div>
+    ${crewHtml}`;
+}
+
+function buildFlipCounter(el) {
+  const value = Number(el.dataset.value || 0);
+  const digits = Number(el.dataset.digits || 3);
+  const label = el.dataset.label || "";
+  const padded = String(Math.max(0, Math.floor(value))).padStart(digits, "0");
+  el.innerHTML = `<div class="flip-label">${label}</div><div class="digit-row">${[...padded].map((ch,i)=>`<div class="digit-cell" data-i="${i}"><span class="digit-char">0</span></div>`).join("")}</div>`;
+  [...el.querySelectorAll(".digit-cell")].forEach((cell, i) => {
+    const target = padded[i];
+    const charEl = cell.querySelector(".digit-char");
+    const delay = 80 + i * 90;
+    setTimeout(() => {
+      let step = 0; const steps = 4 + (digits - i);
+      const iv = setInterval(() => {
+        step++;
+        if (step >= steps) { clearInterval(iv); charEl.textContent = target; cell.classList.add("flipping"); setTimeout(()=>cell.classList.remove("flipping"),230); }
+        else { charEl.textContent = String(Math.floor(Math.random()*10)); cell.classList.add("flipping"); setTimeout(()=>cell.classList.remove("flipping"),180); }
+      }, 55);
+    }, delay);
+  });
+}
+function animateAllCounters() { document.querySelectorAll(".flip-counter").forEach(buildFlipCounter); }
+
+const canvas = document.getElementById("starfield");
+const ctx = canvas.getContext("2d");
+let stars = [], starT = 0, starAnim = null, panelOpen = false, watching = false;
+
+function rebuildStars() {
+  const panel = document.querySelector(".panel");
+  const w = panel ? panel.clientWidth : 360;
+  const h = panel ? panel.clientHeight : 720;
+  canvas.width = w; canvas.height = h; stars = [];
+  for (let i = 0; i < 48; i++) stars.push({ x: Math.random()*w, y: Math.random()*h, r: 0.6+Math.random()*1.4, a: 0.15+Math.random()*0.55, s: 0.2+Math.random()*0.8 });
+}
+function paintStars() {
+  const w = canvas.width, h = canvas.height;
+  ctx.clearRect(0,0,w,h);
+  for (let i = 0; i < stars.length; i++) {
+    const s = stars[i];
+    ctx.globalAlpha = s.a * (0.65 + 0.35 * Math.sin(starT * s.s + i));
+    ctx.fillStyle = "rgba(240,240,250,1)";
+    ctx.beginPath(); ctx.arc(s.x, s.y, s.r, 0, Math.PI*2); ctx.fill();
+  }
+  ctx.globalAlpha = 0.04; ctx.fillStyle = "rgba(240,240,250,1)";
+  for (let y = 0; y < h; y += 3) ctx.fillRect(0, y, w, 1);
+  ctx.globalAlpha = 1;
+}
+function startStarfield() {
+  if (starAnim) return;
+  rebuildStars();
+  starAnim = setInterval(() => {
+    if (!panelOpen || watching) return;
+    starT += 0.08; paintStars();
+  }, 80);
+  paintStars();
+}
+function stopStarfield() { if (starAnim) { clearInterval(starAnim); starAnim = null; } }
+
+const rocketBtn = document.getElementById("rocketBtn");
+const panelAnchor = document.getElementById("panelAnchor");
+const backdrop = document.getElementById("backdrop");
+let countersSeeded = false;
+
+function openPanel() {
+  panelOpen = true;
+  panelAnchor.classList.add("open");
+  panelAnchor.setAttribute("aria-hidden", "false");
+  rocketBtn.setAttribute("aria-expanded", "true");
+  backdrop.classList.add("on");
+  startStarfield();
+  if (!countersSeeded) { countersSeeded = true; requestAnimationFrame(() => animateAllCounters()); }
+  else animateAllCounters();
+  requestAnimationFrame(() => { rebuildStars(); paintStars(); });
+}
+function closePanel() {
+  // Mirror QML: panel hide pauses Watch — no auto-resume on reopen.
+  panelOpen = false; watching = false;
+  panelAnchor.classList.remove("open", "watching");
+  panelAnchor.setAttribute("aria-hidden", "true");
+  rocketBtn.setAttribute("aria-expanded", "false");
+  backdrop.classList.remove("on");
+  document.getElementById("watchPlayer").classList.remove("open");
+  document.getElementById("starfield").classList.remove("paused");
+  const chipPlay = document.getElementById("chipPlay");
+  if (chipPlay) chipPlay.textContent = "PLAY";
+  const playBtn = document.getElementById("watchPlayBtn");
+  if (playBtn) playBtn.textContent = "▶";
+  stopStarfield();
+}
+function togglePanel() { if (panelOpen) closePanel(); else openPanel(); }
+
+rocketBtn.addEventListener("click", (e) => { e.stopPropagation(); togglePanel(); });
+rocketBtn.addEventListener("auxclick", (e) => {
+  e.preventDefault(); e.stopPropagation();
+  if (e.button === 1) {
+    // Middle: play/pause Watch if active, else pretend refresh
+    if (watching) document.getElementById("chipPlay").click();
+    else {
+      const meta = document.querySelector(".panel-meta, .header-meta, [data-updated]");
+      const el = document.getElementById("updatedLine") || document.querySelector(".launch-updated");
+      if (el) { el.textContent = (el.textContent || "").replace(/refreshing…/, "") + ""; el.dataset.flash = "1"; }
+      console.info("Launch Desk preview: middle-click refresh");
+    }
+  }
+});
+rocketBtn.addEventListener("contextmenu", (e) => {
+  e.preventDefault(); e.stopPropagation();
+  if (!panelOpen) openPanel();
+  openWatchChrome();
+});
+backdrop.addEventListener("click", closePanel);
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape" && panelOpen) { closePanel(); return; }
+  if (!panelOpen) return;
+  const k = e.key;
+  if (k === " " || k === "Spacebar") {
+    e.preventDefault();
+    if (watching) document.getElementById("chipPlay").click();
+    else openWatchChrome();
+  } else if (k === "m" || k === "M") {
+    document.getElementById("chipMute").click();
+  } else if (k === "o" || k === "O") {
+    document.getElementById("chipOpen").click();
+  } else if (k === "s" || k === "S") {
+    closeWatchChrome();
+  }
+});
+
+function renderOngoing() {
+  const list = document.getElementById("ongoingList");
+  const section = document.getElementById("ongoingSection");
+  const items = SAMPLE.ongoing || [];
+  if (!items.length) { section.style.display = "none"; return; }
+  list.innerHTML = items.map(o => {
+    const tis = formatIsoDuration(o.time_in_space);
+    return `<div class="card"><div class="card-body"><div class="card-title-row"><span class="card-title">${esc(o.name||"Crew Dragon")}</span><span class="badge ok">${o.in_space?"IN SPACE":""}</span></div><div class="card-sub">${esc(o.config||"Crew Dragon")}${o.serial?" · "+esc(o.serial):""}</div><div class="card-meta">Time in space: ${esc(tis)}</div></div></div>`;
+  }).join("");
+}
+function renderUpcoming() {
+  const list = document.getElementById("upcomingList");
+  list.innerHTML = (SAMPLE.upcoming || []).slice(0,5).map(u => {
+    const b = statusBadge(u);
+    return `<div class="card"><div class="card-body"><div class="card-title-row"><span class="card-title">${esc(u.mission_name||u.name||"—")}</span><span class="badge ${b.kind}">${esc(b.text)}</span></div><div class="card-sub">${esc(u.vehicle||"")}</div><div class="card-meta">NET ${formatNetShort(u.net)}</div></div></div>`;
+  }).join("");
+}
+function updateLive() {
+  const now = Date.now();
+  const next = SAMPLE.next_launch;
+  const cd = formatCountdown(next, now);
+  document.getElementById("barNet").textContent = cd || "NET —";
+  document.getElementById("nextCountdown").textContent = cd || "—";
+  const d = new Date();
+  document.getElementById("barClock").textContent = pad(d.getHours()) + ":" + pad(d.getMinutes());
+}
+
+function openWatchChrome() {
+  watching = true;
+  panelAnchor.classList.add("watching");
+  document.getElementById("starfield").classList.add("paused");
+  const player = document.getElementById("watchPlayer");
+  player.classList.add("open");
+  const vid = officialWebcast(SAMPLE.next_launch);
+  const poster = (vid && vid.feature_image) || STAR_DETAIL.image_url || "";
+  document.getElementById("watchPoster").src = poster;
+  document.getElementById("watchHint").textContent =
+    "X broadcast · yt-dlp may fail — fallback thumbnail + Open original (YouTube embeds when resolved)";
+  requestAnimationFrame(() => { rebuildStars(); });
+}
+function closeWatchChrome() {
+  watching = false;
+  panelAnchor.classList.remove("watching");
+  document.getElementById("starfield").classList.remove("paused");
+  document.getElementById("watchPlayer").classList.remove("open");
+  if (panelOpen) paintStars();
+}
+
+function initStatic() {
+  const next = SAMPLE.next_launch;
+  const b = statusBadge(next);
+  document.getElementById("nextTitle").textContent = next.mission_name || next.name;
+  document.getElementById("nextVehicle").textContent = next.vehicle || "Falcon 9";
+  document.getElementById("nextBadge").textContent = b.text;
+  document.getElementById("nextBadge").className = "badge " + b.kind;
+  document.getElementById("nextMeta").textContent =
+    "NET " + String(next.net).replace("T", " ").replace(/\.\d+Z$/, " UTC") + " · tap for mission detail";
+  document.getElementById("hdrMeta").textContent =
+    "updated " + formatUpdated(SAMPLE.meta.fetched_at) + " · sample";
+  document.getElementById("statsFoot").textContent =
+    "Consecutive successful launches: " + SAMPLE.stats.consecutive_successful_launches +
+    "  ·  LL2 agency totals (not reflight counters)";
+  const counters = document.querySelectorAll(".flip-counter");
+  counters[0].dataset.value = SAMPLE.stats.total_launches;
+  counters[1].dataset.value = SAMPLE.stats.successful_landings;
+  counters[2].dataset.value = SAMPLE.stats.pending_launches;
+
+  renderDetail(document.getElementById("starlinkDetail"), STAR_DETAIL, {showCrew: false});
+  renderDetail(document.getElementById("crewDetail"), CREW_DETAIL, {showCrew: true});
+
+  const watchUrl = (officialWebcast(next) || {}).url;
+  document.getElementById("watchBtn").addEventListener("click", (e) => {
+    e.stopPropagation();
+    openWatchChrome();
+  });
+  document.getElementById("chipClose").addEventListener("click", closeWatchChrome);
+  document.getElementById("chipOpen").addEventListener("click", () => {
+    if (watchUrl) window.open(watchUrl, "_blank", "noopener,noreferrer");
+  });
+  let muted = false, playing = true;
+  document.getElementById("chipMute").addEventListener("click", (e) => {
+    muted = !muted; e.target.textContent = muted ? "UNMUTE" : "MUTE";
+  });
+  document.getElementById("chipPlay").addEventListener("click", (e) => {
+    playing = !playing; e.target.textContent = playing ? "PAUSE" : "PLAY";
+    document.getElementById("watchPlayBtn").textContent = playing ? "❚❚" : "▶";
+  });
+  document.getElementById("watchPlayBtn").addEventListener("click", () => {
+    document.getElementById("chipPlay").click();
+  });
+
+  let detailOpen = true;
+  document.getElementById("nextCard").addEventListener("click", (e) => {
+    if (e.target.closest(".watch-btn")) return;
+    detailOpen = !detailOpen;
+    document.getElementById("starlinkDetail").classList.toggle("open", detailOpen);
+  });
+
+  rocketBtn.title = "Launch Desk — " + (next.mission_name || next.name || "next launch");
+  renderOngoing(); renderUpcoming(); updateLive(); setInterval(updateLive, 1000);
+}
+
+initStatic();
+setTimeout(openPanel, 350);
+setTimeout(openWatchChrome, 900);
+</script>
+</body>
+</html>

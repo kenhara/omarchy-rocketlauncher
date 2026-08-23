@@ -1,0 +1,34 @@
+{
+  "schemaVersion": 1,
+  "id": "io.github.ejuro.phosphor",
+  "name": "Phosphor",
+  "version": "1.0.0",
+  "author": "ejuro",
+  "license": "MIT",
+  "description": "A virtual CRT for your desktop: scanlines, phosphor mask, bloom and a period bezel — independent of your theme.",
+  "kinds": [
+    "service",
+    "bar-widget"
+  ],
+  "entryPoints": {
+    "service": "Service.qml",
+    "barWidget": "BarWidget.qml"
+  },
+  "barWidget": {
+    "displayName": "Phosphor",
+    "description": "Switch the virtual CRT on and choose which tube you are sitting in front of.",
+    "category": "Appearance",
+    "aliases": [
+      "phosphor",
+      "crt",
+      "scanlines",
+      "retro",
+      "tube",
+      "monitor",
+      "shader",
+      "vintage"
+    ],
+    "allowMultiple": false,
+    "defaultSection": "right"
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "error": true,
+  "http_status": 525,
+  "message": "api.spacexdata.com returned Cloudflare SSL handshake failure (525) from this environment on 2026-08-23.",
+  "base_url": "https://api.spacexdata.com",
+  "status_page": "https://status.spacexdata.com/",
+  "project_status": "maintenance-only since ~2024; maintainers recommend Launch Library 2 for live data",
+  "docs": "https://github.com/r-spacex/SpaceX-API",
+  "example_endpoints": [
+    "GET /v5/launches/latest",
+    "GET /v5/launches/next",
+    "GET /v5/launches/upcoming",
+    "GET /v5/launches/past",
+    "POST /v5/launches/query",
+    "GET /v4/company",
+    "GET /v4/rockets",
+    "GET /v4/launchpads"
+  ]
+}

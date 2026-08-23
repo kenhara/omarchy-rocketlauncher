@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "id": "io.github.haydenmckay.omasmash",
+  "name": "Omasmash",
+  "version": "0.1.0",
+  "author": "haydenmckay",
+  "license": "MIT",
+  "description": "Beautiful, theme-aware keyboard smash with a real lock screen underneath. Hand the keyboard to a toddler and they can't reach your agents — and neither can you, on the tenth “fix it, and don't make any mistakes.”",
+  "kinds": [
+    "service"
+  ],
+  "keepLoaded": true,
+  "entryPoints": {
+    "service": "Service.qml"
+  }
+}

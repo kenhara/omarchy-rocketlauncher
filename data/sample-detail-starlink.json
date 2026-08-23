@@ -1,0 +1,30 @@
+{
+  "id": "ad501ebd-a357-4305-90c1-c46c6feb2ecf",
+  "mission_name": "Starlink Group 10-49",
+  "mission_type": "Communications",
+  "description": "A batch of satellites for the Starlink mega-constellation \u2014 SpaceX's satellite internet network. Falcon 9 will loft the stack to low Earth orbit.",
+  "orbit": "LEO",
+  "vehicle": "Falcon 9 Block 5",
+  "pad_name": "Space Launch Complex 40",
+  "location_name": "Cape Canaveral SFS, FL, USA",
+  "landing_summary": "ASDS | Of Course I Still Love You",
+  "booster_serial": "B1090",
+  "booster_flight": 8,
+  "patch_url": "",
+  "image_url": "https://thespacedevs-prod.nyc3.digitaloceanspaces.com/media/images/falcon2520925_image_20221009234147.png",
+  "webcast_live": false,
+  "vid_urls": [
+    {
+      "url": "https://x.com/i/broadcasts/1PKqrNNknkZGb",
+      "source": "x.com",
+      "publisher": "SpaceX",
+      "type": "Official Webcast",
+      "priority": 10,
+      "feature_image": "https://pbs.twimg.com/media/HPsY5bwb0AAtPZn.jpg"
+    }
+  ],
+  "crew": [],
+  "spacecraft_name": "",
+  "spacecraft_serial": "",
+  "detailed_at": "2026-08-23T08:45:00Z"
+}

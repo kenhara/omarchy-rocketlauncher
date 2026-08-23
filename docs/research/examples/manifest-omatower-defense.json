@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "id": "perfektnacht.omatower-defense",
+  "name": "Omatower Defense",
+  "version": "0.6.2",
+  "author": "perfektnacht",
+  "license": "MIT",
+  "description": "Tower defense on real Grand Prix circuits. Park Quattros, shoot down the takes about Omarchy with the screensaver's own effects.",
+  "kinds": [
+    "overlay",
+    "bar-widget"
+  ],
+  "keepLoaded": true,
+  "entryPoints": {
+    "overlay": "Panel.qml",
+    "barWidget": "BarWidget.qml"
+  },
+  "barWidget": {
+    "displayName": "Omatower Defense",
+    "description": "Open the tower defense game",
+    "category": "Games",
+    "allowMultiple": false,
+    "defaultSection": "right"
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "id": "acrogenesis.breakout",
+  "name": "Omarchy Breakout",
+  "version": "0.4.0",
+  "author": "acrogenesis",
+  "license": "MIT",
+  "description": "A 25-level Breakout campaign built for Omarchy. Summon: omarchy-shell shell toggle acrogenesis.breakout '{}'",
+  "kinds": ["panel", "bar-widget"],
+  "entryPoints": {
+    "panel": "Panel.qml",
+    "barWidget": "BarWidget.qml"
+  },
+  "barWidget": {
+    "displayName": "Omarchy Breakout",
+    "description": "Play Omarchy Breakout",
+    "category": "Games",
+    "allowMultiple": false,
+    "defaultSection": "right"
+  }
+}

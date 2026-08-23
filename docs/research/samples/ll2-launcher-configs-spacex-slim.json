@@ -1,0 +1,130 @@
+{
+  "count": 532,
+  "results": [
+    {
+      "id": 136,
+      "url": "https://ll.thespacedevs.com/2.3.0/launcher_configurations/136/",
+      "name": "Angara 1.2",
+      "full_name": "Angara 1.2",
+      "variant": "1.2",
+      "reusable": false,
+      "image": {
+        "id": 1677,
+        "name": "[AUTO] Angara 1.2 - image",
+        "image_url": "https://thespacedevs-prod.nyc3.digitaloceanspaces.com/media/images/angara25201.2_image_20190224012254.jpeg",
+        "thumbnail_url": "https://thespacedevs-prod.nyc3.digitaloceanspaces.com/media/images/255bauto255d__image_thumbnail_20240305193449.jpeg",
+        "credit": null,
+        "license": {
+          "id": 1,
+          "name": "Unknown",
+          "priority": 9,
+          "link": null
+        },
+        "single_use": true,
+        "variants": []
+      },
+      "info_url": "http://www.ilslaunch.com/node/4680",
+      "wiki_url": "https://en.wikipedia.org/wiki/Angara_(rocket_family)#Angara_1.2"
+    },
+    {
+      "id": 53,
+      "url": "https://ll.thespacedevs.com/2.3.0/launcher_configurations/53/",
+      "name": "Angara-1.2pp",
+      "full_name": "Angara 1.2pp",
+      "variant": "1.2pp",
+      "reusable": false,
+      "image": {
+        "id": 1678,
+        "name": "[AUTO] Angara-1.2pp - image",
+        "image_url": "https://thespacedevs-prod.nyc3.digitaloceanspaces.com/media/images/angara-1.2pp_image_20190630234801.jpg",
+        "thumbnail_url": "https://thespacedevs-prod.nyc3.digitaloceanspaces.com/media/images/255bauto255d__image_thumbnail_20240305193450.jpeg",
+        "credit": null,
+        "license": {
+          "id": 1,
+          "name": "Unknown",
+          "priority": 9,
+          "link": null
+        },
+        "single_use": true,
+        "variants": []
+      },
+      "info_url": "http://www.ilslaunch.com/node/4680",
+      "wiki_url": "https://en.wikipedia.org/wiki/Angara-1.2pp"
+    },
+    {
+      "id": 73,
+      "url": "https://ll.thespacedevs.com/2.3.0/launcher_configurations/73/",
+      "name": "Angara A5",
+      "full_name": "Angara A5",
+      "variant": "",
+      "reusable": false,
+      "image": {
+        "id": 1679,
+        "name": "[AUTO] Angara A5 - image",
+        "image_url": "https://thespacedevs-prod.nyc3.digitaloceanspaces.com/media/images/angara2520a5_image_20190630234836.jpg",
+        "thumbnail_url": "https://thespacedevs-prod.nyc3.digitaloceanspaces.com/media/images/255bauto255d__image_thumbnail_20240305193452.jpeg",
+        "credit": null,
+        "license": {
+          "id": 1,
+          "name": "Unknown",
+          "priority": 9,
+          "link": null
+        },
+        "single_use": true,
+        "variants": []
+      },
+      "info_url": null,
+      "wiki_url": "https://en.wikipedia.org/wiki/Angara_(rocket_family)"
+    },
+    {
+      "id": 196,
+      "url": "https://ll.thespacedevs.com/2.3.0/launcher_configurations/196/",
+      "name": "Angara A5/Blok DM-03",
+      "full_name": "Angara A5/Blok DM-03",
+      "variant": "A5/DM-03",
+      "reusable": false,
+      "image": {
+        "id": 2046,
+        "name": "Angara A5 on Site 1A (Testflight)",
+        "image_url": "https://thespacedevs-prod.nyc3.digitaloceanspaces.com/media/images/angara_a5_on_si_image_20240409071243.jpeg",
+        "thumbnail_url": "https://thespacedevs-prod.nyc3.digitaloceanspaces.com/media/images/angara_a5_on_si_image_thumbnail_20240409071243.jpeg",
+        "credit": "ROSCOSMOS",
+        "license": {
+          "id": 14,
+          "name": "Roscosmos Image Use Policy",
+          "priority": 3,
+          "link": "https://www.roscosmos.ru/22650/"
+        },
+        "single_use": true,
+        "variants": []
+      },
+      "info_url": null,
+      "wiki_url": "https://en.wikipedia.org/wiki/Angara_(rocket_family)"
+    },
+    {
+      "id": 504,
+      "url": "https://ll.thespacedevs.com/2.3.0/launcher_configurations/504/",
+      "name": "Angara A5/Briz-M",
+      "full_name": "Angara A5/Briz-M",
+      "variant": "A5/Briz-M",
+      "reusable": false,
+      "image": {
+        "id": 1681,
+        "name": "[AUTO] Angara A5/Briz-M - image",
+        "image_url": "https://thespacedevs-prod.nyc3.digitaloceanspaces.com/media/images/angara_a52fbri_image_20240102171438.jpg",
+        "thumbnail_url": "https://thespacedevs-prod.nyc3.digitaloceanspaces.com/media/images/255bauto255d__image_thumbnail_20240305193456.jpeg",
+        "credit": null,
+        "license": {
+          "id": 1,
+          "name": "Unknown",
+          "priority": 9,
+          "link": null
+        },
+        "single_use": true,
+        "variants": []
+      },
+      "info_url": null,
+      "wiki_url": "https://en.wikipedia.org/wiki/Angara_(rocket_family)"
+    }
+  ]
+}

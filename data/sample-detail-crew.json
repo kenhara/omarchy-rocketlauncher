@@ -1,0 +1,79 @@
+{
+  "id": "862b54e3-7bf8-48e5-8cd1-d77257d5fde9",
+  "mission_name": "Crew-12",
+  "mission_type": "Human Exploration",
+  "description": "SpaceX Crew-12 is the twelfth crewed operational flight of a Crew Dragon spacecraft to the International Space Station as part of NASA's Commercial Crew Program.",
+  "orbit": "LEO",
+  "vehicle": "Falcon 9 Block 5",
+  "pad_name": "Space Launch Complex 40",
+  "location_name": "Cape Canaveral SFS, FL, USA",
+  "landing_summary": "RTLS | Landing Zone 40",
+  "booster_serial": "B1101",
+  "booster_flight": 2,
+  "patch_url": "https://thespacedevs-dev.nyc3.digitaloceanspaces.com/media/mission_patch_images/crew-12_mission_patch_20251226182237.png",
+  "image_url": "https://thespacedevs-dev.nyc3.digitaloceanspaces.com/media/images/falcon_9_at_slc_image_20260208171226.jpg",
+  "webcast_live": false,
+  "vid_urls": [
+    {
+      "url": "https://www.youtube.com/watch?v=zCM-Kwq91cc",
+      "source": "youtube.com",
+      "publisher": "NASA",
+      "type": "Official Webcast",
+      "priority": 10,
+      "feature_image": "https://i.ytimg.com/vi/zCM-Kwq91cc/maxresdefault.jpg"
+    },
+    {
+      "url": "https://plus.nasa.gov/scheduled-video/nasas-spacex-crew-12-launch/",
+      "source": "plus.nasa.gov",
+      "publisher": "NASA",
+      "type": "Official Webcast",
+      "priority": 11,
+      "feature_image": "https://plus.nasa.gov/wp-content/uploads/2026/02/crew-12-day-launch-key-art-r1-horizontal-hero-16-9-without-title.jpg"
+    },
+    {
+      "url": "https://www.youtube.com/watch?v=V_5RWX-GsQo",
+      "source": "youtube.com",
+      "publisher": "European Space Agency, ESA",
+      "type": "Official Webcast",
+      "priority": 12,
+      "feature_image": "https://i.ytimg.com/vi/V_5RWX-GsQo/maxresdefault.jpg"
+    },
+    {
+      "url": "https://www.youtube.com/watch?v=6jtNmOArHCE",
+      "source": "youtube.com",
+      "publisher": "European Space Agency, ESA",
+      "type": "Official Webcast",
+      "priority": 13,
+      "feature_image": "https://i.ytimg.com/vi/6jtNmOArHCE/maxresdefault.jpg"
+    }
+  ],
+  "crew": [
+    {
+      "name": "Jessica Meir",
+      "role": "Spacecraft Commander",
+      "agency": "NASA",
+      "image_url": "https://thespacedevs-dev.nyc3.digitaloceanspaces.com/media/images/jessica_meir_image_20200417064900.jpeg"
+    },
+    {
+      "name": "Jack Hathaway",
+      "role": "Pilot",
+      "agency": "NASA",
+      "image_url": "https://thespacedevs-dev.nyc3.digitaloceanspaces.com/media/images/jack_hathaway_image_20211206185407.jpg"
+    },
+    {
+      "name": "Sophie Adenot",
+      "role": "Flight Engineer",
+      "agency": "ESA",
+      "image_url": "https://thespacedevs-dev.nyc3.digitaloceanspaces.com/media/images/sophie_adenot_image_20221123150954.jpg"
+    },
+    {
+      "name": "Andrei Fedyaev",
+      "role": "Flight Engineer",
+      "agency": "RFSA",
+      "image_url": "https://thespacedevs-dev.nyc3.digitaloceanspaces.com/media/images/andrei_fedyaev_image_20230207203113.jpg"
+    }
+  ],
+  "spacecraft_name": "Crew Dragon Freedom",
+  "spacecraft_serial": "C212",
+  "detailed_at": "2026-08-23T08:45:00Z"
+}

@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "io.github.yourname.plugin-name",
+  "name": "Plugin Name",
+  "version": "1.0.0",
+  "author": "Your name",
+  "license": "MIT",
+  "description": "Fullscreen visual experience for Omarchy Quattro.",
+  "kinds": ["overlay", "bar-widget"],
+  "keepLoaded": true,
+  "entryPoints": {
+    "overlay": "Overlay.qml",
+    "barWidget": "BarWidget.qml"
+  },
+  "barWidget": {
+    "displayName": "Plugin Name",
+    "description": "Open the experience",
+    "category": "Appearance",
+    "allowMultiple": false,
+    "defaultSection": "right"
+  }
+}

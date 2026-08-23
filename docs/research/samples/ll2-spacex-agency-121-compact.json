@@ -1,0 +1,198 @@
+{
+  "response_mode": "detailed",
+  "id": 121,
+  "url": "https://ll.thespacedevs.com/2.3.0/agencies/121/",
+  "name": "SpaceX",
+  "abbrev": "SpX",
+  "type": {
+    "id": 3,
+    "name": "Commercial"
+  },
+  "featured": true,
+  "country": [
+    {
+      "id": 2,
+      "name": "United States of America",
+      "alpha_2_code": "US",
+      "alpha_3_code": "USA",
+      "nationality_name": "American",
+      "nationality_name_composed": "Americano"
+    }
+  ],
+  "description": "Space Exploration Technologies Corp., known as SpaceX, is an American aerospace manufacturer and space transport services company headquartered in Hawthorne, California. It was founded in 2002 by entrepreneur Elon Musk with the goal of reducing space transportation costs and enabling the colonization of Mars. SpaceX operates from many pads, on the East Coast of the US they operate from SLC-40 at Cape Canaveral Space Force Station and historic LC-39A at Kennedy Space Center. They also operate from SLC-4E at Vandenberg Space Force Base, California, usually for polar launches. Another launch site is being developed at Boca Chica, Texas.",
+  "administrator": "CEO: Elon Musk",
+  "founding_year": 2002,
+  "launchers": "Falcon | Starship",
+  "spacecraft": "Dragon",
+  "parent": null,
+  "image": {
+    "id": 1736,
+    "name": "Falcon 9 liftoff from LC-39A",
+    "image_url": "https://thespacedevs-prod.nyc3.digitaloceanspaces.com/media/images/falcon_9_image_20230807133459.jpeg",
+    "thumbnail_url": "https://thespacedevs-prod.nyc3.digitaloceanspaces.com/media/images/255bauto255d__image_thumbnail_20240305193628.jpeg",
+    "credit": "SpaceX",
+    "license": {
+      "id": 5,
+      "name": "CC BY-NC 2.0",
+      "priority": 1,
+      "link": "https://creativecommons.org/licenses/by-nc/2.0/"
+    },
+    "single_use": false,
+    "variants": []
+  },
+  "logo": {
+    "id": 186,
+    "name": "SpaceX logo",
+    "image_url": "https://thespacedevs-prod.nyc3.digitaloceanspaces.com/media/images/spacex_logo_20220826094919.png",
+    "thumbnail_url": "https://thespacedevs-prod.nyc3.digitaloceanspaces.com/media/images/255bauto255d__image_thumbnail_20240305185138.png",
+    "credit": "SpaceX",
+    "license": {
+      "id": 5,
+      "name": "CC BY-NC 2.0",
+      "priority": 1,
+      "link": "https://creativecommons.org/licenses/by-nc/2.0/"
+    },
+    "single_use": true,
+    "variants": []
+  },
+  "social_logo": {
+    "id": 94,
+    "name": "SpaceX social logo",
+    "image_url": "https://thespacedevs-prod.nyc3.digitaloceanspaces.com/media/images/spacex_social_l_image_20260407054626.jpg",
+    "thumbnail_url": "https://thespacedevs-prod.nyc3.digitaloceanspaces.com/media/images/spacex_social_l_image_thumbnail_20260407054626.jpeg",
+    "credit": "SpaceX",
+    "license": {
+      "id": 5,
+      "name": "CC BY-NC 2.0",
+      "priority": 1,
+      "link": "https://creativecommons.org/licenses/by-nc/2.0/"
+    },
+    "single_use": true,
+    "variants": []
+  },
+  "total_launch_count": 721,
+  "consecutive_successful_launches": 206,
+  "successful_launches": 706,
+  "failed_launches": 15,
+  "pending_launches": 129,
+  "consecutive_successful_landings": 13,
+  "successful_landings": 664,
+  "failed_landings": 29,
+  "attempted_landings": 692,
+  "successful_landings_spacecraft": 62,
+  "failed_landings_spacecraft": 3,
+  "attempted_landings_spacecraft": 66,
+  "successful_landings_payload": 1,
+  "failed_landings_payload": 0,
+  "attempted_landings_payload": 1,
+  "info_url": "https://www.spacex.com/",
+  "wiki_url": "https://en.wikipedia.org/wiki/SpaceX",
+  "social_media_links": [
+    {
+      "id": 427,
+      "social_media": {
+        "id": 3,
+        "name": "Homepage",
+        "url": null,
+        "logo": null
+      },
+      "url": "https://www.spacex.com/"
+    },
+    {
+      "id": 428,
+      "social_media": {
+        "id": 1,
+        "name": "X",
+        "url": "https://x.com",
+        "logo": {
+          "id": 2320,
+          "name": "X logo",
+          "image_url": "https://thespacedevs-prod.nyc3.digitaloceanspaces.com/media/images/x_logo_image_20250211191027.jpg",
+          "thumbnail_url": "https://thespacedevs-prod.nyc3.digitaloceanspaces.com/media/images/x_logo_image_thumbnail_20250211191027.jpeg",
+          "credit": "X",
+          "license": {
+            "id": 1,
+            "name": "Unknown",
+            "priority": 9,
+            "link": null
+          },
+          "single_use": true,
+          "variants": []
+        }
+      },
+      "url": "https://x.com/spacex/"
+    },
+    {
+      "id": 429,
+      "social_media": {
+        "id": 6,
+        "name": "Youtube",
+        "url": "https://www.youtube.com/",
+        "logo": {
+          "id": 2356,
+          "name": "YouTube logo",
+          "image_url": "https://thespacedevs-prod.nyc3.digitaloceanspaces.com/media/images/youtube_logo_image_20250321073112.png",
+          "thumbnail_url": "https://thespacedevs-prod.nyc3.digitaloceanspaces.com/media/images/youtube_logo_image_thumbnail_20250321073112.png",
+          "credit": "YouTube",
+          "license": {
+            "id": 1,
+            "name": "Unknown",
+            "priority": 9,
+            "link": null
+          },
+          "single_use": true,
+          "variants": []
+        }
+      },
+      "url": "https://www.youtube.com/@spacex"
+    },
+    {
+      "id": 430,
+      "social_media": {
+        "id": 4,
+        "name": "LinkedIn",
+        "url": "https://www.linkedin.com/",
+        "logo": {
+          "id": 2321,
+          "name": "LinkedIn logo",
+          "image_url": "https://thespacedevs-prod.nyc3.digitaloceanspaces.com/media/images/linkedin_logo_image_20250211191111.png",
+          "thumbnail_url": "https://thespacedevs-prod.nyc3.digitaloceanspaces.com/media/images/linkedin_logo_image_thumbnail_20250211191112.png",
+          "credit": "LinkedIn",
+          "license": {
+            "id": 1,
+            "name": "Unknown",
+            "priority": 9,
+            "link": null
+          },
+          "single_use": true,
+          "variants": []
+        }
+      },
+      "url": "https://www.linkedin.com/company/spacex/"
+    }
+  ],
+  "launcher_list_names": [
+    "Falcon 1",
+    "Falcon 9",
+    "Falcon 9",
+    "Falcon 9",
+    "Falcon 9",
+    "Falcon 9",
+    "Falcon Heavy",
+    "Starship",
+    "Starship",
+    "Starship",
+    "Starship",
+    "Starship Prototype",
+    "Super Heavy Prototype"
+  ],
+  "spacecraft_list_names": [
+    "Cargo Dragon 2",
+    "Crew Dragon 2",
+    "Dragon 1",
+    "Starship V1",
+    "Starship V2",
+    "Starship V3",
+    "Tesla Roadster"
+  ]
+}

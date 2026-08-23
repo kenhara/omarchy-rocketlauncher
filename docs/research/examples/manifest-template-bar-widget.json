@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "id": "io.github.yourname.plugin-name",
+  "name": "Plugin Name",
+  "version": "1.0.0",
+  "author": "Your name",
+  "license": "MIT",
+  "description": "One-line marketplace summary of what the plugin does.",
+  "kinds": ["bar-widget"],
+  "entryPoints": {
+    "barWidget": "BarWidget.qml"
+  },
+  "barWidget": {
+    "displayName": "Plugin Name",
+    "description": "Short bar picker description",
+    "category": "Fun",
+    "allowMultiple": false,
+    "defaultSection": "right"
+  }
+}

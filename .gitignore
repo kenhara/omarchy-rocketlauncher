@@ -1,0 +1,32 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+.venv/
+venv/
+
+# Caches / tooling
+.cache/
+*.cache
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# OS junk
+.DS_Store
+Thumbs.db
+desktop.ini
+*~
+
+# Editors
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Local docs/preview server artifacts
+docs/preview/.cache/
+docs/preview/node_modules/
+docs/preview/.parcel-cache/
+docs/preview/dist/

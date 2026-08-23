@@ -1,0 +1,106 @@
+{
+  "schemaVersion": 1,
+  "id": "harris.launch-desk",
+  "name": "Launch Desk",
+  "version": "1.4.0",
+  "author": "Harris Kenny",
+  "license": "MIT",
+  "description": "Falcon & Starship launch desk for Omarchy \u2014 flip-digit stats, countdown, mission detail, Watch. Unofficial. Launch data via The Space Devs (LL2).",
+  "kinds": [
+    "bar-widget"
+  ],
+  "entryPoints": {
+    "barWidget": "BarWidget.qml"
+  },
+  "keywords": [
+    "spacex",
+    "launches",
+    "countdown",
+    "rocket",
+    "falcon",
+    "dragon",
+    "starship"
+  ],
+  "barWidget": {
+    "displayName": "Launch Desk",
+    "description": "Flip-digit Falcon & Starship stats, next NET countdown, mission detail, ongoing Crew Dragon, and Watch",
+    "category": "Fun",
+    "allowMultiple": false,
+    "defaultSection": "right",
+    "aliases": [
+      "spacex",
+      "launches",
+      "launch desk",
+      "falcon",
+      "starship"
+    ],
+    "defaults": {
+      "refreshIntervalSec": 1800,
+      "notifyMilestones": false,
+      "barShowMissionName": false,
+      "stickyWatch": false,
+      "watchQuality": "best",
+      "starfieldEnabled": true,
+      "flipAnimate": true
+    },
+    "schema": [
+      {
+        "key": "refreshIntervalSec",
+        "type": "integer",
+        "label": "Refresh interval (seconds)",
+        "description": "How often to poll Launch Library 2. Free tier is 15 req/hour \u2014 keep this \u2265 600.",
+        "min": 600,
+        "max": 86400,
+        "step": 60,
+        "defaultValue": 1800
+      },
+      {
+        "key": "notifyMilestones",
+        "type": "boolean",
+        "label": "Notify at T\u221210 and T\u22120",
+        "description": "Opt-in desktop toasts (notify-send) once per launch id when countdown crosses T\u221210 (~10 min) and T\u22120. Off by default.",
+        "defaultValue": false
+      },
+      {
+        "key": "barShowMissionName",
+        "type": "boolean",
+        "label": "Show mission name in bar",
+        "description": "Prefix the bar countdown with a short mission name (truncated).",
+        "defaultValue": false
+      },
+      {
+        "key": "stickyWatch",
+        "type": "boolean",
+        "label": "Sticky Watch (keep playing when hidden)",
+        "description": "When on, Esc / hide keeps MediaPlayer + stream-proxy running; the bar can show a playing glyph. When off (default), hide pauses Watch and stops the proxy.",
+        "defaultValue": false
+      },
+      {
+        "key": "watchQuality",
+        "type": "enum",
+        "label": "Watch stream quality",
+        "description": "yt-dlp height preference passed to scripts/stream-proxy.py (best | 720 | 480).",
+        "options": [
+          "best",
+          "720",
+          "480"
+        ],
+        "defaultValue": "best"
+      },
+      {
+        "key": "starfieldEnabled",
+        "type": "boolean",
+        "label": "Starfield ambience",
+        "description": "Faint animated starfield behind the panel (pauses while Watch is active).",
+        "defaultValue": true
+      },
+      {
+        "key": "flipAnimate",
+        "type": "boolean",
+        "label": "Animate flip counters",
+        "description": "Mechanical digit-flip animation when launch/landing/pending totals change.",
+        "defaultValue": true
+      }
+    ]
+  }
+}

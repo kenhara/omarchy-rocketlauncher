@@ -1,0 +1,495 @@
+{
+  "count": 130,
+  "result_summary": {
+    "id": "6208f972-18ec-490f-bbe5-6f5c6cfcd48c",
+    "name": "Falcon 9 Block 5 | Starlink Group 15-20",
+    "net": "2026-08-22T07:25:16Z",
+    "window_start": "2026-08-22T07:25:00Z",
+    "window_end": "2026-08-22T11:25:00Z",
+    "status": {
+      "id": 3,
+      "name": "Launch Successful",
+      "abbrev": "Success",
+      "description": "The launch vehicle successfully inserted its payload(s) into the target orbit(s)."
+    },
+    "webcast_live": false,
+    "image": {
+      "id": 1296,
+      "name": "Starlink night fairing",
+      "image_url": "https://thespacedevs-prod.nyc3.digitaloceanspaces.com/media/images/falcon2520925_image_20221009234147.png",
+      "thumbnail_url": "https://thespacedevs-prod.nyc3.digitaloceanspaces.com/media/images/255bauto255d__image_thumbnail_20240305192320.png",
+      "credit": "SpaceX",
+      "license": {
+        "id": 5,
+        "name": "CC BY-NC 2.0",
+        "priority": 1,
+        "link": "https://creativecommons.org/licenses/by-nc/2.0/"
+      },
+      "single_use": false,
+      "variants": []
+    },
+    "infographic": null,
+    "mission_patches": [
+      {
+        "id": 7,
+        "name": "Space X Starlink Mission Patch",
+        "priority": 10,
+        "image_url": "https://thespacedevs-prod.nyc3.digitaloceanspaces.com/media/mission_patch_images/space2520x252_mission_patch_20221011205756.png",
+        "agency": {
+          "response_mode": "list",
+          "id": 121,
+          "url": "https://ll.thespacedevs.com/2.3.0/agencies/121/",
+          "name": "SpaceX",
+          "abbrev": "SpX",
+          "type": {
+            "id": 3,
+            "name": "Commercial"
+          }
+        },
+        "response_mode": "normal"
+      }
+    ],
+    "vid_urls": [
+      {
+        "priority": 7,
+        "source": "youtube.com",
+        "publisher": "The Space Devs",
+        "title": "SpaceX Starlink Group 15-20",
+        "description": "On Saturday August 22, 2026 at 07:25 UTC, SpaceX launched the Starlink Group 15-20 mission with a Falcon 9 Block 5 from Space Launch Complex 4E at Vandenberg SFB, CA, USA.\n\nDescription generated from the Launch Library 2 API.\n\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\nObject in the Launch Library 2 API: https://ll.thespacedevs.com/2.3.0/launches/6208f972-18ec-490f-bbe5-6f5c6cfcd48c/?format=json\nRelated news in the Spaceflight News API: https://api.spaceflightnewsapi.net/v4/articles/?launch=6208f972-18ec-490f-bbe5-6f5c6cfcd48c\n\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\n\nRehosted on YouTube by The Space Devs.\nSupport our work on https://www.patreon.com/TheSpaceDevs\n\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\nWebsite: https://thespacedevs.com\nX: https://x.com/thespacedevs\nDiscord: https://discord.com/invite/p7ntkNA\n\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\n\nOriginal...",
+        "feature_image": "https://i.ytimg.com/vi/7r0RfmKbr_Q/hqdefault.jpg",
+        "url": "https://www.youtube.com/watch?v=7r0RfmKbr_Q",
+        "type": {
+          "id": 4,
+          "name": "Unofficial Re-stream"
+        },
+        "language": {
+          "id": 1,
+          "name": "English",
+          "code": "en"
+        },
+        "start_time": "2026-08-22T07:40:23Z",
+        "end_time": "2026-08-22T08:00:25Z",
+        "live": false
+      },
+      {
+        "priority": 8,
+        "source": "youtube.com",
+        "publisher": "Spaceflight Now",
+        "title": "Live: SpaceX Falcon 9 rocket launches Starlink satellites from the West Coast",
+        "description": "Watch live coverage as SpaceX launches a Falcon 9 rocket from California with 24 satellites for the company's Starlink space-based internet service. Liftoff from Space Launch Complex 4E (SLC-4E) at Vandenberg Space Force Base is scheduled for Saturday, August 22, 2026, at 12:25 a.m. PDT (3:25 a.m. EDT / 0725 UTC).\n\nThe first-stage booster, serial number B1100, launching for a ninth time, will land on the drone ship 'Of Course I Still Love You' nearly 8.5 minutes into the flight.\n\nThe Starlink 15-20 mission will take a southeasterly trajectory upon departure from Vandenberg. \n\nLive commentary will be provided by Spaceflight Now\u2019s Will Robinson-Smith starting about 30 minutes prior to launch.\n\nVideos like this are made possible by the support of our members. Join this channel to get acc...",
+        "feature_image": "https://i.ytimg.com/vi/YWa56tU09qk/maxresdefault.jpg",
+        "url": "https://www.youtube.com/watch?v=YWa56tU09qk",
+        "type": {
+          "id": 3,
+          "name": "Unofficial Webcast"
+        },
+        "language": {
+          "id": 1,
+          "name": "English",
+          "code": "en"
+        },
+        "start_time": "2026-08-22T06:55:25Z",
+        "end_time": "2026-08-22T07:44:53Z",
+        "live": false
+      },
+      {
+        "priority": 9,
+        "source": "youtube.com",
+        "publisher": "NASASpaceflight",
+        "title": "SpaceX Launches Falcon 9 Starlink 15-20",
+        "description": "Launch Window: August 22nd from 03:25AM to 7:25AM EDT \n\n\n\u26a1 Become a member of NASASpaceflight's channel for exclusive discord access, fast turnaround clips, and other exclusive benefits. Your support helps us continue our 24/7 coverage. \u26a1\n\n\ud83d\udd0d If you are interested in using footage captured by this stream, please review our content use policy: https://www.nasaspaceflight.com/content-use-policy/\n\n#SpaceX #Starlink #Falcon9 #Starlink1223 #LEO #SatelliteInternet #SpaceXLaunch #GlobalInternet #HighSpeedInternet #RocketLaunch #StarlinkMission #NextGenSatellites #SpaceTechnology\n\n LDAPAABJRG2UMCU3 \ud83c\udfb5 Intro song: New Way Out by Denis. Licensed via PremiumBeat. LDAPAABJRG2UMCU3\n\ud83c\udfb5 Music used on streams and in videos is licensed via EpidemicSound: https://share.epidemicsound.com/qvh38e\n\nAll conten...",
+        "feature_image": "https://i.ytimg.com/vi/tU2YgT-mEhI/maxresdefault.jpg",
+        "url": "https://www.youtube.com/watch?v=tU2YgT-mEhI",
+        "type": {
+          "id": 3,
+          "name": "Unofficial Webcast"
+        },
+        "language": {
+          "id": 1,
+          "name": "English",
+          "code": "en"
+        },
+        "start_time": "2026-08-22T07:00:35Z",
+        "end_time": "2026-08-22T07:36:36Z",
+        "live": false
+      },
+      {
+        "priority": 10,
+        "source": "x.com",
+        "publisher": "SpaceX",
+        "title": "Starlink Mission",
+        "description": "Livestream on X",
+        "feature_image": "https://pbs.twimg.com/media/HPsY5bwb0AAtPZn.jpg",
+        "url": "https://x.com/i/broadcasts/1PKqrNNknkZGb",
+        "type": {
+          "id": 1,
+          "name": "Official Webcast"
+        },
+        "language": {
+          "id": 1,
+          "name": "English",
+          "code": "en"
+        },
+        "start_time": "2026-08-22T07:15:10Z",
+        "end_time": "2026-08-22T07:35:13Z",
+        "live": false
+      }
+    ],
+    "info_urls": [
+      {
+        "priority": 10,
+        "source": "spacex.com",
+        "title": "SpaceX",
+        "description": "SpaceX designs, manufactures and launches advanced rockets and spacecraft. The company was founded in 2002 to revolutionize space technology, with the ultimate goal of enabling people to live on other planets.",
+        "feature_image": null,
+        "url": "https://www.spacex.com/launches/sl-15-20",
+        "type": {
+          "id": 1,
+          "name": "Official Page"
+        },
+        "language": {
+          "id": 1,
+          "name": "English",
+          "code": "en"
+        }
+      }
+    ],
+    "rocket": {
+      "id": 9115,
+      "configuration": {
+        "id": 164,
+        "name": "Falcon 9",
+        "full_name": "Falcon 9 Block 5"
+      },
+      "launcher_stage": [
+        {
+          "id": 975,
+          "type": "Core",
+          "reused": true,
+          "launcher_flight_number": 9,
+          "launcher": {
+            "response_mode": "normal",
+            "id": 239,
+            "url": "https://ll.thespacedevs.com/2.3.0/launchers/239/",
+            "flight_proven": true,
+            "serial_number": "B1100",
+            "is_placeholder": false,
+            "status": {
+              "id": 3,
+              "name": "active"
+            },
+            "image": {
+              "id": 1736,
+              "name": "Falcon 9 liftoff from LC-39A",
+              "image_url": "https://thespacedevs-prod.nyc3.digitaloceanspaces.com/media/images/falcon_9_image_20230807133459.jpeg",
+              "thumbnail_url": "https://thespacedevs-prod.nyc3.digitaloceanspaces.com/media/images/255bauto255d__image_thumbnail_20240305193628.jpeg",
+              "credit": "SpaceX",
+              "license": {
+                "id": 5,
+                "name": "CC BY-NC 2.0",
+                "priority": 1,
+                "link": "https://creativecommons.org/licenses/by-nc/2.0/"
+              },
+              "single_use": false,
+              "variants": []
+            },
+            "details": "Falcon 9 booster, with a special \u201c100\u201d logo in lieu of the usual serial number style painted on the booster.",
+            "successful_landings": 9,
+            "attempted_landings": 9,
+            "flights": 9,
+            "last_launch_date": "2026-08-22T07:25:16Z",
+            "first_launch_date": "2025-11-23T08:48:00Z",
+            "fastest_turnaround": "P23DT12H53M36S"
+          },
+          "previous_flight_date": "2026-07-25T15:51:55Z",
+          "turn_around_time": "P27DT15H33M21S",
+          "landing": {
+            "id": 1908,
+            "url": "https://ll.thespacedevs.com/2.3.0/landings/1908/",
+            "attempt": true,
+            "success": true,
+            "description": "The Falcon 9 first stage B1100 has landed on ASDS OCISLY after its 9th flight.",
+            "downrange_distance": 574.0,
+            "landing_location": {
+              "id": 1,
+              "name": "Of Course I Still Love You",
+              "active": true,
+              "abbrev": "OCISLY",
+              "description": "The second ASDS barge, Of Course I Still Love You (OCISLY) services launches in the Pacific Ocean and was the site of the first landing of a SpaceX Falcon 9 first stage during CRS-8, the launch of a Dragon spacecraft to the International Space Station.",
+              "location": null,
+              "longitude": null,
+              "latitude": null,
+              "image": {
+                "id": 1969,
+                "name": "OCISLY empty",
+                "image_url": "https://thespacedevs-prod.nyc3.digitaloceanspaces.com/media/images/ocisly_empty_image_20240310164323.png",
+                "thumbnail_url": "https://thespacedevs-prod.nyc3.digitaloceanspaces.com/media/images/ocisly_empty_image_thumbnail_20240310164323.png",
+                "credit": "SpaceX",
+                "license": {
+                  "id": 5,
+                  "name": "CC BY-NC 2.0",
+                  "priority": 1,
+                  "link": "https://creativecommons.org/licenses/by-nc/2.0/"
+                },
+                "single_use": true,
+                "variants": []
+              },
+              "successful_landings": 221,
+              "attempted_landings": 229,
+              "failed_landings": 8,
+              "celestial_body": {
+                "response_mode": "normal",
+                "id": 1,
+                "name": "Earth",
+                "type": {
+                  "id": 1,
+                  "name": "Planet"
+                },
+                "diameter": 12742000.0,
+                "mass": 5.972168e+24,
+                "gravity": 9.80655,
+                "length_of_day": "1 00:00:00",
+                "atmosphere": true,
+                "image": {
+                  "id": 2040,
+                  "name": "Earth (Apollo 17)",
+                  "image_url": "https://thespacedevs-prod.nyc3.digitaloceanspaces.com/media/images/earth_2528apol_image_20240402194304.jpeg",
+                  "thumbnail_url": "https://thespacedevs-prod.nyc3.digitaloceanspaces.com/media/images/earth_2528apol_image_thumbnail_20240402194305.jpeg",
+                  "credit": "NASA",
+                  "license": {
+                    "id": 4,
+                    "name": "NASA Image and Media Guidelines",
+                    "priority": 0,
+                    "link": "https://www.nasa.gov/nasa-brand-center/images-and-media/"
+                  },
+                  "single_use": true,
+                  "variants": []
+                },
+                "description": "Earth is the third planet from the Sun and the only astronomical object known to harbor life.",
+                "wiki_url": "https://en.wikipedia.org/wiki/Earth"
+              }
+            },
+            "type": {
+              "id": 1,
+              "name": "Autonomous Spaceport Drone Ship",
+              "abbrev": "ASDS",
+              "description": "An autonomous spaceport drone ship (ASDS) is an ocean-going vessel derived from a deck barge, outfitted with station-keeping engines and a large landing platform. Construction of such ships was commissioned by aerospace company SpaceX to allow for recovery of rocket first-stages at sea for high-velocity missions which do not carry enough fuel to return to the launch site after lofting spacecraft onto an orbital trajectory."
+            }
+          },
+          "previous_flight": {
+            "id": "5b2f05d7-9052-49fb-9bd7-2a05d4910576",
+            "url": "https://ll.thespacedevs.com/2.3.0/launches/5b2f05d7-9052-49fb-9bd7-2a05d4910576/",
+            "name": "Falcon 9 Block 5 | Starlink Group 17-51"
+          }
+        }
+      ]
+    },
+    "mission": {
+      "id": 7710,
+      "name": "Starlink Group 15-20",
+      "type": "Communications",
+      "description": "A batch of 27 satellites for the Starlink mega-constellation - SpaceX's project for space-based Internet communication system.",
+      "orbit": {
+        "id": 8,
+        "name": "Low Earth Orbit",
+        "abbrev": "LEO",
+        "celestial_body": {
+          "response_mode": "list",
+          "id": 1,
+          "name": "Earth"
+        }
+      }
+    },
+    "pad": {
+      "id": 16,
+      "name": "Space Launch Complex 4E",
+      "location": {
+        "response_mode": "normal",
+        "id": 11,
+        "url": "https://ll.thespacedevs.com/2.3.0/locations/11/",
+        "name": "Vandenberg SFB, CA, USA",
+        "celestial_body": {
+          "response_mode": "normal",
+          "id": 1,
+          "name": "Earth",
+          "type": {
+            "id": 1,
+            "name": "Planet"
+          },
+          "diameter": 12742000.0,
+          "mass": 5.972168e+24,
+          "gravity": 9.80655,
+          "length_of_day": "1 00:00:00",
+          "atmosphere": true,
+          "image": {
+            "id": 2040,
+            "name": "Earth (Apollo 17)",
+            "image_url": "https://thespacedevs-prod.nyc3.digitaloceanspaces.com/media/images/earth_2528apol_image_20240402194304.jpeg",
+            "thumbnail_url": "https://thespacedevs-prod.nyc3.digitaloceanspaces.com/media/images/earth_2528apol_image_thumbnail_20240402194305.jpeg",
+            "credit": "NASA",
+            "license": {
+              "id": 4,
+              "name": "NASA Image and Media Guidelines",
+              "priority": 0,
+              "link": "https://www.nasa.gov/nasa-brand-center/images-and-media/"
+            },
+            "single_use": true,
+            "variants": []
+          },
+          "description": "Earth is the third planet from the Sun and the only astronomical object known to harbor life.",
+          "wiki_url": "https://en.wikipedia.org/wiki/Earth",
+          "total_attempted_launches": 7597,
+          "successful_launches": 7040,
+          "failed_launches": 557,
+          "total_attempted_landings": 1359,
+          "successful_landings": 1310,
+          "failed_landings": 49
+        },
+        "active": true,
+        "country": {
+          "id": 2,
+          "name": "United States of America",
+          "alpha_2_code": "US",
+          "alpha_3_code": "USA",
+          "nationality_name": "American",
+          "nationality_name_composed": "Americano"
+        },
+        "description": "Vandenberg Space Force Base is a United States Space Force Base in Santa Barbara County, California. Established in 1941, Vandenberg Space Force Base is a space launch base, launching spacecraft from the Western Range, and also performs missile testing. The United States Space Force's Space Launch Delta 30 serves as the host delta for the base, equivalent to an Air Force air base wing. In addition to its military space launch mission, Vandenberg Space Force Base also hosts space launches for civil and commercial space entities, such as NASA and SpaceX.",
+        "image": {
+          "id": 2226,
+          "name": "Vandenberg SFB imaged by Sentinel-2",
+          "image_url": "https://thespacedevs-prod.nyc3.digitaloceanspaces.com/media/images/vandenberg_sfb__image_20240920082910.jpeg",
+          "thumbnail_url": "https://thespacedevs-prod.nyc3.digitaloceanspaces.com/media/images/vandenberg_sfb__image_thumbnail_20240920082910.jpeg",
+          "credit": "Contains modified Copernicus Sentinel data 2020",
+          "license": {
+            "id": 33,
+            "name": "Copernicus Image Use Policy",
+            "priority": 0,
+            "link": "https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32013R1159"
+          },
+          "single_use": true,
+          "variants": []
+        },
+        "map_image": "https://thespacedevs-prod.nyc3.digitaloceanspaces.com/media/map_images/location_11_20200803142416.jpg",
+        "longitude": -120.52023,
+        "latitude": 34.75133,
+        "timezone_name": "America/Los_Angeles",
+        "total_launch_count": 908,
+        "total_landing_count": 35
+      },
+      "map_url": "https://www.google.com/maps?q=34.632,-120.611"
+    },
+    "program": [
+      {
+        "response_mode": "normal",
+        "id": 25,
+        "url": "https://ll.thespacedevs.com/2.3.0/programs/25/",
+        "name": "Starlink",
+        "image": {
+          "id": 1890,
+          "name": "Starlink stack in space before deployment",
+          "image_url": "https://thespacedevs-prod.nyc3.digitaloceanspaces.com/media/images/starlink_program_20231228154508.jpeg",
+          "thumbnail_url": "https://thespacedevs-prod.nyc3.digitaloceanspaces.com/media/images/255bauto255d__image_thumbnail_20240305194044.jpeg",
+          "credit": "SpaceX",
+          "license": {
+            "id": 5,
+            "name": "CC BY-NC 2.0",
+            "priority": 1,
+            "link": "https://creativecommons.org/licenses/by-nc/2.0/"
+          },
+          "single_use": true,
+          "variants": []
+        },
+        "info_url": "https://starlink.com",
+        "wiki_url": "https://en.wikipedia.org/wiki/Starlink",
+        "description": "Starlink is a satellite internet constellation operated by American aerospace company SpaceX",
+        "agencies": [
+          {
+            "response_mode": "list",
+            "id": 121,
+            "url": "https://ll.thespacedevs.com/2.3.0/agencies/121/",
+            "name": "SpaceX",
+            "abbrev": "SpX",
+            "type": {
+              "id": 3,
+              "name": "Commercial"
+            }
+          }
+        ],
+        "start_date": "2018-02-22T14:17:00Z",
+        "end_date": null,
+        "mission_patches": [
+          {
+            "id": 7,
+            "name": "Space X Starlink Mission Patch",
+            "priority": 10,
+            "image_url": "https://thespacedevs-prod.nyc3.digitaloceanspaces.com/media/mission_patch_images/space2520x252_mission_patch_20221011205756.png",
+            "agency": {
+              "response_mode": "list",
+              "id": 121,
+              "url": "https://ll.thespacedevs.com/2.3.0/agencies/121/",
+              "name": "SpaceX",
+              "abbrev": "SpX",
+              "type": {
+                "id": 3,
+                "name": "Commercial"
+              }
+            },
+            "response_mode": "normal"
+          }
+        ],
+        "type": {
+          "id": 3,
+          "name": "Communication Constellation"
+        }
+      }
+    ],
+    "agency_launch_attempt_count": 721,
+    "agency_launch_attempt_count_year": 102,
+    "probability": null,
+    "flightclub_url": "https://flightclub.io/result?llId=6208f972-18ec-490f-bbe5-6f5c6cfcd48c",
+    "slug": "falcon-9-block-5-starlink-group-15-20",
+    "url": "https://ll.thespacedevs.com/2.3.0/launches/6208f972-18ec-490f-bbe5-6f5c6cfcd48c/",
+    "all_top_level_keys": [
+      "agency_launch_attempt_count",
+      "agency_launch_attempt_count_year",
+      "failreason",
+      "flightclub_url",
+      "hashtag",
+      "id",
+      "image",
+      "info_urls",
+      "infographic",
+      "last_updated",
+      "launch_designator",
+      "launch_service_provider",
+      "location_launch_attempt_count",
+      "location_launch_attempt_count_year",
+      "mission",
+      "mission_patches",
+      "name",
+      "net",
+      "net_precision",
+      "orbital_launch_attempt_count",
+      "orbital_launch_attempt_count_year",
+      "pad",
+      "pad_launch_attempt_count",
+      "pad_launch_attempt_count_year",
+      "pad_turnaround",
+      "probability",
+      "program",
+      "response_mode",
+      "rocket",
+      "slug",
+      "status",
+      "timeline",
+      "updates",
+      "url",
+      "vid_urls",
+      "weather_concerns",
+      "webcast_live",
+      "window_end",
+      "window_start"
+    ]
+  }
+}

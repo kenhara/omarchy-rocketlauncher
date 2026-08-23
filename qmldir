@@ -1,0 +1,7 @@
+# Launch Desk — local module types (optional singleton import).
+# Prefer instantiating LaunchStore from BarWidget and injecting into Panel.
+LaunchStore 1.0 LaunchStore.qml
+FlipCounter 1.0 FlipCounter.qml
+MissionCard 1.0 MissionCard.qml
+MissionDetail 1.0 MissionDetail.qml
+WatchPlayer 1.0 WatchPlayer.qml

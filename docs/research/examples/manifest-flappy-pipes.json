@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "id": "eduardodallecort.flappy-pipes",
+  "name": "Flappy Pipes",
+  "version": "0.1.0",
+  "author": "Eduardo Dalle Cort",
+  "license": "MIT",
+  "description": "A Flappy Bird-style game for Omarchy, drawn entirely from the current theme.",
+  "kinds": [
+    "panel",
+    "bar-widget"
+  ],
+  "entryPoints": {
+    "panel": "Panel.qml",
+    "barWidget": "BarWidget.qml"
+  },
+  "barWidget": {
+    "displayName": "Flappy Pipes",
+    "description": "Thread a bird through gaps in the pipes. Original physics, your theme's colours.",
+    "category": "Fun",
+    "allowMultiple": false,
+    "defaultSection": "right"
+  }
+}

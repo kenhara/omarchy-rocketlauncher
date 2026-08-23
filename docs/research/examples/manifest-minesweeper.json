@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 1,
+  "id": "terminal.minesweeper",
+  "name": "Minesweeper",
+  "version": "1.3.0",
+  "author": "acobrerosf",
+  "license": "MIT",
+  "description": "Theme-aware terminal Minesweeper with Beginner, Intermediate, and Expert boards.",
+  "kinds": [
+    "bar-widget"
+  ],
+  "entryPoints": {
+    "barWidget": "BarWidget.qml"
+  },
+  "barWidget": {
+    "displayName": "Minesweeper",
+    "description": "Play Minesweeper in a terminal that follows the current Omarchy theme.",
+    "category": "Fun",
+    "aliases": [
+      "minesweeper",
+      "mines",
+      "game"
+    ],
+    "allowMultiple": false,
+    "defaultSection": "center"
+  }
+}
