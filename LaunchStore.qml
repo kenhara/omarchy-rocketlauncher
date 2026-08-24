@@ -30,7 +30,7 @@ Item {
     .replace(/\/$/, "")
   readonly property string samplePath: pluginDir + "/data/sample-cache.json"
 
-  readonly property string pluginVersion: "1.5.9"
+  readonly property string pluginVersion: "1.5.10"
   readonly property string userAgent: "Rocketlauncher/" + pluginVersion + " (Omarchy unofficial; kenhara.rocketlauncher)"
 
 
@@ -720,7 +720,10 @@ Item {
     store.watchStreamUrl = ""
     var script = store.pluginDir + "/scripts/stream-proxy.py"
     var q = store.normalizeWatchQuality(store.watchQuality)
-    streamProxy.command = ["python3", script, url, "--timeout", "180", "--quality", q]
+    streamProxy.command = ["python3", "-B", script, url, "--timeout", "180", "--quality", q]
+    streamProxy.environment = ({
+      "PYTHONDONTWRITEBYTECODE": "1"
+    })
     streamProxyStdout = ""
     streamProxy.running = true
     resolveTimer.restart()

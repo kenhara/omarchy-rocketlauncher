@@ -2,10 +2,10 @@
   "schemaVersion": 1,
   "id": "kenhara.rocketlauncher",
   "name": "Rocketlauncher",
-  "version": "1.5.9",
+  "version": "1.5.10",
   "author": "Harris Kenny",
   "license": "MIT",
-  "description": "Rocketlauncher on your Omarchy bar \u2014 flip-digit Falcon & Starship stats, countdown, Watch. Unofficial SpaceX/NASA launch desk via The Space Devs (LL2); not affiliated.",
+  "description": "Rocketlauncher on your Omarchy bar — flip-digit Falcon & Starship stats, countdown, Watch. Unofficial SpaceX/NASA launch desk via The Space Devs (LL2); not affiliated.",
   "kinds": [
     "bar-widget"
   ],
@@ -47,7 +47,7 @@
   ],
   "barWidget": {
     "displayName": "Rocketlauncher",
-    "description": "Rocketlauncher on your Omarchy bar \u2014 flip-digit Falcon & Starship stats, countdown, Watch. Unofficial; launch data via The Space Devs (LL2).",
+    "description": "Rocketlauncher on your Omarchy bar — flip-digit Falcon & Starship stats, countdown, Watch. Unofficial; launch data via The Space Devs (LL2).",
     "category": "Widgets",
     "allowMultiple": false,
     "defaultSection": "right",
@@ -89,7 +89,7 @@
         "key": "refreshIntervalSec",
         "type": "integer",
         "label": "Refresh interval (seconds)",
-        "description": "How often to poll Launch Library 2. Free tier is 15 req/hour \u2014 keep this \u2265 600.",
+        "description": "How often to poll Launch Library 2. Free tier is 15 req/hour — keep this ≥ 600.",
         "min": 600,
         "max": 86400,
         "step": 60,
@@ -98,8 +98,8 @@
       {
         "key": "notifyMilestones",
         "type": "boolean",
-        "label": "Notify at T\u221210 and T\u22120",
-        "description": "Opt-in desktop toasts (notify-send) once per launch id when countdown crosses T\u221210 (~10 min) and T\u22120. Off by default.",
+        "label": "Notify at T−10 and T−0",
+        "description": "Opt-in desktop toasts (notify-send) once per launch id when countdown crosses T−10 (~10 min) and T−0. Off by default.",
         "defaultValue": false
       },
       {
