@@ -7,11 +7,14 @@ ongoing missions, past missions, expandable mission detail, and in-panel Watch. 
 native Quattro `bar-widget` (not Electron). Named for Heinlein’s Rocketlauncher vibe
 (rocket pilot) — unofficial; not SpaceX-branded.
 
-**ID:** `harris.rocketlauncher`  
+**ID:** `kenhara.rocketlauncher`  
 **Author:** Harris Kenny  
 **License:** MIT  
-**Version:** 1.5.3  
+**Version:** 1.5.4  
 **Repo:** https://github.com/kenhara/omarchy-rocketlauncher
+
+### 1.5.4
+- Renamed plugin id `harris.rocketlauncher` → `kenhara.rocketlauncher` (install path `~/.config/omarchy/plugins/kenhara.rocketlauncher`). Display name unchanged.
 
 ### 1.5.3
 - Discoverability: category **Widgets**; expanded `keywords` + `barWidget.aliases`; honest search note.
@@ -24,7 +27,7 @@ native Quattro `bar-widget` (not Electron). Named for Heinlein’s Rocketlaunche
 - Font fallbacks use concrete `"monospace"` when bar theme font is unavailable.
 
 ### 1.4.2
-- Renamed to **Rocketlauncher** (`harris.rocketlauncher`); cache → `~/.cache/rocketlauncher`.
+- Renamed to **Rocketlauncher** (`kenhara.rocketlauncher`); cache → `~/.cache/rocketlauncher`.
 - Local folder + GitHub: `kenhara/omarchy-rocketlauncher`.
 
 ## Unofficial disclaimer
@@ -53,7 +56,7 @@ name stays **Rocketlauncher** (brand-free).
 
 ```sh
 omarchy plugin add https://github.com/kenhara/omarchy-rocketlauncher.git --enable
-omarchy bar move harris.rocketlauncher --section right
+omarchy bar move kenhara.rocketlauncher --section right
 ```
 
 ### Local copy
@@ -63,11 +66,11 @@ machine:
 
 ```sh
 mkdir -p ~/.config/omarchy/plugins
-cp -a . ~/.config/omarchy/plugins/harris.rocketlauncher
+cp -a . ~/.config/omarchy/plugins/kenhara.rocketlauncher
 
-omarchy plugin validate ~/.config/omarchy/plugins/harris.rocketlauncher
+omarchy plugin validate ~/.config/omarchy/plugins/kenhara.rocketlauncher
 omarchy-shell shell rescanPlugins
-omarchy bar move harris.rocketlauncher --section right
+omarchy bar move kenhara.rocketlauncher --section right
 ```
 
 Hot reload applies on save under `~/.config/omarchy/plugins/`.
@@ -154,8 +157,8 @@ player (outlives the keyboard panel). Treat sticky playback as
 ### IPC
 
 ```sh
-omarchy-shell shell toggle harris.rocketlauncher
-omarchy-shell shell hide harris.rocketlauncher
+omarchy-shell shell toggle kenhara.rocketlauncher
+omarchy-shell shell hide kenhara.rocketlauncher
 ```
 
 Rocketlauncher is **`bar-widget` only** — use left / middle / right clicks on the
@@ -170,7 +173,7 @@ edit** `~/.config/hypr/` or `shell.json` for you:
 
 ```ini
 # hyprland.conf / binds.conf (example only)
-bind = SUPER, L, exec, omarchy-shell shell toggle harris.rocketlauncher
+bind = SUPER, L, exec, omarchy-shell shell toggle kenhara.rocketlauncher
 ```
 
 ## Configure
@@ -190,7 +193,7 @@ Widget settings (`shell.json` / bar widget schema):
 ## Remove
 
 ```sh
-omarchy plugin remove harris.rocketlauncher
+omarchy plugin remove kenhara.rocketlauncher
 ```
 
 Optional cache cleanup:

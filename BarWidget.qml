@@ -10,7 +10,7 @@ import qs.Ui
 // the community BarWidget / WidgetButton / Style tokens from research §3–9.
 BarWidget {
   id: root
-  moduleName: "harris.rocketlauncher"
+  moduleName: "kenhara.rocketlauncher"
 
   // The bar identifies a panel by the widget in its slot, so open state and
   // popout hand-off must be readable from here (not only from the panel).

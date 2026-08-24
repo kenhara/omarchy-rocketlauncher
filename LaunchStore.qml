@@ -30,8 +30,8 @@ QtObject {
     .replace(/\/$/, "")
   readonly property string samplePath: pluginDir + "/data/sample-cache.json"
 
-  readonly property string pluginVersion: "1.5.3"
-  readonly property string userAgent: "Rocketlauncher/" + pluginVersion + " (Omarchy unofficial; harris.rocketlauncher)"
+  readonly property string pluginVersion: "1.5.4"
+  readonly property string userAgent: "Rocketlauncher/" + pluginVersion + " (Omarchy unofficial; kenhara.rocketlauncher)"
 
 
   property var stats: ({

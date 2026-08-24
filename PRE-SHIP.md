@@ -5,7 +5,7 @@
 Patch bump for marketplace discoverability before UTM smoke: `barWidget.category` **Fun → Widgets**; generous `keywords` + `barWidget.aliases` (SpaceX/NASA/Falcon/LL2/webcast…); README Discoverability (honest: keywords may help search; aliases for discovery docs). No QML/logic change.
 
 
-Applied Omarchy Quattro pre-ship checklist to `harris.rocketlauncher` on 2026-08-23.
+Applied Omarchy Quattro pre-ship checklist to `kenhara.rocketlauncher` on 2026-08-23.
 
 ## Grep / must-fix results
 

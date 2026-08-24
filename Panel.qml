@@ -6,7 +6,7 @@ import qs.Ui
 // Nested details panel for Rocketlauncher (loaded by BarWidget — not a separate kind).
 Panel {
   id: root
-  moduleName: "harris.rocketlauncher"
+  moduleName: "kenhara.rocketlauncher"
   manageIpc: false
 
   property var anchorItem: null

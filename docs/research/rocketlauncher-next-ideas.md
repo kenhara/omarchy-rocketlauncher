@@ -1,6 +1,6 @@
 # Rocketlauncher — next ideas from Omarchy Quattro plugins
 
-**Purpose:** Prioritized “steal / skip” list for `harris.rocketlauncher` before marketplace submit.  
+**Purpose:** Prioritized “steal / skip” list for `kenhara.rocketlauncher` before marketplace submit.  
 **Refresh date:** Sun 23 Aug 2026 (America/Denver)  
 **Deadline context:** Competition Mon 24 Aug 2026, 09:00 CEST (~01:00 MDT) — ship buffer matters.  
 **Baseline research:** `docs/research/omarchy-plugins.md` (22 Aug) — this doc refreshes official + marketplace standouts and maps gaps onto **current** Rocketlauncher (v1.2.0).
@@ -30,9 +30,9 @@ Source: `basecamp/omarchy` `shell/plugins/README.md` + `docs/omarchy-shell.md` (
 **IPC contract worth documenting (already partially in README):**
 
 ```sh
-omarchy-shell shell toggle harris.rocketlauncher
-omarchy-shell shell summon harris.rocketlauncher '{}'
-omarchy-shell shell hide harris.rocketlauncher
+omarchy-shell shell toggle kenhara.rocketlauncher
+omarchy-shell shell summon kenhara.rocketlauncher '{}'
+omarchy-shell shell hide kenhara.rocketlauncher
 # Future: summon with payload e.g. '{"watch":true}' or '{"launchId":"..."}'
 ```
 

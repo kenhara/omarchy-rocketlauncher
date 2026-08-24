@@ -1,6 +1,6 @@
 # DHH / Omarchy signals for Rocketlauncher
 
-**Purpose:** Concrete things DHH (and close Quattro framing) has said about Omarchy, plugins, and the “malleable computer” — mapped to competition plugin strategy for `harris.rocketlauncher`.  
+**Purpose:** Concrete things DHH (and close Quattro framing) has said about Omarchy, plugins, and the “malleable computer” — mapped to competition plugin strategy for `kenhara.rocketlauncher`.  
 **Refresh:** Sun 23 Aug 2026 (America/Denver)  
 **Competition:** Mon 24 Aug 2026, 09:00 CEST · Core Team vote · “best ideas and execution”  
 **Note:** X/Twitter API was not used; quotes come from omarchy.org/news, GitHub releases/manual, hey.com essays, Rails World 2025 transcript coverage, Digg syndication of launch tweets, and secondary Linux coverage.
@@ -81,7 +81,7 @@ Core Team judges are steeped in the above. Implied scoring axes:
 
 ## 3. Concrete Rocketlauncher improvements mapped to signals
 
-**Baseline product (already shipped):** bar countdown · flip-digit stats · mission detail · crew avatars · Watch (yt-dlp + Qt Multimedia) · LL2 data · unofficial disclaimer · README install/IPC · schema knobs (`refreshIntervalSec`, `notifyMilestones`, `barShowMissionName`, `stickyWatch`) · Fun category · MIT · `harris.rocketlauncher` (was `harris.launch-desk`).
+**Baseline product (already shipped):** bar countdown · flip-digit stats · mission detail · crew avatars · Watch (yt-dlp + Qt Multimedia) · LL2 data · unofficial disclaimer · README install/IPC · schema knobs (`refreshIntervalSec`, `notifyMilestones`, `barShowMissionName`, `stickyWatch`) · Fun category · MIT · `kenhara.rocketlauncher` (was `harris.launch-desk`).
 
 | Signal | Already done | Still worth doing (pre-deadline) |
 |--------|--------------|----------------------------------|
