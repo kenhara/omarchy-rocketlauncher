@@ -321,7 +321,7 @@ Panel {
               var src = liveStore ? liveStore.dataSource : "—"
               var upd = liveStore ? liveStore.lastUpdatedText : "never"
               var load = (liveStore && liveStore.loading) ? " · refreshing…" : ""
-              return "updated " + upd + " · " + src + load
+              return "next launch · updated " + upd + " · " + src + load
             }
             color: root.contentForeground
             opacity: 0.45
@@ -1018,7 +1018,7 @@ Panel {
 
         Text {
           width: parent.width
-          text: "Launch data: The Space Devs (LL2) · Unofficial"
+          text: "Unofficial · Launch Library 2"
           wrapMode: Text.WordWrap
           color: root.contentForeground
           opacity: 0.32
