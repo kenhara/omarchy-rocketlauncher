@@ -251,7 +251,7 @@ Panel {
           spacing: Style.space(4)
 
           Text {
-            text: "SPACE JOCKEY"
+            text: "ROCKETLAUNCHER"
             color: root.contentForeground
             font.family: root.contentFontFamily
             font.pixelSize: Style.font.body
@@ -281,7 +281,7 @@ Panel {
           // L4: 4-digit FlipCounter is intentional (odometer look), not a bug.
           FlipCounter {
             width: (parent.width - parent.spacing * 2) / 3
-            value: liveStore ? liveStore.stats.total_launches : 0
+            value: liveStore ? liveStore.statTotalLaunches : 0
             label: "Total launches"
             digitCount: 4
             foreground: root.contentForeground
@@ -292,7 +292,7 @@ Panel {
 
           FlipCounter {
             width: (parent.width - parent.spacing * 2) / 3
-            value: liveStore ? liveStore.stats.successful_landings : 0
+            value: liveStore ? liveStore.statSuccessfulLandings : 0
             label: "Landings"
             digitCount: 4
             foreground: root.contentForeground
@@ -303,7 +303,7 @@ Panel {
 
           FlipCounter {
             width: (parent.width - parent.spacing * 2) / 3
-            value: liveStore ? liveStore.stats.pending_launches : 0
+            value: liveStore ? liveStore.statPendingLaunches : 0
             label: "Pending"
             digitCount: 4
             foreground: root.contentForeground
@@ -316,7 +316,7 @@ Panel {
         Text {
           width: parent.width
           text: {
-            var c = liveStore ? liveStore.stats.consecutive_successful_launches : 0
+            var c = liveStore ? liveStore.statConsecutiveSuccessfulLaunches : 0
             return "Consecutive successful launches: " + c
               + "  ·  LL2 agency totals (not reflight counters)"
           }

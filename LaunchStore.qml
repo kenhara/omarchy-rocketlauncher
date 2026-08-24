@@ -30,7 +30,7 @@ Item {
     .replace(/\/$/, "")
   readonly property string samplePath: pluginDir + "/data/sample-cache.json"
 
-  readonly property string pluginVersion: "1.5.6"
+  readonly property string pluginVersion: "1.5.7"
   readonly property string userAgent: "Rocketlauncher/" + pluginVersion + " (Omarchy unofficial; kenhara.rocketlauncher)"
 
 
@@ -40,6 +40,11 @@ Item {
     pending_launches: 0,
     consecutive_successful_launches: 0
   })
+  // Flat ints for FlipCounter bindings (nested var fields don't always notify)
+  property int statTotalLaunches: 0
+  property int statSuccessfulLandings: 0
+  property int statPendingLaunches: 0
+  property int statConsecutiveSuccessfulLaunches: 0
   property var nextLaunch: null
   property var upcoming: []
   property var past: []
@@ -427,6 +432,10 @@ Item {
       consecutive_successful_launches: Number(s.consecutive_successful_launches) || 0,
       consecutive_successful_landings: Number(s.consecutive_successful_landings) || 0
     }
+    store.statTotalLaunches = store.stats.total_launches
+    store.statSuccessfulLandings = store.stats.successful_landings
+    store.statPendingLaunches = store.stats.pending_launches
+    store.statConsecutiveSuccessfulLaunches = store.stats.consecutive_successful_launches
     var up = []
     var rawUp = obj.upcoming || []
     for (var i = 0; i < rawUp.length; i++)
