@@ -3,8 +3,8 @@ import qs.Commons
 
 // Mechanical digit-flip counter for the Rocketlauncher stats strip.
 // Theme-aware by default; optional accentColor for secondary chrome.
-// Digits bind directly to displayText so Quattro always paints numbers
-// (no setDigit / Style.font.display object pitfalls).
+// Digits rebuilt into digitChars so Repeater/modelData always paints
+// (avoids charAt binding stalls that left wells stuck at 0000).
 Item {
   id: root
 
@@ -16,18 +16,29 @@ Item {
   property int digitCount: 3
   property bool animate: true
 
-  readonly property string displayText: {
-    var n = Math.max(0, Math.floor(Number(value) || 0))
-    var s = String(n)
-    while (s.length < digitCount)
-      s = "0" + s
-    return s
-  }
+  property var digitChars: []
 
   readonly property int digitPx: 28
   readonly property int labelPx: 10
   readonly property int cellW: 22
   readonly property int cellH: 34
+
+  function rebuildDigits() {
+    var n = Math.max(0, Math.floor(Number(root.value) || 0))
+    var s = String(n)
+    while (s.length < root.digitCount)
+      s = "0" + s
+    if (s.length > root.digitCount)
+      s = s.substring(s.length - root.digitCount)
+    var chars = []
+    for (var i = 0; i < s.length; i++)
+      chars.push(s.charAt(i))
+    root.digitChars = chars
+  }
+
+  onValueChanged: root.rebuildDigits()
+  onDigitCountChanged: root.rebuildDigits()
+  Component.onCompleted: root.rebuildDigits()
 
   implicitWidth: Math.max(column.implicitWidth, 72)
   implicitHeight: column.implicitHeight
@@ -50,10 +61,9 @@ Item {
       spacing: 3
 
       Repeater {
-        model: root.digitCount
+        model: root.digitChars
 
         Rectangle {
-          required property int index
           width: root.cellW
           height: root.cellH
           radius: 4
@@ -61,7 +71,7 @@ Item {
 
           Text {
             anchors.centerIn: parent
-            text: root.displayText.charAt(index) || "0"
+            text: modelData
             color: root.foreground
             font.family: root.fontFamily
             font.pixelSize: root.digitPx

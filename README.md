@@ -10,7 +10,7 @@ native Quattro `bar-widget` (not Electron). Named for Heinlein’s Rocketlaunche
 **ID:** `kenhara.rocketlauncher`  
 **Author:** Harris Kenny  
 **License:** MIT  
-**Version:** 1.5.4  
+**Version:** 1.5.9  
 **Repo:** https://github.com/kenhara/omarchy-rocketlauncher
 
 ### 1.5.4

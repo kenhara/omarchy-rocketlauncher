@@ -30,7 +30,7 @@ Item {
     .replace(/\/$/, "")
   readonly property string samplePath: pluginDir + "/data/sample-cache.json"
 
-  readonly property string pluginVersion: "1.5.8"
+  readonly property string pluginVersion: "1.5.9"
   readonly property string userAgent: "Rocketlauncher/" + pluginVersion + " (Omarchy unofficial; kenhara.rocketlauncher)"
 
 
@@ -418,19 +418,32 @@ Item {
     return list.length ? list[0] : null
   }
 
+  function pickStat(s, primary, aliases) {
+    s = s || {}
+    if (s[primary] !== undefined && s[primary] !== null && s[primary] !== "")
+      return Number(s[primary]) || 0
+    var list = aliases || []
+    for (var i = 0; i < list.length; i++) {
+      var k = list[i]
+      if (s[k] !== undefined && s[k] !== null && s[k] !== "")
+        return Number(s[k]) || 0
+    }
+    return Number(s[primary]) || 0
+  }
+
   function applyPayload(obj, source) {
     if (!obj || typeof obj !== "object") return false
     var s = obj.stats || {}
     store.stats = {
-      total_launches: Number(s.total_launches) || 0,
-      successful_launches: Number(s.successful_launches) || 0,
-      failed_launches: Number(s.failed_launches) || 0,
-      pending_launches: Number(s.pending_launches) || 0,
-      attempted_landings: Number(s.attempted_landings) || 0,
-      successful_landings: Number(s.successful_landings) || 0,
-      failed_landings: Number(s.failed_landings) || 0,
-      consecutive_successful_launches: Number(s.consecutive_successful_launches) || 0,
-      consecutive_successful_landings: Number(s.consecutive_successful_landings) || 0
+      total_launches: store.pickStat(s, "total_launches", ["total_launch_count"]),
+      successful_launches: store.pickStat(s, "successful_launches", ["successful_launch_count"]),
+      failed_launches: store.pickStat(s, "failed_launches", ["failed_launch_count"]),
+      pending_launches: store.pickStat(s, "pending_launches", ["pending_launch_count"]),
+      attempted_landings: store.pickStat(s, "attempted_landings", ["attempted_landing_count"]),
+      successful_landings: store.pickStat(s, "successful_landings", ["successful_landing_count"]),
+      failed_landings: store.pickStat(s, "failed_landings", ["failed_landing_count"]),
+      consecutive_successful_launches: store.pickStat(s, "consecutive_successful_launches", ["consecutive_successful_launch_count"]),
+      consecutive_successful_landings: store.pickStat(s, "consecutive_successful_landings", ["consecutive_successful_landing_count"])
     }
     store.statTotalLaunches = store.stats.total_launches
     store.statSuccessfulLandings = store.stats.successful_landings
