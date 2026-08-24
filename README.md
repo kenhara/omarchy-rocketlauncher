@@ -10,7 +10,10 @@ native Quattro `bar-widget` (not Electron). Named for Heinlein’s Rocketlaunche
 **ID:** `kenhara.rocketlauncher`  
 **Author:** Harris Kenny  
 **License:** MIT  
-**Version:** 1.5.16  
+**Version:** 1.5.18  
+
+### 1.5.18
+- Header: FA rocket glyph (`\uf135`) left of ROCKETLAUNCHER (same as bar chip).
 
 ### 1.5.16
 - List sections (Ongoing / Upcoming / Past) all start collapsed.

@@ -307,13 +307,24 @@ Panel {
           width: parent.width
           spacing: Style.space(4)
 
-          Text {
-            text: "ROCKETLAUNCHER"
-            color: root.contentForeground
-            font.family: root.contentFontFamily
-            font.pixelSize: Style.font.body
-            font.bold: true
-            font.letterSpacing: 3
+          Row {
+            spacing: Style.space(8)
+            Text {
+              text: "\uf135"
+              color: root.contentForeground
+              font.family: root.contentFontFamily
+              font.pixelSize: Style.font.body
+              anchors.verticalCenter: parent.verticalCenter
+            }
+            Text {
+              text: "ROCKETLAUNCHER"
+              color: root.contentForeground
+              font.family: root.contentFontFamily
+              font.pixelSize: Style.font.body
+              font.bold: true
+              font.letterSpacing: 3
+              anchors.verticalCenter: parent.verticalCenter
+            }
           }
 
           Text {
