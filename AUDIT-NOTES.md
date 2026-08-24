@@ -20,6 +20,7 @@ Mapping of plugin audit IDs after the 1.5.0 fix pass.
 | **L3** | `formatNetShort` is UTC (comment + `UTC` suffix in UI / fuzzy NET countdown). | `LaunchStore.qml`, `Panel.qml` |
 | **L4** | Comment that 4-digit `FlipCounter` is intentional odometer look. | `Panel.qml`, `FlipCounter.qml` |
 | **HC1** | Bounded HTTP/cache reads via `scripts/fetch-json.py` (1 MiB/response, 2 MiB cache); row/field caps after parse; FileView cache writes-only. | `LaunchStore.qml`, `scripts/fetch-json.py` |
+| **HC-05** | `--file` refuses symlink/FIFO/non-regular via O_NOFOLLOW + S_ISREG; ERR not-regular. | `scripts/fetch-json.py` |
 
 ## Remaining — live Omarchy / UTM VM
 
@@ -32,3 +33,4 @@ Mapping of plugin audit IDs after the 1.5.0 fix pass.
 
 - **1.5.0** — stickyWatch hoist is a behavioral change (from 1.4.2).
 - **1.5.20** — defensive I/O bounds (helper + cache + row/field caps).
+- **1.5.21** — refuse symlink/FIFO cache reads (HC-05).

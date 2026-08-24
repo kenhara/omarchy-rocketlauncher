@@ -9,13 +9,16 @@ Usage:
   fetch-json.py --file <PATH> --cap <BYTES>
 
 Stdout (machine-readable):
-  OK <nbytes>\\n<body>      # body is <= cap bytes
-  ERR <reason>             # timeout | http-<code> | too-large | not-found | io
+  OK <nbytes>\n<body>      # body is <= cap bytes
+  ERR <reason>             # timeout | http-<code> | too-large | not-found | not-regular | io
 """
 from __future__ import annotations
 
 import argparse
+import errno
+import os
 import socket
+import stat
 import sys
 from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
@@ -35,6 +38,30 @@ def read_capped(reader, cap: int):
     return data
 
 
+class _RejectedFile(Exception):
+    """Cache path is not a plain regular file (symlink, FIFO, device, dir…)."""
+
+
+def read_file_capped(path: str, cap: int):
+    flags = os.O_RDONLY | getattr(os, "O_NONBLOCK", 0) | getattr(os, "O_NOFOLLOW", 0)
+    try:
+        fd = os.open(path, flags)
+    except OSError as e:
+        if e.errno in (errno.ELOOP, errno.EMLINK):
+            raise _RejectedFile(path) from e
+        raise
+    try:
+        if not stat.S_ISREG(os.fstat(fd).st_mode):
+            raise _RejectedFile(path)
+        os.set_blocking(fd, True)
+        f = os.fdopen(fd, "rb")
+    except BaseException:
+        os.close(fd)
+        raise
+    with f:
+        return read_capped(f, cap)
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description="Bounded JSON fetch (OK/ERR + body)")
     src = ap.add_mutually_exclusive_group(required=True)
@@ -47,8 +74,7 @@ def main() -> int:
 
     try:
         if a.file:
-            with open(a.file, "rb") as f:
-                body = read_capped(f, a.cap)
+            body = read_file_capped(a.file, a.cap)
         else:
             headers = {}
             for h in a.header:
@@ -57,6 +83,9 @@ def main() -> int:
             req = Request(a.url, headers=headers, method="GET")
             with urlopen(req, timeout=a.timeout) as resp:
                 body = read_capped(resp, a.cap)
+    except _RejectedFile:
+        print("ERR not-regular")
+        return 7
     except FileNotFoundError:
         print("ERR not-found")
         return 2

@@ -10,7 +10,10 @@ native Quattro `bar-widget` (not Electron). Named for Heinlein’s Rocketlaunche
 **ID:** `kenhara.rocketlauncher`  
 **Author:** Harris Kenny  
 **License:** MIT  
-**Version:** 1.5.20  
+**Version:** 1.5.21  
+
+### 1.5.21
+- Refuse symlink/FIFO cache reads in fetch-json.py
 
 ### 1.5.20
 - Bound HTTP / helper / cache reads (#2217)
