@@ -38,8 +38,8 @@ Panel {
 
   readonly property var liveStore: store
   property bool pastSectionExpanded: false
-  property bool ongoingSectionExpanded: true
-  property bool upcomingSectionExpanded: true
+  property bool ongoingSectionExpanded: false
+  property bool upcomingSectionExpanded: false
 
   onOpenedChanged: {
     if (root.opened && liveStore && liveStore.nextLaunch && liveStore.nextLaunch.id) {

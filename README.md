@@ -10,7 +10,10 @@ native Quattro `bar-widget` (not Electron). Named for Heinlein’s Rocketlaunche
 **ID:** `kenhara.rocketlauncher`  
 **Author:** Harris Kenny  
 **License:** MIT  
-**Version:** 1.5.15  
+**Version:** 1.5.16  
+
+### 1.5.16
+- List sections (Ongoing / Upcoming / Past) all start collapsed.
 
 ### 1.5.15
 - In-panel **Bar** toggles near the footer: **Countdown on bar** and **Mission name on bar** (Compliantish-style On/Off). Omarchy has no widget-settings GUI — primary path to hide the bar countdown.
