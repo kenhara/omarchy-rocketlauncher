@@ -7,7 +7,7 @@ import Quickshell.Io
 //
 // Refresh budget: default 30–60 min (schema knob, min 600s). Free tier is
 // 15 req/hour — we use mode=list and at most 3 GETs per refresh cycle.
-QtObject {
+Item {
   id: store
 
   // Injected / configurable
@@ -30,7 +30,7 @@ QtObject {
     .replace(/\/$/, "")
   readonly property string samplePath: pluginDir + "/data/sample-cache.json"
 
-  readonly property string pluginVersion: "1.5.4"
+  readonly property string pluginVersion: "1.5.5"
   readonly property string userAgent: "Rocketlauncher/" + pluginVersion + " (Omarchy unofficial; kenhara.rocketlauncher)"
 
 
