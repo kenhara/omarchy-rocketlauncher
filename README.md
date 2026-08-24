@@ -10,7 +10,10 @@ native Quattro `bar-widget` (not Electron). Named for Heinlein’s Rocketlaunche
 **ID:** `kenhara.rocketlauncher`  
 **Author:** Harris Kenny  
 **License:** MIT  
-**Version:** 1.5.11  
+**Version:** 1.5.12  
+
+### 1.5.12
+- MissionDetail: coerce patch/type/orbit row `visible` to bool (fixes QML bool warn).
 
 ### 1.5.11
 - Real DETAIL / CLOSE secondary buttons on Next, Upcoming, and Past cards (Watch stays primary filled).

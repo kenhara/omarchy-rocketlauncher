@@ -58,7 +58,7 @@ Item {
     Row {
       width: parent.width
       spacing: Style.space(10)
-      visible: root.showPatch || (root.detail && (root.detail.mission_type || root.detail.orbit))
+      visible: !!(root.showPatch || (root.detail && (root.detail.mission_type || root.detail.orbit)))
 
       Rectangle {
         id: patchRect
