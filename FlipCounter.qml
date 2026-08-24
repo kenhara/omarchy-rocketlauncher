@@ -18,12 +18,12 @@ Item {
 
   readonly property string displayText: padValue(value, digitCount)
 
-  implicitWidth: Math.max(column.implicitWidth, StyleSafe.space(72))
+  implicitWidth: Math.max(column.implicitWidth, styleSafe.space(72))
   implicitHeight: column.implicitHeight
 
   // Graceful Style fallback when qs.Commons tokens differ / unavailable.
   QtObject {
-    id: StyleSafe
+    id: styleSafe
     function space(n) {
       try { if (typeof Style !== "undefined" && Style.space) return Style.space(n) } catch (e) {}
       return n
@@ -65,21 +65,21 @@ Item {
 
   Column {
     id: column
-    spacing: StyleSafe.space(6)
+    spacing: styleSafe.space(6)
 
     Text {
       text: root.label
       color: root.foreground
       opacity: 0.5
       font.family: root.fontFamily
-      font.pixelSize: StyleSafe.fontSize("caption")
+      font.pixelSize: styleSafe.fontSize("caption")
       font.letterSpacing: 1.5
       font.capitalization: Font.AllUppercase
     }
 
     Row {
       id: digitRow
-      spacing: StyleSafe.space(3)
+      spacing: styleSafe.space(3)
 
       property string current: root.displayText
 
@@ -106,9 +106,9 @@ Item {
         Rectangle {
           id: digitCell
           required property int index
-          width: StyleSafe.space(22)
-          height: StyleSafe.space(34)
-          radius: Math.max(2, StyleSafe.cornerRadius() - 4)
+          width: styleSafe.space(22)
+          height: styleSafe.space(34)
+          radius: Math.max(2, styleSafe.cornerRadius() - 4)
           color: root.accentColor
           clip: true
 
@@ -137,7 +137,7 @@ Item {
             text: digitCell.digit
             color: root.foreground
             font.family: root.fontFamily
-            font.pixelSize: StyleSafe.fontSize("display")
+            font.pixelSize: styleSafe.fontSize("display")
             font.bold: true
             visible: false
           }
@@ -148,7 +148,7 @@ Item {
             text: digitCell.digit
             color: root.foreground
             font.family: root.fontFamily
-            font.pixelSize: StyleSafe.fontSize("display")
+            font.pixelSize: styleSafe.fontSize("display")
             font.bold: true
             opacity: 1 - Math.min(1, Math.abs(digitCell.flipY) / 28)
             scale: 1 - Math.min(0.15, Math.abs(digitCell.flipY) / 120)
