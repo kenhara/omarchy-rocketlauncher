@@ -57,6 +57,16 @@ BarWidget {
     return false
   }
 
+  property bool barShowCountdown: {
+    try {
+      if (root.settings && root.settings.barShowCountdown !== undefined)
+        return !!root.settings.barShowCountdown
+      if (typeof root.setting === "function")
+        return !!root.setting("barShowCountdown", true)
+    } catch (e) {}
+    return true
+  }
+
   property bool stickyWatch: {
     try {
       if (root.settings && root.settings.stickyWatch !== undefined)
@@ -184,6 +194,7 @@ BarWidget {
       refreshIntervalSec: root.refreshIntervalSec,
       notifyMilestones: root.notifyMilestones,
       barShowMissionName: root.barShowMissionName,
+      barShowCountdown: root.barShowCountdown,
       stickyWatch: root.stickyWatch,
       watchQuality: root.watchQuality,
       starfieldEnabled: root.starfieldEnabled,
@@ -204,6 +215,7 @@ BarWidget {
   onRefreshIntervalSecChanged: syncStoreSettings()
   onNotifyMilestonesChanged: syncStoreSettings()
   onBarShowMissionNameChanged: syncStoreSettings()
+  onBarShowCountdownChanged: syncStoreSettings()
   onStickyWatchChanged: syncStoreSettings()
   onWatchQualityChanged: syncStoreSettings()
   onStarfieldEnabledChanged: syncStoreSettings()
@@ -251,14 +263,24 @@ BarWidget {
     id: button
     anchors.fill: parent
     bar: root.bar
-    // Rocket glyph + optional playing glyph / mission name + next NET countdown
-    text: "🚀 " + (launchStore.barLabel || "NET —")
+    // FA rocket (\uf135) + optional ▶ / mission / countdown — tintable; emoji is not
+    text: {
+      var g = launchStore.barGlyph || "\uf135"
+      var label = launchStore.barLabel || ""
+      return label.length ? (g + " " + label) : g
+    }
+    active: launchStore.barLive
+    activeColor: Color.accent
+    useActiveColor: true
+    fontSize: Style.font.caption
     horizontalMargin: 8.5
     tooltipText: {
       var n = launchStore.nextLaunch
       var tip = "Rocketlauncher — rocket pilot"
       if (n)
         tip += " — " + (n.mission_name || n.name || "next launch")
+      if (launchStore.countdownText && launchStore.countdownText.length)
+        tip += " · " + launchStore.countdownText
       if (launchStore.stickyWatch && launchStore.watching)
         tip += launchStore.watchStickyBackground
           ? " · Watch playing in background (sticky)"

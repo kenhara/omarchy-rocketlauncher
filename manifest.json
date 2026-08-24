@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "kenhara.rocketlauncher",
   "name": "Rocketlauncher",
-  "version": "1.5.13",
+  "version": "1.5.14",
   "author": "Harris Kenny",
   "license": "MIT",
   "description": "Rocketlauncher on your Omarchy bar — flip-digit Falcon & Starship stats, countdown, Watch. Unofficial SpaceX/NASA launch desk via The Space Devs (LL2); not affiliated.",
@@ -79,6 +79,7 @@
       "refreshIntervalSec": 1800,
       "notifyMilestones": false,
       "barShowMissionName": false,
+      "barShowCountdown": true,
       "stickyWatch": false,
       "watchQuality": "best",
       "starfieldEnabled": true,
@@ -108,6 +109,13 @@
         "label": "Show mission name in bar",
         "description": "Prefix the bar countdown with a short mission name (truncated).",
         "defaultValue": false
+      },
+      {
+        "key": "barShowCountdown",
+        "type": "boolean",
+        "label": "Show countdown in bar",
+        "description": "When off, the bar chip is just the rocket (optional mission name still respects barShowMissionName). Countdown stays in the panel and tooltip.",
+        "defaultValue": true
       },
       {
         "key": "stickyWatch",

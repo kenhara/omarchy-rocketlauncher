@@ -10,7 +10,12 @@ native Quattro `bar-widget` (not Electron). Named for Heinlein’s Rocketlaunche
 **ID:** `kenhara.rocketlauncher`  
 **Author:** Harris Kenny  
 **License:** MIT  
-**Version:** 1.5.13  
+**Version:** 1.5.14  
+
+### 1.5.14
+- Tintable FA rocket bar glyph (Nerd Font `\uf135`); accent-green chip when next launch `webcast_live`.
+- New setting `barShowCountdown` (default on) — hide countdown from the bar chip; tooltip + panel still show it.
+- Watching-only (`▶`) no longer forces green — only LL2 `webcast_live`.
 
 ### 1.5.13
 - MissionCard: stack Watch / Detail vertically (compact rows grow for two buttons).
@@ -203,6 +208,7 @@ Widget settings (`shell.json` / bar widget schema):
 | `refreshIntervalSec` | integer | `1800` | Poll interval in seconds. **Minimum 600** so the free Launch Library 2 tier (15 req/hour) is never hammered. |
 | `notifyMilestones` | bool | `false` | Opt-in `notify-send` once per launch id at **T−10** and **T−0** (debounced in `~/.cache/rocketlauncher/cache.json`). |
 | `barShowMissionName` | bool | `false` | Prefix the bar countdown with a short mission name. |
+| `barShowCountdown` | bool | `true` | Show NET countdown on the bar chip. When off, chip is just the rocket (mission name still respects `barShowMissionName`); countdown stays in panel + tooltip. |
 | `stickyWatch` | bool | `false` | Keep Watch playing when the panel hides — Meet-style PiP (see above). |
 | `watchQuality` | enum | `best` | `best`, `720`, or `480` — passed to `scripts/stream-proxy.py` as yt-dlp height preference. |
 | `starfieldEnabled` | bool | `true` | Faint panel starfield ambience (pauses while Watch is active). |

@@ -16,6 +16,7 @@ Item {
   // Schema knobs (injected from BarWidget / settings)
   property bool notifyMilestones: false
   property bool barShowMissionName: false
+  property bool barShowCountdown: true
   property bool stickyWatch: false
   property string watchQuality: "best"   // best | 720 | 480 → stream-proxy.py
   property bool starfieldEnabled: true
@@ -30,7 +31,7 @@ Item {
     .replace(/\/$/, "")
   readonly property string samplePath: pluginDir + "/data/sample-cache.json"
 
-  readonly property string pluginVersion: "1.5.13"
+  readonly property string pluginVersion: "1.5.14"
   readonly property string userAgent: "Rocketlauncher/" + pluginVersion + " (Omarchy unofficial; kenhara.rocketlauncher)"
 
 
@@ -87,9 +88,12 @@ Item {
 
   readonly property string countdownText: formatCountdown(nextLaunch)
   readonly property string lastUpdatedText: formatUpdated(fetchedAt)
-  // Inline binding so QML tracks stickyWatch / watching / mission / countdown.
+  // FA rocket (\uf135) — tintable via Text.color; color emoji 🚀 is not.
+  readonly property string barGlyph: "\uf135"
+  // LIVE chip tint: webcast_live only (not stickyWatch ▶).
+  readonly property bool barLive: !!(store.nextLaunch && store.nextLaunch.webcast_live)
+  // Inline binding so QML tracks stickyWatch / watching / mission / countdown / barShowCountdown.
   readonly property string barLabel: {
-    var cd = store.countdownText.length ? store.countdownText : "NET —"
     var parts = []
     if (store.stickyWatch && store.watching)
       parts.push("▶")
@@ -100,7 +104,10 @@ Item {
       if (mn.length)
         parts.push(mn)
     }
-    parts.push(cd)
+    if (store.barShowCountdown) {
+      var cd = store.countdownText.length ? store.countdownText : "NET —"
+      parts.push(cd)
+    }
     return parts.join(" ")
   }
 
@@ -127,6 +134,8 @@ Item {
       store.notifyMilestones = !!opts.notifyMilestones
     if (opts.barShowMissionName !== undefined)
       store.barShowMissionName = !!opts.barShowMissionName
+    if (opts.barShowCountdown !== undefined)
+      store.barShowCountdown = !!opts.barShowCountdown
     if (opts.stickyWatch !== undefined)
       store.stickyWatch = !!opts.stickyWatch
     if (opts.watchQuality !== undefined)
