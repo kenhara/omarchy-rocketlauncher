@@ -10,7 +10,14 @@ native Quattro `bar-widget` (not Electron). Named for Heinlein’s Rocketlaunche
 **ID:** `kenhara.rocketlauncher`  
 **Author:** Harris Kenny  
 **License:** MIT  
-**Version:** 1.5.12  
+**Version:** 1.5.13  
+
+### 1.5.13
+- MissionCard: stack Watch / Detail vertically (compact rows grow for two buttons).
+- Upcoming section EXPAND / COLLAPSE (default expanded); show Watch when webcast known.
+- MissionDetail: broader hasDetail + thin-stub fallback; Upcoming loading / lastError near card.
+- Detail fetch failure keeps expand open and seeds a list-mode stub.
+- Shortcuts: W watch · D detail (footer).
 
 ### 1.5.12
 - MissionDetail: coerce patch/type/orbit row `visible` to bool (fixes QML bool warn).

@@ -26,20 +26,18 @@ Item {
   signal clicked()
 
   implicitWidth: Style.space(320)
-  implicitHeight: body.implicitHeight + Style.space(compact ? 16 : 20)
+  // Stacked Watch/Detail: height is max(text column, button column) + padding.
+  implicitHeight: {
+    var pad = Style.space(compact ? 16 : 20)
+    var textH = textColumn.implicitHeight
+    var btnH = btnColumn.visible ? btnColumn.implicitHeight : 0
+    return Math.max(textH, btnH) + pad
+  }
 
   readonly property real cardRadius: Math.max(4, Style.cornerRadius)
   readonly property int actionBtnCount: (showWatch ? 1 : 0) + (showDetail ? 1 : 0)
-  readonly property real actionBtnsWidth: {
-    var w = 0
-    if (showWatch)
-      w += Style.space(72)
-    if (showDetail)
-      w += Style.space(72)
-    if (actionBtnCount > 1)
-      w += Style.space(6)
-    return w
-  }
+  // Stacked buttons share one column width (single button width).
+  readonly property real actionBtnsWidth: actionBtnCount > 0 ? Style.space(72) : 0
 
   function badgeColor() {
     // Alpha wells from theme accent/urgent — readable on light and dark themes.
@@ -93,6 +91,7 @@ Item {
       z: 1
 
       Column {
+        id: textColumn
         width: parent.width - (root.actionBtnCount > 0 ? root.actionBtnsWidth + parent.spacing : 0)
         spacing: Style.space(4)
 
@@ -155,11 +154,11 @@ Item {
         }
       }
 
-      // Primary Watch + secondary Detail on the right
-      Row {
-        id: btnRow
+      // Primary Watch + secondary Detail stacked vertically on the right
+      Column {
+        id: btnColumn
         visible: root.actionBtnCount > 0
-        spacing: Style.space(6)
+        spacing: Style.space(4)
         anchors.verticalCenter: parent.verticalCenter
 
         Rectangle {
@@ -169,6 +168,8 @@ Item {
           height: Style.space(28)
           radius: Math.max(3, Style.cornerRadius - 3)
           color: watchMa.containsMouse ? Qt.lighter(root.foreground, 1.12) : root.foreground
+          Accessible.name: "Watch"
+          Accessible.role: Accessible.Button
 
           Text {
             anchors.centerIn: parent
@@ -200,6 +201,8 @@ Item {
           border.width: 1
           border.color: Qt.rgba(root.foreground.r, root.foreground.g, root.foreground.b,
             detailMa.containsMouse ? 0.5 : 0.35)
+          Accessible.name: root.detailOpen ? "Close detail" : "Detail"
+          Accessible.role: Accessible.Button
 
           Text {
             anchors.centerIn: parent

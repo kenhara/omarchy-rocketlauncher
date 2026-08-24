@@ -14,9 +14,23 @@ Item {
 
   signal openLink(string url)
 
-  readonly property bool hasDetail: !!(detail && (detail.description || detail.pad_name || detail.landing_summary))
+  // True when any useful mission field is present (list-mode stubs often lack description/pad).
+  readonly property bool hasDetail: {
+    if (!detail) return false
+    if (detail.description || detail.pad_name || detail.landing_summary) return true
+    if (detail.mission_name || detail.name || detail.net || detail.vehicle) return true
+    if (detail.status || detail.status_abbrev || detail.orbit || detail.mission_type) return true
+    if (detail.crew && detail.crew.length) return true
+    if (detail.vid_urls && detail.vid_urls.length) return true
+    if (detail.spacecraft_name || detail.booster_serial || detail.patch_url || detail.image_url) return true
+    if (detail.location_name || detail.window_start) return true
+    return false
+  }
+  readonly property bool hasExtendedDetail: !!(detail && (detail.description || detail.pad_name
+    || detail.landing_summary || detail.mission_type || detail.orbit || detail.spacecraft_name
+    || (detail.crew && detail.crew.length) || detail.patch_url || detail.image_url))
   readonly property var crewList: (detail && detail.crew) ? detail.crew : []
-  readonly property bool hasCrew: crewList && crewList.length > 0
+  readonly property bool hasCrew: !!(crewList && crewList.length > 0)
   readonly property string preferredPatchUrl: {
     if (!detail) return ""
     if (detail.patch_url) return detail.patch_url
@@ -38,7 +52,7 @@ Item {
 
   readonly property bool showPatch: patchSource.length > 0 && !patchFailed
 
-  visible: hasDetail && expanded
+  visible: !!(hasDetail && expanded)
   implicitWidth: Style.space(320)
   implicitHeight: visible ? col.implicitHeight : 0
 
@@ -147,6 +161,20 @@ Item {
       font.family: root.fontFamily
       font.pixelSize: Style.font.bodySmall
       lineHeight: 1.25
+    }
+
+
+    // Thin list-mode stub: keep expand useful until detailed GET lands.
+    Text {
+      width: parent.width
+      visible: !!(root.expanded && root.detail && !root.hasExtendedDetail)
+      text: "No extended detail yet"
+      textFormat: Text.PlainText
+      color: root.foreground
+      opacity: 0.45
+      font.family: root.fontFamily
+      font.pixelSize: Style.font.caption
+      font.italic: true
     }
 
     // Pad / landing / rocket facts

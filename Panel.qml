@@ -39,6 +39,7 @@ Panel {
   readonly property var liveStore: store
   property bool pastSectionExpanded: false
   property bool ongoingSectionExpanded: true
+  property bool upcomingSectionExpanded: true
 
   onOpenedChanged: {
     if (root.opened && liveStore && liveStore.nextLaunch && liveStore.nextLaunch.id) {
@@ -69,6 +70,22 @@ Panel {
       liveStore.openWatch(liveStore.nextLaunch)
   }
 
+  function watchTargetLaunch() {
+    if (!liveStore) return null
+    var sid = liveStore.selectedLaunchId
+    if (sid) {
+      if (liveStore.nextLaunch && String(liveStore.nextLaunch.id) === String(sid))
+        return liveStore.nextLaunch
+      if (typeof liveStore.launchRowById === "function") {
+        var row = liveStore.launchRowById(sid)
+        if (row) return row
+      }
+      var d = liveStore.detailFor(sid)
+      if (d) return d
+    }
+    return liveStore.nextLaunch
+  }
+
   function handleWatchKeys(event) {
     if (!event) return false
     var key = event.key
@@ -79,6 +96,31 @@ Panel {
         root.watchPlayer.togglePlayPause()
       } else if (liveStore) {
         liveStore.openWatch(liveStore.nextLaunch)
+      }
+      event.accepted = true
+      return true
+    }
+    // W — Watch for next (or selected) if not already watching
+    if (key === Qt.Key_W || text === "w") {
+      if (liveStore && !liveStore.watching)
+        liveStore.openWatch(root.watchTargetLaunch())
+      event.accepted = true
+      return true
+    }
+    // D — toggle Detail for selected, else next
+    if (key === Qt.Key_D || text === "d") {
+      if (liveStore) {
+        var sid = liveStore.selectedLaunchId
+        if (!sid) {
+          root.requestNextDetail()
+        } else if (liveStore.nextLaunch && String(liveStore.nextLaunch.id) === String(sid)) {
+          if (liveStore.detailExpanded)
+            liveStore.detailExpanded = false
+          else
+            root.requestNextDetail()
+        } else {
+          root.requestLaunchDetail(sid)
+        }
       }
       event.accepted = true
       return true
@@ -130,7 +172,8 @@ Panel {
       liveStore.detailExpanded = false
       return
     }
-    liveStore.fetchLaunchDetail(id)
+    // Always expand; fetchLaunchDetail seeds a stub if the API fails.
+    liveStore.fetchLaunchDetail(id, { expand: true })
   }
 
   function openExternalLink(url) {
@@ -398,6 +441,21 @@ Panel {
             font.pixelSize: Style.font.caption
           }
 
+          Text {
+            width: parent.width
+            visible: {
+              if (!liveStore || !liveStore.lastError || liveStore.detailLoading) return false
+              if (!liveStore.detailExpanded || !liveStore.nextLaunch) return false
+              return liveStore.selectedLaunchId === liveStore.nextLaunch.id
+            }
+            text: liveStore ? liveStore.lastError : ""
+            color: Color.urgent
+            opacity: 0.75
+            font.family: root.contentFontFamily
+            font.pixelSize: Style.font.caption
+            wrapMode: Text.WordWrap
+          }
+
           MissionDetail {
             width: parent.width
             detail: root.nextDetail()
@@ -511,15 +569,58 @@ Panel {
           width: parent.width
           spacing: Style.space(8)
 
-          PanelSectionHeader {
-            text: "UPCOMING"
-            foreground: root.contentForeground
-            fontFamily: root.contentFontFamily
+          Item {
+            width: parent.width
+            height: Math.max(upcomingHdr.implicitHeight, upcomingToggle.height)
+
+            PanelSectionHeader {
+              id: upcomingHdr
+              anchors.left: parent.left
+              anchors.right: upcomingToggle.left
+              anchors.rightMargin: Style.space(8)
+              anchors.verticalCenter: parent.verticalCenter
+              text: "UPCOMING"
+              foreground: root.contentForeground
+              fontFamily: root.contentFontFamily
+            }
+
+            Rectangle {
+              id: upcomingToggle
+              anchors.right: parent.right
+              anchors.verticalCenter: parent.verticalCenter
+              width: Style.space(88)
+              height: Style.space(28)
+              radius: Math.max(3, Style.cornerRadius - 3)
+              color: Qt.rgba(root.contentForeground.r, root.contentForeground.g, root.contentForeground.b,
+                upcomingToggleMa.containsMouse ? 0.12 : 0.06)
+              border.width: 1
+              border.color: Qt.rgba(root.contentForeground.r, root.contentForeground.g, root.contentForeground.b,
+                upcomingToggleMa.containsMouse ? 0.5 : 0.35)
+
+              Text {
+                anchors.centerIn: parent
+                text: root.upcomingSectionExpanded ? "COLLAPSE" : "EXPAND"
+                color: root.contentForeground
+                font.family: root.contentFontFamily
+                font.pixelSize: Style.font.caption
+                font.bold: true
+                font.letterSpacing: 1
+              }
+
+              MouseArea {
+                id: upcomingToggleMa
+                anchors.fill: parent
+                hoverEnabled: true
+                cursorShape: Qt.PointingHandCursor
+                onClicked: root.upcomingSectionExpanded = !root.upcomingSectionExpanded
+              }
+            }
           }
 
           Repeater {
             model: {
-              if (!liveStore || !liveStore.upcoming) return []
+              if (!root.upcomingSectionExpanded || !liveStore || !liveStore.upcoming)
+                return []
               return liveStore.upcoming.slice(0, 5)
             }
 
@@ -544,11 +645,42 @@ Panel {
                 }
                 badgeText: badgeFor(modelData).text
                 badgeKind: badgeFor(modelData).kind
-                showWatch: false
+                showWatch: !!(liveStore && liveStore.officialWebcast(modelData))
                 showDetail: true
                 detailOpen: !!(liveStore && liveStore.selectedLaunchId === modelData.id
                   && liveStore.detailExpanded)
+                onWatchClicked: {
+                  if (liveStore)
+                    liveStore.openWatch(modelData)
+                }
                 onDetailClicked: root.requestLaunchDetail(modelData.id)
+              }
+
+              Text {
+                width: parent.width
+                visible: !!(liveStore && liveStore.detailLoading
+                  && String(liveStore.selectedLaunchId) === String(modelData.id)
+                  && (String(liveStore.detailLoadingId || liveStore.selectedLaunchId)
+                      === String(modelData.id)))
+                text: "Loading mission detail…"
+                color: root.contentForeground
+                opacity: 0.45
+                font.family: root.contentFontFamily
+                font.pixelSize: Style.font.caption
+              }
+
+              Text {
+                width: parent.width
+                visible: !!(liveStore && liveStore.lastError
+                  && liveStore.detailExpanded
+                  && String(liveStore.selectedLaunchId) === String(modelData.id)
+                  && !liveStore.detailLoading)
+                text: liveStore ? liveStore.lastError : ""
+                color: Color.urgent
+                opacity: 0.75
+                font.family: root.contentFontFamily
+                font.pixelSize: Style.font.caption
+                wrapMode: Text.WordWrap
               }
 
               MissionDetail {
@@ -556,6 +688,7 @@ Panel {
                 detail: {
                   if (!liveStore || liveStore.selectedLaunchId !== modelData.id)
                     return null
+                  // Next launch detail lives under NEXT LAUNCH — avoid a duplicate empty card.
                   if (liveStore.nextLaunch && liveStore.nextLaunch.id === modelData.id)
                     return null
                   return liveStore.detailFor(modelData.id) || modelData
@@ -566,7 +699,7 @@ Panel {
                 foreground: root.contentForeground
                 surfaceColor: root.surfaceColor
                 fontFamily: root.contentFontFamily
-            onOpenLink: function(url) { root.openExternalLink(url) }
+                onOpenLink: function(url) { root.openExternalLink(url) }
               }
             }
           }
@@ -716,7 +849,7 @@ Panel {
           width: parent.width
           text: {
             var sticky = liveStore && liveStore.stickyWatch
-            var base = "Esc closes · Space play/pause · M mute · O open original · S stop Watch"
+            var base = "Esc closes · Space play/pause · W watch · D detail · M mute · O open original · S stop Watch"
             if (sticky)
               base += " · stickyWatch: Esc keeps playback (best-effort; verify on live Omarchy)"
             else

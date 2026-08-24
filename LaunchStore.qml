@@ -30,7 +30,7 @@ Item {
     .replace(/\/$/, "")
   readonly property string samplePath: pluginDir + "/data/sample-cache.json"
 
-  readonly property string pluginVersion: "1.5.12"
+  readonly property string pluginVersion: "1.5.13"
   readonly property string userAgent: "Rocketlauncher/" + pluginVersion + " (Omarchy unofficial; kenhara.rocketlauncher)"
 
 
@@ -217,6 +217,59 @@ Item {
     if (!id) return null
     var d = store.launchDetails[id]
     return d || null
+  }
+
+  // Resolve a list-mode launch row by id (next / upcoming / past) for stubs.
+  function launchRowById(id) {
+    id = String(id || "")
+    if (!id) return null
+    if (store.nextLaunch && String(store.nextLaunch.id) === id)
+      return store.nextLaunch
+    var i
+    for (i = 0; i < store.upcoming.length; i++) {
+      if (store.upcoming[i] && String(store.upcoming[i].id) === id)
+        return store.upcoming[i]
+    }
+    for (i = 0; i < store.past.length; i++) {
+      if (store.past[i] && String(store.past[i].id) === id)
+        return store.past[i]
+    }
+    return null
+  }
+
+  // Merge a list-mode row into launchDetails so MissionDetail has something to show.
+  function rememberStubFromRow(id) {
+    id = String(id || "")
+    if (!id) return null
+    if (store.launchDetails[id]) return store.launchDetails[id]
+    var row = store.launchRowById(id)
+    if (!row) return null
+    var stub = {
+      id: row.id,
+      name: row.name || "",
+      mission_name: row.mission_name || row.name || "",
+      vehicle: row.vehicle || "",
+      status: row.status || "",
+      status_abbrev: row.status_abbrev || "",
+      status_id: row.status_id || 0,
+      net: row.net || "",
+      window_start: row.window_start || "",
+      window_end: row.window_end || "",
+      net_precision: row.net_precision || "",
+      vid_urls: row.vid_urls || [],
+      image_url: row.image_url || "",
+      thumbnail_url: row.thumbnail_url || "",
+      webcast_live: !!(row.webcast_live),
+      description: row.description || "",
+      pad_name: row.pad_name || "",
+      landing_summary: row.landing_summary || "",
+      mission_type: row.mission_type || "",
+      orbit: row.orbit || "",
+      crew: row.crew || [],
+      detailed_at: ""
+    }
+    rememberDetail(stub)
+    return stub
   }
 
   function selectedDetail() {
@@ -911,9 +964,10 @@ Item {
       if (expand) {
         store.selectedLaunchId = id
         store.detailExpanded = true
+        store.lastError = ""
       }
       store.applyDetailToLists(id, cached)
-        store.maybeStartPendingWatch(id)
+      store.maybeStartPendingWatch(id)
       return true
     }
 
@@ -931,6 +985,7 @@ Item {
     if (expand) {
       store.selectedLaunchId = id
       store.detailExpanded = true
+      store.lastError = ""
     }
     store.detailLoading = true
     store.detailLoadingId = id
@@ -940,8 +995,13 @@ Item {
       store.detailLoadingId = ""
       if (!ok) {
         store.lastError = "detail fetch failed"
-        // Offline / rate-limit: keep any partial fields already on the launch
-            store.maybeStartPendingWatch(id)
+        // Keep expand open and seed a stub so MissionDetail can render list fields.
+        if (expand) {
+          store.selectedLaunchId = id
+          store.detailExpanded = true
+        }
+        store.rememberStubFromRow(id)
+        store.maybeStartPendingWatch(id)
         store.drainPendingDetail()
         return
       }
@@ -950,15 +1010,27 @@ Item {
         var detail = slimDetail(raw)
         if (!detail) {
           store.lastError = "detail parse empty"
+          if (expand) {
+            store.selectedLaunchId = id
+            store.detailExpanded = true
+          }
+          store.rememberStubFromRow(id)
+          store.maybeStartPendingWatch(id)
           store.drainPendingDetail()
           return
         }
         rememberDetail(detail)
         store.applyDetailToLists(id, detail)
-            persistToDisk()
+        store.lastError = ""
+        persistToDisk()
         store.maybeStartPendingWatch(id)
       } catch (e) {
         store.lastError = "detail parse failed"
+        if (expand) {
+          store.selectedLaunchId = id
+          store.detailExpanded = true
+        }
+        store.rememberStubFromRow(id)
       }
       store.drainPendingDetail()
     })
