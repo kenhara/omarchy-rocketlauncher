@@ -10,7 +10,12 @@ native Quattro `bar-widget` (not Electron). Named for Heinlein’s Rocketlaunche
 **ID:** `kenhara.rocketlauncher`  
 **Author:** Harris Kenny  
 **License:** MIT  
-**Version:** 1.5.14  
+**Version:** 1.5.15  
+
+### 1.5.15
+- In-panel **Bar** toggles near the footer: **Countdown on bar** and **Mission name on bar** (Compliantish-style On/Off). Omarchy has no widget-settings GUI — primary path to hide the bar countdown.
+- Toggles call `applySettings` and mirror into host widget settings so `shell.json` / `omarchy bar set` stay in sync.
+- CLI remains secondary: `omarchy bar set kenhara.rocketlauncher barShowCountdown false`.
 
 ### 1.5.14
 - Tintable FA rocket bar glyph (Nerd Font `\uf135`); accent-green chip when next launch `webcast_live`.
@@ -201,14 +206,32 @@ bind = SUPER, L, exec, omarchy-shell shell toggle kenhara.rocketlauncher
 
 ## Configure
 
-Widget settings (`shell.json` / bar widget schema):
+Omarchy has **no widget-settings GUI**. Prefer the in-panel toggles; CLI / `shell.json` are secondary.
+
+### 1) In-panel Bar (preferred)
+
+Open Rocketlauncher → scroll to the **Bar** section near the footer:
+
+- **Countdown on bar** — On/Off (default On). When Off, the bar chip is just the rocket (optional mission name still respects its own toggle); countdown stays in the panel and tooltip.
+- **Mission name on bar** — On/Off (default Off). Prefixes a short mission name on the chip.
+
+Edits update the live store and mirror into bar settings so they survive reload.
+
+### 2) CLI (`omarchy bar set`)
+
+```sh
+omarchy bar set kenhara.rocketlauncher barShowCountdown false
+omarchy bar set kenhara.rocketlauncher barShowMissionName true
+```
+
+### 3) `~/.config/omarchy/shell.json` / schema
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
 | `refreshIntervalSec` | integer | `1800` | Poll interval in seconds. **Minimum 600** so the free Launch Library 2 tier (15 req/hour) is never hammered. |
 | `notifyMilestones` | bool | `false` | Opt-in `notify-send` once per launch id at **T−10** and **T−0** (debounced in `~/.cache/rocketlauncher/cache.json`). |
-| `barShowMissionName` | bool | `false` | Prefix the bar countdown with a short mission name. |
-| `barShowCountdown` | bool | `true` | Show NET countdown on the bar chip. When off, chip is just the rocket (mission name still respects `barShowMissionName`); countdown stays in panel + tooltip. |
+| `barShowMissionName` | bool | `false` | Prefix the bar countdown with a short mission name. Prefer the in-panel **Mission name on bar** toggle. |
+| `barShowCountdown` | bool | `true` | Show NET countdown on the bar chip. Prefer the in-panel **Countdown on bar** toggle. When off, chip is just the rocket (mission name still respects `barShowMissionName`); countdown stays in panel + tooltip. |
 | `stickyWatch` | bool | `false` | Keep Watch playing when the panel hides — Meet-style PiP (see above). |
 | `watchQuality` | enum | `best` | `best`, `720`, or `480` — passed to `scripts/stream-proxy.py` as yt-dlp height preference. |
 | `starfieldEnabled` | bool | `true` | Faint panel starfield ambience (pauses while Watch is active). |

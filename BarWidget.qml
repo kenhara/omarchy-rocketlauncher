@@ -203,6 +203,15 @@ BarWidget {
     launchStore.panelOpen = root.opened
   }
 
+  // Best-effort write-back into mutable settings (Compliantish / Enricherino).
+  // Keeps shell.json / `omarchy bar set` durable across reload.
+  function mirrorSetting(key, value) {
+    if (!root.settings) return
+    try {
+      root.settings[key] = value
+    } catch (e) {}
+  }
+
   onBarChanged: injectPanel()
   onSettingsChanged: {
     injectPanel()

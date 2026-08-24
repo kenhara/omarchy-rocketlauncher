@@ -190,6 +190,19 @@ Panel {
   readonly property int panelBaseHeight: Style.space(520)
   readonly property int panelWatchHeight: Style.space(720)
 
+  function persistSetting(key, value) {
+    if (!liveStore) return
+    var opts = ({})
+    opts[key] = value
+    liveStore.applySettings(opts)
+    // Mirror into bar settings so shell.json / `omarchy bar set` stay durable.
+    if (hostWidget && typeof hostWidget.mirrorSetting === "function")
+      hostWidget.mirrorSetting(key, value)
+    else if (hostWidget && hostWidget.settings) {
+      try { hostWidget.settings[key] = value } catch (e) {}
+    }
+  }
+
   KeyboardPanel {
     id: panel
     anchorItem: root.anchorItem
@@ -832,6 +845,174 @@ Panel {
             onOpenLink: function(url) { root.openExternalLink(url) }
               }
             }
+          }
+        }
+
+        // Bar display — in-panel (Omarchy has no widget-settings GUI)
+        Column {
+          width: parent.width
+          spacing: Style.space(8)
+
+          Text {
+            text: "Bar"
+            color: root.contentForeground
+            opacity: 0.55
+            font.family: root.contentFontFamily
+            font.pixelSize: Style.font.caption
+            font.bold: true
+            font.letterSpacing: 1
+          }
+
+          // Countdown on bar
+          Row {
+            width: parent.width
+            spacing: Style.space(10)
+
+            Column {
+              width: parent.width - countdownToggleWell.width - Style.space(10)
+              spacing: 2
+              anchors.verticalCenter: parent.verticalCenter
+
+              Text {
+                width: parent.width
+                text: "Countdown on bar"
+                color: root.contentForeground
+                font.family: root.contentFontFamily
+                font.pixelSize: Style.font.body
+                font.bold: true
+                elide: Text.ElideRight
+              }
+
+              Text {
+                width: parent.width
+                text: (liveStore && liveStore.barShowCountdown)
+                  ? "On — NET countdown in the bar chip"
+                  : "Off — rocket only (countdown stays in panel + tooltip)"
+                color: root.contentForeground
+                opacity: 0.4
+                font.family: root.contentFontFamily
+                font.pixelSize: Style.font.caption
+                elide: Text.ElideRight
+              }
+            }
+
+            Rectangle {
+              id: countdownToggleWell
+              width: Style.space(46)
+              height: Style.space(24)
+              radius: height / 2
+              anchors.verticalCenter: parent.verticalCenter
+              color: (liveStore && liveStore.barShowCountdown)
+                ? Qt.rgba(Color.accent.r, Color.accent.g, Color.accent.b, 0.35)
+                : Qt.rgba(root.contentForeground.r, root.contentForeground.g, root.contentForeground.b, 0.12)
+              border.width: 1
+              border.color: Qt.rgba(root.contentForeground.r, root.contentForeground.g, root.contentForeground.b, 0.14)
+
+              Rectangle {
+                width: Style.space(18)
+                height: Style.space(18)
+                radius: width / 2
+                anchors.verticalCenter: parent.verticalCenter
+                x: (liveStore && liveStore.barShowCountdown)
+                  ? parent.width - width - Style.space(3)
+                  : Style.space(3)
+                color: root.contentForeground
+
+                Behavior on x {
+                  NumberAnimation { duration: 120; easing.type: Easing.OutCubic }
+                }
+              }
+
+              MouseArea {
+                anchors.fill: parent
+                cursorShape: Qt.PointingHandCursor
+                onClicked: {
+                  if (!liveStore) return
+                  root.persistSetting("barShowCountdown", !liveStore.barShowCountdown)
+                }
+              }
+            }
+          }
+
+          // Mission name on bar
+          Row {
+            width: parent.width
+            spacing: Style.space(10)
+
+            Column {
+              width: parent.width - missionNameToggleWell.width - Style.space(10)
+              spacing: 2
+              anchors.verticalCenter: parent.verticalCenter
+
+              Text {
+                width: parent.width
+                text: "Mission name on bar"
+                color: root.contentForeground
+                font.family: root.contentFontFamily
+                font.pixelSize: Style.font.body
+                font.bold: true
+                elide: Text.ElideRight
+              }
+
+              Text {
+                width: parent.width
+                text: (liveStore && liveStore.barShowMissionName)
+                  ? "On — short mission name prefixes the chip"
+                  : "Off — no mission name on the bar chip"
+                color: root.contentForeground
+                opacity: 0.4
+                font.family: root.contentFontFamily
+                font.pixelSize: Style.font.caption
+                elide: Text.ElideRight
+              }
+            }
+
+            Rectangle {
+              id: missionNameToggleWell
+              width: Style.space(46)
+              height: Style.space(24)
+              radius: height / 2
+              anchors.verticalCenter: parent.verticalCenter
+              color: (liveStore && liveStore.barShowMissionName)
+                ? Qt.rgba(Color.accent.r, Color.accent.g, Color.accent.b, 0.35)
+                : Qt.rgba(root.contentForeground.r, root.contentForeground.g, root.contentForeground.b, 0.12)
+              border.width: 1
+              border.color: Qt.rgba(root.contentForeground.r, root.contentForeground.g, root.contentForeground.b, 0.14)
+
+              Rectangle {
+                width: Style.space(18)
+                height: Style.space(18)
+                radius: width / 2
+                anchors.verticalCenter: parent.verticalCenter
+                x: (liveStore && liveStore.barShowMissionName)
+                  ? parent.width - width - Style.space(3)
+                  : Style.space(3)
+                color: root.contentForeground
+
+                Behavior on x {
+                  NumberAnimation { duration: 120; easing.type: Easing.OutCubic }
+                }
+              }
+
+              MouseArea {
+                anchors.fill: parent
+                cursorShape: Qt.PointingHandCursor
+                onClicked: {
+                  if (!liveStore) return
+                  root.persistSetting("barShowMissionName", !liveStore.barShowMissionName)
+                }
+              }
+            }
+          }
+
+          Text {
+            width: parent.width
+            text: "CLI secondary: omarchy bar set kenhara.rocketlauncher barShowCountdown false"
+            color: root.contentForeground
+            opacity: 0.28
+            font.family: root.contentFontFamily
+            font.pixelSize: Style.font.caption
+            wrapMode: Text.WordWrap
           }
         }
 
