@@ -1,11 +1,11 @@
-# Space Jockey — In-plugin Watch feasibility
+# Rocketlauncher — In-plugin Watch feasibility
 
 **Date:** 2026-08-23 (America/Denver)  
 **Goal:** Play Official Webcast (YouTube / X broadcasts / HLS) *inside* the plugin panel instead of `Qt.openUrlExternally`.
 
 ---
 
-## 1. What Space Jockey does today
+## 1. What Rocketlauncher does today
 
 `LaunchStore.openWatch()` prefers `Qt.openUrlExternally(url)` with `xdg-open` fallback. Official URLs from LL2 are often:
 
@@ -87,7 +87,7 @@ Official Omarchy docs emphasize MPRIS / media *control*, not shipping Chromium i
 
 ---
 
-## 6. Recommendation for Space Jockey (this milestone)
+## 6. Recommendation for Rocketlauncher (this milestone)
 
 - **Do not** implement full embed in the theme pass.
 - **Next implementation step:** Option **1** for YouTube-capable official/unofficial URLs; Option **2** optional setting (“Watch in mpv window”); keep external open as tertiary fallback especially for X broadcasts.

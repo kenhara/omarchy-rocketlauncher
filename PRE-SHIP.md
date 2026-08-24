@@ -1,11 +1,11 @@
-# Space Jockey — pre-ship checklist (v1.5.2)
+# Rocketlauncher — pre-ship checklist (v1.5.3)
 
-## PRE-SHIP note — discoverability (1.5.2)
+## PRE-SHIP note — discoverability (1.5.3)
 
 Patch bump for marketplace discoverability before UTM smoke: `barWidget.category` **Fun → Widgets**; generous `keywords` + `barWidget.aliases` (SpaceX/NASA/Falcon/LL2/webcast…); README Discoverability (honest: keywords may help search; aliases for discovery docs). No QML/logic change.
 
 
-Applied Omarchy Quattro pre-ship checklist to `harris.space-jockey` on 2026-08-23.
+Applied Omarchy Quattro pre-ship checklist to `harris.rocketlauncher` on 2026-08-23.
 
 ## Grep / must-fix results
 
@@ -24,12 +24,12 @@ Applied Omarchy Quattro pre-ship checklist to `harris.space-jockey` on 2026-08-2
 | 11 | `openUrlExternally` bool + honest toasts | **Fixed** (https allow-list; Opened / Refused / Open failed) |
 | 12 | Remote Text → `textFormat: PlainText` | **Fixed** in `MissionDetail.qml` |
 | 13 | Hover on buttons; Flickable tall panel | **Hover added**; Flickable kept |
-| 14 | Version sync manifest/README/DESIGN/preview/UA | **1.5.2** |
+| 14 | Version sync manifest/README/DESIGN/preview/UA | **1.5.3** |
 | 15 | Integer schema min/max/step | Already OK |
 | 16 | Drop invented `handleSummonPayload` | **Dropped**; local `onBarMiddleClick` / `onBarRightClick` |
 | 17 | Witty pitch ≤15 words; Controls L/R/M; baseline-clean | **Pitch synced**; Controls OK; no curl\|sh |
 
-## Space-Jockey-specific kept
+## Rocketlauncher-specific kept
 
 - Panel `Flickable` scroll (H1)
 - Async Watch after detail / `pendingWatchAfterDetail` (H2)
@@ -47,4 +47,4 @@ Applied Omarchy Quattro pre-ship checklist to `harris.space-jockey` on 2026-08-2
 
 ## Version
 
-**1.5.2** (discoverability: Widgets category + keywords/aliases). Prior **1.5.1** was pre-ship doc/code hardening after 1.5.0 audit.
+**1.5.3** (discoverability: Widgets category + keywords/aliases). Prior **1.5.1** was pre-ship doc/code hardening after 1.5.0 audit.

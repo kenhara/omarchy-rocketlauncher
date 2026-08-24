@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Space Jockey stream helper (Normarchy-style).
+"""Rocketlauncher stream helper (Normarchy-style).
 
 Resolve a webcast URL with yt-dlp and expose a short-lived localhost redirect
 that Qt Multimedia (MediaPlayer) can open inside the plugin panel.
@@ -128,7 +128,7 @@ class _Handler(BaseHTTPRequestHandler):
 
 
 def main() -> int:
-    ap = argparse.ArgumentParser(description="Space Jockey yt-dlp → localhost stream helper")
+    ap = argparse.ArgumentParser(description="Rocketlauncher yt-dlp → localhost stream helper")
     ap.add_argument("url", help="YouTube / X / HLS / other yt-dlp URL")
     ap.add_argument("--port", type=int, default=0, help="Bind port (0 = ephemeral)")
     ap.add_argument("--timeout", type=int, default=180, help="Seconds before exit")

@@ -1,4 +1,4 @@
-# Space Jockey — local module types (optional singleton import).
+# Rocketlauncher — local module types (optional singleton import).
 # Prefer instantiating LaunchStore from BarWidget and injecting into Panel.
 LaunchStore 1.0 LaunchStore.qml
 FlipCounter 1.0 FlipCounter.qml

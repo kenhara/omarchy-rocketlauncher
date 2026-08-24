@@ -5,7 +5,7 @@
     "fetched_at": "2026-08-23T17:00:00Z",
     "agency_id": 121,
     "bundled_sample": true,
-    "note": "Offline sample for Space Jockey UI. upcoming[] excludes Success/past; NETs dated ahead for demo freshness."
+    "note": "Offline sample for Rocketlauncher UI. upcoming[] excludes Success/past; NETs dated ahead for demo freshness."
   },
   "stats": {
     "total_launches": 721,

@@ -1,4 +1,4 @@
-# Space Jockey — Mission detail fields (LL2)
+# Rocketlauncher — Mission detail fields (LL2)
 
 **Date:** 2026-08-23 (America/Denver)  
 **Sources:** `docs/research/spacex-data.md`, `docs/research/samples/ll2-spacex-*-one.json`, live probe `launches/?search=Crew-10&mode=detailed`.
@@ -71,7 +71,7 @@ Current `LaunchStore` already does the 3-call cycle; **add** `fetchLaunchDetail(
 | Mission patch | `mission_patches[].image_url` (priority sort) |
 | Program patch | `program[].mission_patches` / program `image` |
 
-Cache images under `~/.cache/space-jockey/` (optional later).
+Cache images under `~/.cache/rocketlauncher/` (optional later).
 
 ### Webcasts
 | UI | LL2 path |

@@ -1,4 +1,4 @@
-# Space Jockey audit notes (v1.5.0)
+# Rocketlauncher audit notes (v1.5.0)
 
 Mapping of plugin audit IDs after the 1.5.0 fix pass.
 
@@ -13,8 +13,8 @@ Mapping of plugin audit IDs after the 1.5.0 fix pass.
 | **M1** | `upcoming[]` no longer includes Success/past (Starlink Group 15-20 stays in `past[]` only). Sample NETs pushed forward for demo freshness. | `data/sample-cache.json` |
 | **M2** | HLS takes one path: `DIRECT` + return. Non-HLS uses `READY` via proxy only. HLS detection is path/extension `.m3u8` (not substring). | `scripts/stream-proxy.py`, `LaunchStore.isHlsUrl` |
 | **M3** | `detailLoading` guarded before mutating selection; busy fetches queue `pendingDetailId`. `detailLoadingId` drives the spinner. | `LaunchStore.qml`, `Panel.qml` |
-| **M4** | README: removed rename-in-progress WIP / duplicate install; one clean install for `kenhara/omarchy-space-jockey`. | `README.md` |
-| **M5** | README hero: `![Space Jockey](preview.png)` near top. | `README.md` |
+| **M4** | README: removed rename-in-progress WIP / duplicate install; one clean install for `kenhara/omarchy-rocketlauncher`. | `README.md` |
+| **M5** | README hero: `![Rocketlauncher](preview.png)` near top. | `README.md` |
 | **L1** | `openUrlExternal`: if `Qt.openUrlExternally` returns `false`, fall back to `xdg-open`. | `LaunchStore.qml` |
 | **L2** | Single owner for `pauseWatchOnHide`: `LaunchStore.onPanelOpenChanged` only (Panel no longer calls it). | `LaunchStore.qml`, `Panel.qml` |
 | **L3** | `formatNetShort` is UTC (comment + `UTC` suffix in UI / fuzzy NET countdown). | `LaunchStore.qml`, `Panel.qml` |

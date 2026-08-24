@@ -1,6 +1,6 @@
-# Space Jockey — design rationale
+# Rocketlauncher — design rationale
 
-**Version:** 1.5.2
+**Version:** 1.5.3
 
 ## Why this shape wins on Omarchy
 
@@ -8,9 +8,9 @@ Marketplace standouts (Coin Toss, Game of Life, Coverglow, Agents, Minesweeper)
 share a pattern: **tiny bar affordance → rich popout**, theme tokens first,
 correct Quattro lifecycle, witty one-liner, MIT, baseline-friendly.
 
-Space Jockey follows that cluster exactly:
+Rocketlauncher follows that cluster exactly:
 
-| Winner pattern | How Space Jockey uses it |
+| Winner pattern | How Rocketlauncher uses it |
 |----------------|-------------------------|
 | `bar-widget` only + nested `Panel.qml` via Loader (clock / Minesweeper / Game of Life) | No separate `panel` kind — avoids double registration |
 | Forward `opened` / `open` / `close` / `toggle` / `closeForPopoutSwitch` + inject `bar` / `anchorItem` / `hostWidget` | Matches community BarWidget contracts so popout switching works |
@@ -18,7 +18,7 @@ Space Jockey follows that cluster exactly:
 | Schema knobs | `refreshIntervalSec` (min 600) so power users tune without editing QML |
 | Subtle motion, pause when hidden | Digit flips + starfield/scanline only while open |
 | Zero privilege | Pure QML + `XMLHttpRequest` + optional `xdg-open` — aim for security baseline `passed` |
-| Strong pitch (≤15 words) | “Space Jockey on your Omarchy bar — flip-digit Falcon & Starship stats, countdown, Watch.” |
+| Strong pitch (≤15 words) | “Rocketlauncher on your Omarchy bar — flip-digit Falcon & Starship stats, countdown, Watch.” |
 
 ## Product choices
 
@@ -34,7 +34,7 @@ BarWidget.qml  ──Loader──►  Panel.qml
       │                        │
       └── LaunchStore ─────────┘
              │
-             ├─ ~/.cache/space-jockey/cache.json
+             ├─ ~/.cache/rocketlauncher/cache.json
              └─ data/sample-cache.json (bundled)
 ```
 
@@ -43,4 +43,4 @@ BarWidget.qml  ──Loader──►  Panel.qml
 Delight in ≤10 seconds: open the panel, see flip digits, next NET, Watch.
 Native Omarchy feel, not a bolted-on website. The git repo root **is** the
 plugin (`manifest.json` at root) so `omarchy plugin add <git-url>` works for
-the marketplace. GitHub: `kenhara/omarchy-space-jockey` (renamed from `omarchy-launch-desk`).
+the marketplace. GitHub: `kenhara/omarchy-rocketlauncher` (renamed from `omarchy-launch-desk`).

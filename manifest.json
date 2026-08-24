@@ -1,11 +1,11 @@
 {
   "schemaVersion": 1,
-  "id": "harris.space-jockey",
-  "name": "Space Jockey",
-  "version": "1.5.2",
+  "id": "harris.rocketlauncher",
+  "name": "Rocketlauncher",
+  "version": "1.5.3",
   "author": "Harris Kenny",
   "license": "MIT",
-  "description": "Space Jockey on your Omarchy bar — flip-digit Falcon & Starship stats, countdown, Watch. Unofficial SpaceX/NASA launch desk via The Space Devs (LL2); not affiliated.",
+  "description": "Rocketlauncher on your Omarchy bar — flip-digit Falcon & Starship stats, countdown, Watch. Unofficial SpaceX/NASA launch desk via The Space Devs (LL2); not affiliated.",
   "kinds": [
     "bar-widget"
   ],
@@ -13,7 +13,7 @@
     "barWidget": "BarWidget.qml"
   },
   "keywords": [
-    "space jockey",
+    "rocketlauncher",
     "rocket",
     "launch",
     "launches",
@@ -42,16 +42,17 @@
     "t-0",
     "liftoff",
     "spaceflight",
-    "launch desk"
+    "launch desk",
+    "space jockey"
   ],
   "barWidget": {
-    "displayName": "Space Jockey",
-    "description": "Space Jockey on your Omarchy bar — flip-digit Falcon & Starship stats, countdown, Watch. Unofficial; launch data via The Space Devs (LL2).",
+    "displayName": "Rocketlauncher",
+    "description": "Rocketlauncher on your Omarchy bar — flip-digit Falcon & Starship stats, countdown, Watch. Unofficial; launch data via The Space Devs (LL2).",
     "category": "Widgets",
     "allowMultiple": false,
     "defaultSection": "right",
     "aliases": [
-      "space jockey",
+      "rocketlauncher",
       "launch desk",
       "rocket",
       "launches",
@@ -71,7 +72,8 @@
       "livestream",
       "ll2",
       "launch library",
-      "next launch"
+      "next launch",
+      "space jockey"
     ],
     "defaults": {
       "refreshIntervalSec": 1800,

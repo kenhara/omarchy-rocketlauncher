@@ -2,7 +2,7 @@ import QtQuick
 import Quickshell
 import Quickshell.Io
 
-// Launch Library 2 client + cache for Space Jockey.
+// Launch Library 2 client + cache for Rocketlauncher.
 // Pure QML + Qt network (XMLHttpRequest). No elevated privilege.
 //
 // Refresh budget: default 30–60 min (schema knob, min 600s). Free tier is
@@ -23,15 +23,15 @@ QtObject {
 
   readonly property string apiBase: "https://ll.thespacedevs.com/2.3.0"
   readonly property int agencyId: 121
-  readonly property string cacheDir: Quickshell.env("HOME") + "/.cache/space-jockey"
+  readonly property string cacheDir: Quickshell.env("HOME") + "/.cache/rocketlauncher"
   readonly property string cachePath: cacheDir + "/cache.json"
   readonly property string pluginDir: String(Qt.resolvedUrl("."))
     .replace(/^file:\/\//, "")
     .replace(/\/$/, "")
   readonly property string samplePath: pluginDir + "/data/sample-cache.json"
 
-  readonly property string pluginVersion: "1.5.1"
-  readonly property string userAgent: "Space-Jockey/" + pluginVersion + " (Omarchy unofficial; harris.space-jockey)"
+  readonly property string pluginVersion: "1.5.3"
+  readonly property string userAgent: "Rocketlauncher/" + pluginVersion + " (Omarchy unofficial; harris.rocketlauncher)"
 
 
   property var stats: ({
@@ -544,13 +544,13 @@ QtObject {
   function openUrlExternal(url) {
     var u = store.sanitizeOpenUrl(url)
     if (!u.length) {
-      store.notifySend("Space Jockey", String(url || "").trim().length ? "Refused — https only" : "No URL")
+      store.notifySend("Rocketlauncher", String(url || "").trim().length ? "Refused — https only" : "No URL")
       return false
     }
     try {
       var ok = Qt.openUrlExternally(u)
       if (ok !== false) {
-        store.notifySend("Space Jockey", "Opened")
+        store.notifySend("Rocketlauncher", "Opened")
         return true
       }
     } catch (e) {}
@@ -606,7 +606,7 @@ QtObject {
           idleInhibit.command = [
             "systemd-inhibit",
             "--what=idle",
-            "--who=Space Jockey",
+            "--who=Rocketlauncher",
             "--why=Watch playing (stickyWatch)",
             "--mode=block",
             "sleep", "infinity"
@@ -627,9 +627,9 @@ QtObject {
     try {
       notifyProc.command = [
         "notify-send",
-        "-a", "Space Jockey",
+        "-a", "Rocketlauncher",
         "-u", "normal",
-        String(title || "Space Jockey"),
+        String(title || "Rocketlauncher"),
         String(body || "")
       ]
       notifyProc.running = true
@@ -675,12 +675,12 @@ QtObject {
     // Cross T−10 (600s): was above 10 min, now at/under 10 min but still pre-liftoff
     if (prev > 600 && delta <= 600 && delta > 0 && !store.wasNotified(L.id, "t10")) {
       store.markNotified(L.id, "t10")
-      store.notifySend("T−10: " + mission, "Space Jockey · NET in about 10 minutes")
+      store.notifySend("T−10: " + mission, "Rocketlauncher · NET in about 10 minutes")
     }
     // Cross T−0: was positive, now ≤ 0 (liftoff window)
     if (prev > 0 && delta <= 0 && delta > -3600 && !store.wasNotified(L.id, "t0")) {
       store.markNotified(L.id, "t0")
-      store.notifySend("T−0: " + mission, "Space Jockey · liftoff window")
+      store.notifySend("T−0: " + mission, "Rocketlauncher · liftoff window")
     }
     store.prevCountdownSec = delta
   }
@@ -1263,9 +1263,9 @@ QtObject {
     running: false
     onExited: function(exitCode, exitStatus) {
       if (exitCode === 0)
-        store.notifySend("Space Jockey", "Opened")
+        store.notifySend("Rocketlauncher", "Opened")
       else
-        store.notifySend("Space Jockey", "Open failed")
+        store.notifySend("Rocketlauncher", "Open failed")
     }
   }
 

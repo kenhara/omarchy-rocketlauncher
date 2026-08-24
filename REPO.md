@@ -1,10 +1,10 @@
-# Space Jockey — repo notes
+# Rocketlauncher — repo notes
 
-GitHub: `https://github.com/kenhara/omarchy-space-jockey` (renamed from `omarchy-launch-desk`).
+GitHub: `https://github.com/kenhara/omarchy-rocketlauncher` (renamed from `omarchy-launch-desk`).
 
 Install:
 
 ```sh
-omarchy plugin add https://github.com/kenhara/omarchy-space-jockey.git --enable
-omarchy bar move harris.space-jockey --section right
+omarchy plugin add https://github.com/kenhara/omarchy-rocketlauncher.git --enable
+omarchy bar move harris.rocketlauncher --section right
 ```

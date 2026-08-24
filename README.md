@@ -1,19 +1,19 @@
-# Space Jockey
+# Rocketlauncher
 
-![Space Jockey](preview.png)
+![Rocketlauncher](preview.png)
 
 Rocket-pilot Falcon & Starship board for Omarchy — flip-digit stats, countdown,
 ongoing missions, past missions, expandable mission detail, and in-panel Watch. Built as a
-native Quattro `bar-widget` (not Electron). Named for Heinlein’s Space Jockey vibe
+native Quattro `bar-widget` (not Electron). Named for Heinlein’s Rocketlauncher vibe
 (rocket pilot) — unofficial; not SpaceX-branded.
 
-**ID:** `harris.space-jockey`  
+**ID:** `harris.rocketlauncher`  
 **Author:** Harris Kenny  
 **License:** MIT  
-**Version:** 1.5.2  
-**Repo:** https://github.com/kenhara/omarchy-space-jockey
+**Version:** 1.5.3  
+**Repo:** https://github.com/kenhara/omarchy-rocketlauncher
 
-### 1.5.2
+### 1.5.3
 - Discoverability: category **Widgets**; expanded `keywords` + `barWidget.aliases`; honest search note.
 
 ### 1.5.1
@@ -24,13 +24,13 @@ native Quattro `bar-widget` (not Electron). Named for Heinlein’s Space Jockey 
 - Font fallbacks use concrete `"monospace"` when bar theme font is unavailable.
 
 ### 1.4.2
-- Renamed to **Space Jockey** (`harris.space-jockey`); cache → `~/.cache/space-jockey`.
-- Local folder + GitHub: `kenhara/omarchy-space-jockey`.
+- Renamed to **Rocketlauncher** (`harris.rocketlauncher`); cache → `~/.cache/rocketlauncher`.
+- Local folder + GitHub: `kenhara/omarchy-rocketlauncher`.
 
 ## Unofficial disclaimer
 
 
-**Space Jockey is unofficial.** It is **not** affiliated with, endorsed by, or
+**Rocketlauncher is unofficial.** It is **not** affiliated with, endorsed by, or
 sponsored by Space Exploration Technologies Corp. (“SpaceX”) or any related
 entity. This plugin does **not** ship SpaceX logos, wordmarks, or brand assets.
 Mission/vehicle names and trademarks mentioned in launch data belong to their
@@ -45,15 +45,15 @@ Marketplace filing: **Widgets** · tags `bar, media, quickshell`.
 Top-level `keywords` in `manifest.json` may help marketplace/search (SpaceX,
 NASA, Falcon, Starship, LL2, webcast, etc.). `barWidget.aliases` are for
 discovery docs and human search — the bar loader may not index them. Display
-name stays **Space Jockey** (brand-free).
+name stays **Rocketlauncher** (brand-free).
 
 ## Install
 
 ### From GitHub
 
 ```sh
-omarchy plugin add https://github.com/kenhara/omarchy-space-jockey.git --enable
-omarchy bar move harris.space-jockey --section right
+omarchy plugin add https://github.com/kenhara/omarchy-rocketlauncher.git --enable
+omarchy bar move harris.rocketlauncher --section right
 ```
 
 ### Local copy
@@ -63,11 +63,11 @@ machine:
 
 ```sh
 mkdir -p ~/.config/omarchy/plugins
-cp -a . ~/.config/omarchy/plugins/harris.space-jockey
+cp -a . ~/.config/omarchy/plugins/harris.rocketlauncher
 
-omarchy plugin validate ~/.config/omarchy/plugins/harris.space-jockey
+omarchy plugin validate ~/.config/omarchy/plugins/harris.rocketlauncher
 omarchy-shell shell rescanPlugins
-omarchy bar move harris.space-jockey --section right
+omarchy bar move harris.rocketlauncher --section right
 ```
 
 Hot reload applies on save under `~/.config/omarchy/plugins/`.
@@ -154,23 +154,23 @@ player (outlives the keyboard panel). Treat sticky playback as
 ### IPC
 
 ```sh
-omarchy-shell shell toggle harris.space-jockey
-omarchy-shell shell hide harris.space-jockey
+omarchy-shell shell toggle harris.rocketlauncher
+omarchy-shell shell hide harris.rocketlauncher
 ```
 
-Space Jockey is **`bar-widget` only** — use left / middle / right clicks on the
+Rocketlauncher is **`bar-widget` only** — use left / middle / right clicks on the
 bar (and the keys above) rather than inventing summon payloads. Middle-click
 play/pauses Watch when active, otherwise refreshes launch data; right-click
 starts Watch for the next launch.
 
 ### Optional Hyprland bind
 
-Paste into your own Hypr config if you want a key — **Space Jockey does not
+Paste into your own Hypr config if you want a key — **Rocketlauncher does not
 edit** `~/.config/hypr/` or `shell.json` for you:
 
 ```ini
 # hyprland.conf / binds.conf (example only)
-bind = SUPER, L, exec, omarchy-shell shell toggle harris.space-jockey
+bind = SUPER, L, exec, omarchy-shell shell toggle harris.rocketlauncher
 ```
 
 ## Configure
@@ -180,7 +180,7 @@ Widget settings (`shell.json` / bar widget schema):
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
 | `refreshIntervalSec` | integer | `1800` | Poll interval in seconds. **Minimum 600** so the free Launch Library 2 tier (15 req/hour) is never hammered. |
-| `notifyMilestones` | bool | `false` | Opt-in `notify-send` once per launch id at **T−10** and **T−0** (debounced in `~/.cache/space-jockey/cache.json`). |
+| `notifyMilestones` | bool | `false` | Opt-in `notify-send` once per launch id at **T−10** and **T−0** (debounced in `~/.cache/rocketlauncher/cache.json`). |
 | `barShowMissionName` | bool | `false` | Prefix the bar countdown with a short mission name. |
 | `stickyWatch` | bool | `false` | Keep Watch playing when the panel hides — Meet-style PiP (see above). |
 | `watchQuality` | enum | `best` | `best`, `720`, or `480` — passed to `scripts/stream-proxy.py` as yt-dlp height preference. |
@@ -190,13 +190,13 @@ Widget settings (`shell.json` / bar widget schema):
 ## Remove
 
 ```sh
-omarchy plugin remove harris.space-jockey
+omarchy plugin remove harris.rocketlauncher
 ```
 
 Optional cache cleanup:
 
 ```sh
-rm -rf ~/.cache/space-jockey
+rm -rf ~/.cache/rocketlauncher
 ```
 
 ## Data & network
@@ -226,12 +226,12 @@ Bundled `data/sample-cache.json` includes offline past rows from
 When you open the panel or expand the next / upcoming / past card:
 
 5. `GET /launches/{id}/` — **one detailed fetch per id**, then cached in
-   `~/.cache/space-jockey/cache.json` and in-memory `launchDetails`.
+   `~/.cache/rocketlauncher/cache.json` and in-memory `launchDetails`.
 
 Do **not** detailed-fetch every upcoming/past row. Stay under the free tier
 (**15 req/hour**).
 
-**Cache path:** `~/.cache/space-jockey/cache.json`  
+**Cache path:** `~/.cache/rocketlauncher/cache.json`  
 Offline fixtures: `data/sample-cache.json`, plus
 `data/sample-detail-crew.json` / `data/sample-detail-starlink.json` for UI demos.
 
@@ -251,7 +251,7 @@ process. Pure QML + Qt network (+ optional local `yt-dlp` helper for Watch).
 - Network: `ll.thespacedevs.com` for launch data; when Watch is used,
   `yt-dlp` contacts the webcast host (YouTube / X / etc.) and the helper
   binds **127.0.0.1 only**.
-- Disk: read/write `~/.cache/space-jockey/cache.json`; read bundled samples.
+- Disk: read/write `~/.cache/rocketlauncher/cache.json`; read bundled samples.
 - Opens user-selected webcast URLs in the default browser as a fallback.
 - Optional `notify-send` toasts when `notifyMilestones` is enabled (FreeDesktop Notifications).
 - Optional `systemd-inhibit --what=idle` while `stickyWatch` Watch is playing (user-session inhibit only; not used when sticky is off).

@@ -1,7 +1,7 @@
 import QtQuick
 import qs.Commons
 
-// Compact mission / upcoming / ongoing row used by Space Jockey Panel.
+// Compact mission / upcoming / ongoing row used by Rocketlauncher Panel.
 // Theme-native: Color / Style tokens lead; badge hues tint accent/urgent.
 Item {
   id: root

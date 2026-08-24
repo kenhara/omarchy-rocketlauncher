@@ -3,10 +3,10 @@ import Quickshell
 import qs.Commons
 import qs.Ui
 
-// Nested details panel for Space Jockey (loaded by BarWidget — not a separate kind).
+// Nested details panel for Rocketlauncher (loaded by BarWidget — not a separate kind).
 Panel {
   id: root
-  moduleName: "harris.space-jockey"
+  moduleName: "harris.rocketlauncher"
   manageIpc: false
 
   property var anchorItem: null
