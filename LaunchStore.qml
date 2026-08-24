@@ -3,7 +3,8 @@ import Quickshell
 import Quickshell.Io
 
 // Launch Library 2 client + cache for Rocketlauncher.
-// Pure QML + Qt network (XMLHttpRequest). No elevated privilege.
+// Network + cache reads go through scripts/fetch-json.py (hard byte cap).
+// FileView is write-only for the user cache.
 //
 // Refresh budget: default 30–60 min (schema knob, min 600s). Free tier is
 // 15 req/hour — we use mode=list and at most 3 GETs per refresh cycle.
@@ -31,8 +32,23 @@ Item {
     .replace(/\/$/, "")
   readonly property string samplePath: pluginDir + "/data/sample-cache.json"
 
-  readonly property string pluginVersion: "1.5.16"
+  readonly property string pluginVersion: "1.5.20"
   readonly property string userAgent: "Rocketlauncher/" + pluginVersion + " (Omarchy unofficial; kenhara.rocketlauncher)"
+
+  readonly property int netByteCap: 1048576   // 1 MiB per LL2 response
+  readonly property int netTimeoutSec: 20
+  readonly property int cacheByteCap: 2097152  // 2 MiB
+  readonly property int maxListRows: 25
+  readonly property int maxDetails:  60
+  readonly property int maxVids:     12
+  readonly property int maxCrew:     16
+  readonly property int maxStr:      4000
+  readonly property int maxShortStr: 512
+
+  function clampStr(v, n) {
+    var s = String(v == null ? "" : v)
+    return s.length > n ? s.substring(0, n) : s
+  }
 
 
   property var stats: ({
@@ -172,33 +188,34 @@ Item {
     var parts = parseName(item.name)
     var vids = []
     var rawVids = item.vid_urls || []
-    for (var i = 0; i < rawVids.length; i++) {
+    var vlim = Math.min(rawVids.length, store.maxVids)
+    for (var i = 0; i < vlim; i++) {
       var v = rawVids[i] || {}
       var t = v.type
       var tname = (t && typeof t === "object") ? (t.name || "") : String(t || "")
       vids.push({
-        url: v.url || "",
-        source: v.source || "",
-        publisher: v.publisher || "",
-        type: tname,
+        url: store.clampStr(v.url || "", store.maxShortStr),
+        source: store.clampStr(v.source || "", store.maxShortStr),
+        publisher: store.clampStr(v.publisher || "", store.maxShortStr),
+        type: store.clampStr(tname, store.maxShortStr),
         priority: v.priority || 0,
-        feature_image: v.feature_image || ""
+        feature_image: store.clampStr(v.feature_image || "", store.maxShortStr)
       })
     }
     return {
-      id: item.id || "",
-      name: item.name || "",
-      mission_name: item.mission_name || parts.mission,
-      vehicle: item.vehicle || parts.vehicle,
+      id: store.clampStr(item.id || "", store.maxShortStr),
+      name: store.clampStr(item.name || "", store.maxShortStr),
+      mission_name: store.clampStr(item.mission_name || parts.mission, store.maxShortStr),
+      vehicle: store.clampStr(item.vehicle || parts.vehicle, store.maxShortStr),
       status_id: status.id !== undefined ? status.id : (item.status_id || 0),
-      status: status.name || item.status || "",
-      status_abbrev: status.abbrev || item.status_abbrev || "",
-      net: item.net || "",
-      window_start: item.window_start || "",
-      window_end: item.window_end || "",
-      net_precision: (typeof netP === "object" ? (netP.name || "") : String(netP || "")),
-      image_url: img.image_url || item.image_url || "",
-      thumbnail_url: img.thumbnail_url || item.thumbnail_url || "",
+      status: store.clampStr(status.name || item.status || "", store.maxShortStr),
+      status_abbrev: store.clampStr(status.abbrev || item.status_abbrev || "", store.maxShortStr),
+      net: store.clampStr(item.net || "", store.maxShortStr),
+      window_start: store.clampStr(item.window_start || "", store.maxShortStr),
+      window_end: store.clampStr(item.window_end || "", store.maxShortStr),
+      net_precision: store.clampStr((typeof netP === "object" ? (netP.name || "") : String(netP || "")), store.maxShortStr),
+      image_url: store.clampStr(img.image_url || item.image_url || "", store.maxShortStr),
+      thumbnail_url: store.clampStr(img.thumbnail_url || item.thumbnail_url || "", store.maxShortStr),
       webcast_live: !!(item.webcast_live),
       vid_urls: vids
     }
@@ -301,12 +318,12 @@ Item {
     // Already-slim sample / cache rows
     if (!c.astronaut && (c.name || c.wiki_url || c.image_url)) {
       return {
-        name: c.name || "",
-        role: c.role || "",
-        agency: c.agency || "",
-        image_url: c.image_url || "",
-        wiki_url: c.wiki_url || "",
-        url: c.url || ""
+        name: store.clampStr(c.name || "", store.maxShortStr),
+        role: store.clampStr(c.role || "", store.maxShortStr),
+        agency: store.clampStr(c.agency || "", store.maxShortStr),
+        image_url: store.clampStr(c.image_url || "", store.maxShortStr),
+        wiki_url: store.clampStr(c.wiki_url || "", store.maxShortStr),
+        url: store.clampStr(c.url || "", store.maxShortStr)
       }
     }
     var a = c.astronaut || {}
@@ -318,12 +335,12 @@ Item {
     var wiki = a.wiki || a.wiki_url || c.wiki_url || ""
     var astrUrl = a.url || c.url || ""
     return {
-      name: a.name || "",
-      role: roleName,
-      agency: ag.abbrev || ag.name || "",
-      image_url: img.image_url || img.thumbnail_url || "",
-      wiki_url: wiki,
-      url: astrUrl
+      name: store.clampStr(a.name || "", store.maxShortStr),
+      role: store.clampStr(roleName, store.maxShortStr),
+      agency: store.clampStr(ag.abbrev || ag.name || "", store.maxShortStr),
+      image_url: store.clampStr(img.image_url || img.thumbnail_url || "", store.maxShortStr),
+      wiki_url: store.clampStr(wiki, store.maxShortStr),
+      url: store.clampStr(astrUrl, store.maxShortStr)
     }
   }
 
@@ -352,6 +369,7 @@ Item {
         for (var oi = 0; oi < oc.length; oi++) src.push(oc[oi])
       }
       for (var i = 0; i < src.length; i++) {
+        if (crew.length >= store.maxCrew) break
         var m = slimCrewMember(src[i])
         if (!m || !m.name) continue
         if (seen[m.name]) continue
@@ -387,31 +405,34 @@ Item {
         var pri = Number(patches[p].priority) || 0
         if (pri >= bestPri) { bestPri = pri; bestP = patches[p] }
       }
-      patchUrl = bestP.image_url || ""
+      patchUrl = store.clampStr(bestP.image_url || "", store.maxShortStr)
     }
     var img = item.image || {}
     var base = slimLaunch(item) || {}
+    var fallbackCrew = item.crew || []
+    if (fallbackCrew.length > store.maxCrew)
+      fallbackCrew = fallbackCrew.slice(0, store.maxCrew)
     return {
-      id: item.id || base.id || "",
-      name: item.name || base.name || "",
-      mission_name: mission.name || base.mission_name || parts.mission,
-      mission_type: mission.type || item.mission_type || "",
-      description: mission.description || item.description || "",
-      orbit: orbit.abbrev || orbit.name || item.orbit || "",
-      vehicle: cfg.full_name || cfg.name || base.vehicle || parts.vehicle,
-      pad_name: pad.name || item.pad_name || "",
-      location_name: loc.name || item.location_name || "",
-      landing_summary: landingSummary || item.landing_summary || "",
-      booster_serial: boosterSerial || item.booster_serial || "",
+      id: store.clampStr(item.id || base.id || "", store.maxShortStr),
+      name: store.clampStr(item.name || base.name || "", store.maxShortStr),
+      mission_name: store.clampStr(mission.name || base.mission_name || parts.mission, store.maxShortStr),
+      mission_type: store.clampStr(mission.type || item.mission_type || "", store.maxShortStr),
+      description: store.clampStr(mission.description || item.description || "", store.maxStr),
+      orbit: store.clampStr(orbit.abbrev || orbit.name || item.orbit || "", store.maxShortStr),
+      vehicle: store.clampStr(cfg.full_name || cfg.name || base.vehicle || parts.vehicle, store.maxShortStr),
+      pad_name: store.clampStr(pad.name || item.pad_name || "", store.maxShortStr),
+      location_name: store.clampStr(loc.name || item.location_name || "", store.maxShortStr),
+      landing_summary: store.clampStr(landingSummary || item.landing_summary || "", store.maxShortStr),
+      booster_serial: store.clampStr(boosterSerial || item.booster_serial || "", store.maxShortStr),
       booster_flight: boosterFlight || item.booster_flight || 0,
-      patch_url: patchUrl || item.patch_url || "",
-      image_url: img.image_url || base.image_url || "",
-      thumbnail_url: img.thumbnail_url || base.thumbnail_url || "",
+      patch_url: store.clampStr(patchUrl || item.patch_url || "", store.maxShortStr),
+      image_url: store.clampStr(img.image_url || base.image_url || "", store.maxShortStr),
+      thumbnail_url: store.clampStr(img.thumbnail_url || base.thumbnail_url || "", store.maxShortStr),
       webcast_live: !!(item.webcast_live),
       vid_urls: base.vid_urls || [],
-      crew: crew.length ? crew : (item.crew || []),
-      spacecraft_name: sc.name || item.spacecraft_name || "",
-      spacecraft_serial: sc.serial_number || item.spacecraft_serial || "",
+      crew: crew.length ? crew : fallbackCrew,
+      spacecraft_name: store.clampStr(sc.name || item.spacecraft_name || "", store.maxShortStr),
+      spacecraft_serial: store.clampStr(sc.serial_number || item.spacecraft_serial || "", store.maxShortStr),
       status_id: base.status_id,
       status: base.status,
       status_abbrev: base.status_abbrev,
@@ -419,7 +440,7 @@ Item {
       window_start: base.window_start,
       window_end: base.window_end,
       net_precision: base.net_precision,
-      detailed_at: item.detailed_at || (new Date()).toISOString()
+      detailed_at: store.clampStr(item.detailed_at || (new Date()).toISOString(), store.maxShortStr)
     }
   }
 
@@ -430,6 +451,25 @@ Item {
     for (var i = 0; i < keys.length; i++)
       cache[keys[i]] = store.launchDetails[keys[i]]
     cache[detail.id] = detail
+    var ckeys = Object.keys(cache)
+    while (ckeys.length > store.maxDetails) {
+      var drop = ""
+      var oldest = ""
+      for (var j = 0; j < ckeys.length; j++) {
+        if (String(ckeys[j]) === String(detail.id)) continue
+        var at = ""
+        if (cache[ckeys[j]] && cache[ckeys[j]].detailed_at)
+          at = String(cache[ckeys[j]].detailed_at)
+        if (drop === "" || at < oldest) {
+          drop = ckeys[j]
+          oldest = at
+        }
+      }
+      if (!drop)
+        break
+      delete cache[drop]
+      ckeys = Object.keys(cache)
+    }
     store.launchDetails = cache
   }
 
@@ -512,12 +552,12 @@ Item {
     store.statPendingLaunches = store.stats.pending_launches
     store.statConsecutiveSuccessfulLaunches = store.stats.consecutive_successful_launches
     var up = []
-    var rawUp = obj.upcoming || []
+    var rawUp = (obj.upcoming || []).slice(0, store.maxListRows)
     for (var i = 0; i < rawUp.length; i++)
       up.push(slimLaunch(rawUp[i]))
     store.upcoming = up
     var past = []
-    var rawPast = obj.past || obj.previous || []
+    var rawPast = (obj.past || obj.previous || []).slice(0, store.maxListRows)
     for (var pi = 0; pi < rawPast.length; pi++)
       past.push(slimLaunch(rawPast[pi]))
     if (past.length) {
@@ -528,7 +568,8 @@ Item {
     // Ingest bundled / cached detail map
     if (obj.details && typeof obj.details === "object") {
       var dkeys = Object.keys(obj.details)
-      for (var di = 0; di < dkeys.length; di++) {
+      var dlim = Math.min(dkeys.length, store.maxDetails)
+      for (var di = 0; di < dlim; di++) {
         var rawD = obj.details[dkeys[di]]
         var sd = rawD && rawD.detailed_at && (rawD.description !== undefined || rawD.pad_name !== undefined)
           ? rawD
@@ -551,7 +592,7 @@ Item {
       next = mergeDetailOntoLaunch(next, store.launchDetails[next.id])
     store.nextLaunch = next
     var on = []
-    var rawOn = obj.ongoing || []
+    var rawOn = (obj.ongoing || []).slice(0, store.maxListRows)
     for (var j = 0; j < rawOn.length; j++)
       on.push(slimOngoing(rawOn[j]))
     store.ongoing = on
@@ -1142,8 +1183,16 @@ Item {
   }
 
   function bootstrap() {
-    // Prefer disk cache if present; else bundled sample; then network refresh.
-    cacheFile.reload()
+    // Prefer disk cache if present (bounded read); else bundled sample; then network.
+    store.runCappedFetch([
+      "--file", store.cachePath,
+      "--cap", String(store.cacheByteCap)
+    ], function(ok, body) {
+      if (ok)
+        store.onCacheLoaded(body)
+      else
+        sampleFile.reload()
+    })
   }
 
   function onCacheLoaded(text) {
@@ -1194,7 +1243,7 @@ Item {
       }
       try {
         var raw = JSON.parse(body)
-        var rows = raw.results || []
+        var rows = (raw.results || []).slice(0, store.maxListRows)
         var past = []
         for (var i = 0; i < rows.length; i++)
           past.push(slimLaunch(rows[i]))
@@ -1254,6 +1303,7 @@ Item {
   function commitNetworkFetch() {
     var a = store.fetchAgency || {}
     var upRaw = (store.fetchUpcoming && store.fetchUpcoming.results) ? store.fetchUpcoming.results : []
+    upRaw = upRaw.slice(0, store.maxListRows)
     var up = []
     for (var i = 0; i < upRaw.length; i++)
       up.push(slimLaunch(upRaw[i]))
@@ -1263,6 +1313,7 @@ Item {
     if (next && prev && next.id === prev.id && (!next.vid_urls || !next.vid_urls.length) && prev.vid_urls)
       next.vid_urls = prev.vid_urls
     var onRaw = (store.fetchDragon && store.fetchDragon.results) ? store.fetchDragon.results : []
+    onRaw = onRaw.slice(0, store.maxListRows)
     var on = []
     for (var j = 0; j < onRaw.length; j++)
       on.push(slimOngoing(onRaw[j]))
@@ -1301,21 +1352,46 @@ Item {
       store.fetchLaunchDetail(newId, { expand: false })
   }
 
+  // Per-call Process+StdioCollector so fetchLaunchDetail can overlap
+  // refreshFromNetwork / ensurePastLaunches without clobbering stdout.
+  function deliverFetch(raw, cb) {
+    var t = String(raw || "")
+    if (t.indexOf("OK ") === 0) {
+      var nl = t.indexOf("\n")
+      var body = nl >= 0 ? t.substring(nl + 1) : ""
+      if (cb) cb(true, body)
+      return
+    }
+    var reason = "fetch failed"
+    if (t.indexOf("ERR ") === 0) {
+      var end = t.indexOf("\n")
+      reason = (end >= 0 ? t.substring(4, end) : t.substring(4)).trim() || reason
+    }
+    store.lastError = reason
+    if (cb) cb(false, "")
+  }
+
+  function runCappedFetch(args, cb) {
+    var proc = fetchProcComp.createObject(store)
+    if (!proc) {
+      store.lastError = "fetch spawn failed"
+      if (cb) cb(false, "")
+      return
+    }
+    proc.doneCb = cb
+    proc.command = ["python3", "-B", store.pluginDir + "/scripts/fetch-json.py"].concat(args)
+    proc.environment = ({ "PYTHONDONTWRITEBYTECODE": "1" })
+    proc.running = true
+  }
+
   function httpGet(url, cb) {
-    var xhr = new XMLHttpRequest()
-    xhr.onreadystatechange = function() {
-      if (xhr.readyState !== XMLHttpRequest.DONE) return
-      var ok = xhr.status >= 200 && xhr.status < 300
-      cb(ok, xhr.responseText || "")
-    }
-    try {
-      xhr.open("GET", url)
-      xhr.setRequestHeader("Accept", "application/json")
-      xhr.setRequestHeader("User-Agent", store.userAgent)
-      xhr.send()
-    } catch (e) {
-      cb(false, "")
-    }
+    store.runCappedFetch([
+      "--url", url,
+      "--cap", String(store.netByteCap),
+      "--timeout", String(store.netTimeoutSec),
+      "--header", "Accept: application/json",
+      "--header", "User-Agent: " + store.userAgent
+    ], cb)
   }
 
   Component.onCompleted: {
@@ -1348,8 +1424,8 @@ Item {
     watchChanges: false
     atomicWrites: true
     printErrors: false
-    onLoaded: store.onCacheLoaded(text())
-    onLoadFailed: sampleFile.reload()
+    preload: false
+    // Writes only (setText). Reads go through fetch-json.py --file.
   }
 
   FileView {
@@ -1393,6 +1469,39 @@ Item {
       if (store.watching && store.watchStatus === "resolving") {
         store.watchStatus = "fallback"
         store.watchStreamUrl = ""
+      }
+    }
+  }
+
+  Component {
+    id: fetchProcComp
+    Process {
+      id: fp
+      property var doneCb: null
+      property bool delivered: false
+      running: false
+      stdout: StdioCollector {
+        id: capOut
+        waitForEnd: true
+        onStreamFinished: fp.completeFetch(capOut.text)
+      }
+      onExited: function(exitCode, exitStatus) {
+        Qt.callLater(function() {
+          if (!fp.delivered) {
+            var t = ""
+            try { t = capOut.text } catch (e) {}
+            fp.completeFetch(t)
+          }
+          fp.destroy()
+        })
+      }
+      function completeFetch(raw) {
+        if (fp.delivered)
+          return
+        fp.delivered = true
+        var cb = fp.doneCb
+        fp.doneCb = null
+        store.deliverFetch(raw, cb)
       }
     }
   }

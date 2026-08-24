@@ -10,7 +10,10 @@ native Quattro `bar-widget` (not Electron). Named for Heinlein’s Rocketlaunche
 **ID:** `kenhara.rocketlauncher`  
 **Author:** Harris Kenny  
 **License:** MIT  
-**Version:** 1.5.19  
+**Version:** 1.5.20  
+
+### 1.5.20
+- Bound HTTP / helper / cache reads (#2217)
 
 ### 1.5.19
 - Marketplace preview.png is the live Omarchy smoke screenshot.
