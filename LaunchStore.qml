@@ -30,7 +30,7 @@ Item {
     .replace(/\/$/, "")
   readonly property string samplePath: pluginDir + "/data/sample-cache.json"
 
-  readonly property string pluginVersion: "1.5.7"
+  readonly property string pluginVersion: "1.5.8"
   readonly property string userAgent: "Rocketlauncher/" + pluginVersion + " (Omarchy unofficial; kenhara.rocketlauncher)"
 
 
