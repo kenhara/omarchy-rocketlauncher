@@ -10,7 +10,11 @@ native Quattro `bar-widget` (not Electron). Named for Heinlein’s Rocketlaunche
 **ID:** `kenhara.rocketlauncher`  
 **Author:** Harris Kenny  
 **License:** MIT  
-**Version:** 1.5.10  
+**Version:** 1.5.11  
+
+### 1.5.11
+- Real DETAIL / CLOSE secondary buttons on Next, Upcoming, and Past cards (Watch stays primary filled).
+- Past and Ongoing section headers use EXPAND / COLLAPSE secondary buttons (no fragile full-header tap).
 
 ### 1.5.10
 - python3 -B + PYTHONDONTWRITEBYTECODE on stream-proxy Process (stops __pycache__ reload storms).

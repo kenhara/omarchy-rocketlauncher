@@ -15,17 +15,31 @@ Item {
   property color surfaceColor: Qt.rgba(Color.foreground.r, Color.foreground.g, Color.foreground.b, 0.06)
   property string fontFamily: "monospace"
   property bool showWatch: false
+  property bool showDetail: false
+  property bool detailOpen: false
   property bool compact: false
   // Only true when parent wires an action (detail expand, etc.)
   property bool interactive: false
 
   signal watchClicked()
+  signal detailClicked()
   signal clicked()
 
   implicitWidth: Style.space(320)
   implicitHeight: body.implicitHeight + Style.space(compact ? 16 : 20)
 
   readonly property real cardRadius: Math.max(4, Style.cornerRadius)
+  readonly property int actionBtnCount: (showWatch ? 1 : 0) + (showDetail ? 1 : 0)
+  readonly property real actionBtnsWidth: {
+    var w = 0
+    if (showWatch)
+      w += Style.space(72)
+    if (showDetail)
+      w += Style.space(72)
+    if (actionBtnCount > 1)
+      w += Style.space(6)
+    return w
+  }
 
   function badgeColor() {
     // Alpha wells from theme accent/urgent — readable on light and dark themes.
@@ -65,6 +79,7 @@ Item {
       hoverEnabled: root.interactive
       cursorShape: root.interactive ? Qt.PointingHandCursor : Qt.ArrowCursor
       onClicked: root.clicked()
+      z: 0
     }
 
     Row {
@@ -75,9 +90,10 @@ Item {
       anchors.leftMargin: Style.space(12)
       anchors.rightMargin: Style.space(12)
       spacing: Style.space(10)
+      z: 1
 
       Column {
-        width: parent.width - (root.showWatch ? watchBtn.width + parent.spacing : 0)
+        width: parent.width - (root.actionBtnCount > 0 ? root.actionBtnsWidth + parent.spacing : 0)
         spacing: Style.space(4)
 
         Row {
@@ -139,31 +155,69 @@ Item {
         }
       }
 
-      Rectangle {
-        id: watchBtn
-        visible: root.showWatch
-        width: Style.space(72)
-        height: Style.space(28)
-        radius: Math.max(3, Style.cornerRadius - 3)
-        color: watchMa.containsMouse ? Qt.lighter(root.foreground, 1.12) : root.foreground
+      // Primary Watch + secondary Detail on the right
+      Row {
+        id: btnRow
+        visible: root.actionBtnCount > 0
+        spacing: Style.space(6)
         anchors.verticalCenter: parent.verticalCenter
 
-        Text {
-          anchors.centerIn: parent
-          text: "WATCH"
-          color: Color.background
-          font.family: root.fontFamily
-          font.pixelSize: Style.font.caption
-          font.bold: true
-          font.letterSpacing: 1
+        Rectangle {
+          id: watchBtn
+          visible: root.showWatch
+          width: Style.space(72)
+          height: Style.space(28)
+          radius: Math.max(3, Style.cornerRadius - 3)
+          color: watchMa.containsMouse ? Qt.lighter(root.foreground, 1.12) : root.foreground
+
+          Text {
+            anchors.centerIn: parent
+            text: "WATCH"
+            color: Color.background
+            font.family: root.fontFamily
+            font.pixelSize: Style.font.caption
+            font.bold: true
+            font.letterSpacing: 1
+          }
+
+          MouseArea {
+            id: watchMa
+            anchors.fill: parent
+            hoverEnabled: true
+            cursorShape: Qt.PointingHandCursor
+            onClicked: root.watchClicked()
+          }
         }
 
-        MouseArea {
-          id: watchMa
-          anchors.fill: parent
-          hoverEnabled: true
-          cursorShape: Qt.PointingHandCursor
-          onClicked: root.watchClicked()
+        Rectangle {
+          id: detailBtn
+          visible: root.showDetail
+          width: Style.space(72)
+          height: Style.space(28)
+          radius: Math.max(3, Style.cornerRadius - 3)
+          color: Qt.rgba(root.foreground.r, root.foreground.g, root.foreground.b,
+            detailMa.containsMouse ? 0.12 : 0.06)
+          border.width: 1
+          border.color: Qt.rgba(root.foreground.r, root.foreground.g, root.foreground.b,
+            detailMa.containsMouse ? 0.5 : 0.35)
+
+          Text {
+            anchors.centerIn: parent
+            text: root.detailOpen ? "CLOSE" : "DETAIL"
+            color: root.foreground
+            font.family: root.fontFamily
+            font.pixelSize: Style.font.caption
+            font.bold: true
+            font.letterSpacing: 1
+          }
+
+          MouseArea {
+            id: detailMa
+            anchors.fill: parent
+            hoverEnabled: true
+            cursorShape: Qt.PointingHandCursor
+            onClicked: root.detailClicked()
+          }
         }
       }
     }

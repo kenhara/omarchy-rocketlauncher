@@ -38,6 +38,7 @@ Panel {
 
   readonly property var liveStore: store
   property bool pastSectionExpanded: false
+  property bool ongoingSectionExpanded: true
 
   onOpenedChanged: {
     if (root.opened && liveStore && liveStore.nextLaunch && liveStore.nextLaunch.id) {
@@ -343,7 +344,7 @@ Panel {
           MissionCard {
             width: parent.width
             compact: false
-            interactive: true
+            interactive: false
             foreground: root.contentForeground
             surfaceColor: root.surfaceColor
             fontFamily: root.contentFontFamily
@@ -360,12 +361,7 @@ Panel {
             meta: {
               var n = liveStore ? liveStore.nextLaunch : null
               if (!n || !n.net) return ""
-              var tip = "NET " + n.net.replace("T", " ").replace(/\.\d+Z$/, " UTC")
-              if (liveStore && liveStore.detailExpanded)
-                tip += "  ·  tap to collapse detail"
-              else
-                tip += "  ·  tap for mission detail"
-              return tip
+              return "NET " + n.net.replace("T", " ").replace(/\.\d+Z$/, " UTC")
             }
             badgeText: badgeFor(liveStore ? liveStore.nextLaunch : null).text
             badgeKind: badgeFor(liveStore ? liveStore.nextLaunch : null).kind
@@ -373,8 +369,11 @@ Panel {
               var n = liveStore ? liveStore.nextLaunch : null
               return !!(n && liveStore.officialWebcast(n))
             }
+            showDetail: !!(liveStore && liveStore.nextLaunch)
+            detailOpen: !!(liveStore && liveStore.detailExpanded && liveStore.nextLaunch
+              && liveStore.selectedLaunchId === liveStore.nextLaunch.id)
             onWatchClicked: root.watchNext()
-            onClicked: {
+            onDetailClicked: {
               if (!liveStore) return
               if (liveStore.detailExpanded) {
                 liveStore.detailExpanded = false
@@ -433,19 +432,62 @@ Panel {
           spacing: Style.space(8)
           visible: liveStore && liveStore.ongoing && liveStore.ongoing.length > 0
 
-          PanelSectionHeader {
-            text: "ONGOING MISSIONS"
-            foreground: root.contentForeground
-            fontFamily: root.contentFontFamily
+          Item {
+            width: parent.width
+            height: Math.max(ongoingHdr.implicitHeight, ongoingToggle.height)
+
+            PanelSectionHeader {
+              id: ongoingHdr
+              anchors.left: parent.left
+              anchors.right: ongoingToggle.left
+              anchors.rightMargin: Style.space(8)
+              anchors.verticalCenter: parent.verticalCenter
+              text: "ONGOING MISSIONS"
+              foreground: root.contentForeground
+              fontFamily: root.contentFontFamily
+            }
+
+            Rectangle {
+              id: ongoingToggle
+              anchors.right: parent.right
+              anchors.verticalCenter: parent.verticalCenter
+              width: Style.space(88)
+              height: Style.space(28)
+              radius: Math.max(3, Style.cornerRadius - 3)
+              color: Qt.rgba(root.contentForeground.r, root.contentForeground.g, root.contentForeground.b,
+                ongoingToggleMa.containsMouse ? 0.12 : 0.06)
+              border.width: 1
+              border.color: Qt.rgba(root.contentForeground.r, root.contentForeground.g, root.contentForeground.b,
+                ongoingToggleMa.containsMouse ? 0.5 : 0.35)
+
+              Text {
+                anchors.centerIn: parent
+                text: root.ongoingSectionExpanded ? "COLLAPSE" : "EXPAND"
+                color: root.contentForeground
+                font.family: root.contentFontFamily
+                font.pixelSize: Style.font.caption
+                font.bold: true
+                font.letterSpacing: 1
+              }
+
+              MouseArea {
+                id: ongoingToggleMa
+                anchors.fill: parent
+                hoverEnabled: true
+                cursorShape: Qt.PointingHandCursor
+                onClicked: root.ongoingSectionExpanded = !root.ongoingSectionExpanded
+              }
+            }
           }
 
           Repeater {
-            model: liveStore ? liveStore.ongoing : []
+            model: root.ongoingSectionExpanded && liveStore ? liveStore.ongoing : []
 
             MissionCard {
               required property var modelData
               width: parent.width
               compact: true
+              interactive: false
               foreground: root.contentForeground
               surfaceColor: root.surfaceColor
               fontFamily: root.contentFontFamily
@@ -459,6 +501,7 @@ Panel {
               badgeText: modelData.in_space ? "IN SPACE" : ""
               badgeKind: "ok"
               showWatch: false
+              showDetail: false
             }
           }
         }
@@ -488,7 +531,7 @@ Panel {
               MissionCard {
                 width: parent.width
                 compact: true
-                interactive: true
+                interactive: false
                 foreground: root.contentForeground
                 surfaceColor: root.surfaceColor
                 fontFamily: root.contentFontFamily
@@ -497,17 +540,15 @@ Panel {
                 meta: {
                   if (!modelData.net) return ""
                   if (!liveStore) return modelData.net
-                  var tip = "NET " + liveStore.formatNetShort(modelData.net) + " UTC"
-                  if (liveStore.selectedLaunchId === modelData.id && liveStore.detailExpanded)
-                    tip += "  ·  tap to collapse"
-                  else
-                    tip += "  ·  tap for detail"
-                  return tip
+                  return "NET " + liveStore.formatNetShort(modelData.net) + " UTC"
                 }
                 badgeText: badgeFor(modelData).text
                 badgeKind: badgeFor(modelData).kind
                 showWatch: false
-                onClicked: root.requestLaunchDetail(modelData.id)
+                showDetail: true
+                detailOpen: !!(liveStore && liveStore.selectedLaunchId === modelData.id
+                  && liveStore.detailExpanded)
+                onDetailClicked: root.requestLaunchDetail(modelData.id)
               }
 
               MissionDetail {
@@ -538,22 +579,52 @@ Panel {
 
           Item {
             width: parent.width
-            height: pastHdr.implicitHeight
+            height: Math.max(pastHdr.implicitHeight, pastToggle.height)
 
             PanelSectionHeader {
               id: pastHdr
-              text: root.pastSectionExpanded ? "PAST MISSIONS" : "PAST MISSIONS  ·  tap to expand"
+              anchors.left: parent.left
+              anchors.right: pastToggle.left
+              anchors.rightMargin: Style.space(8)
+              anchors.verticalCenter: parent.verticalCenter
+              text: "PAST MISSIONS"
               foreground: root.contentForeground
               fontFamily: root.contentFontFamily
             }
 
-            MouseArea {
-              anchors.fill: parent
-              cursorShape: Qt.PointingHandCursor
-              onClicked: {
-                root.pastSectionExpanded = !root.pastSectionExpanded
-                if (root.pastSectionExpanded && liveStore)
-                  liveStore.ensurePastLaunches()
+            Rectangle {
+              id: pastToggle
+              anchors.right: parent.right
+              anchors.verticalCenter: parent.verticalCenter
+              width: Style.space(88)
+              height: Style.space(28)
+              radius: Math.max(3, Style.cornerRadius - 3)
+              color: Qt.rgba(root.contentForeground.r, root.contentForeground.g, root.contentForeground.b,
+                pastToggleMa.containsMouse ? 0.12 : 0.06)
+              border.width: 1
+              border.color: Qt.rgba(root.contentForeground.r, root.contentForeground.g, root.contentForeground.b,
+                pastToggleMa.containsMouse ? 0.5 : 0.35)
+
+              Text {
+                anchors.centerIn: parent
+                text: root.pastSectionExpanded ? "COLLAPSE" : "EXPAND"
+                color: root.contentForeground
+                font.family: root.contentFontFamily
+                font.pixelSize: Style.font.caption
+                font.bold: true
+                font.letterSpacing: 1
+              }
+
+              MouseArea {
+                id: pastToggleMa
+                anchors.fill: parent
+                hoverEnabled: true
+                cursorShape: Qt.PointingHandCursor
+                onClicked: {
+                  root.pastSectionExpanded = !root.pastSectionExpanded
+                  if (root.pastSectionExpanded && liveStore)
+                    liveStore.ensurePastLaunches()
+                }
               }
             }
           }
@@ -593,7 +664,7 @@ Panel {
               MissionCard {
                 width: parent.width
                 compact: true
-                interactive: true
+                interactive: false
                 foreground: root.contentForeground
                 surfaceColor: root.surfaceColor
                 fontFamily: root.contentFontFamily
@@ -602,17 +673,15 @@ Panel {
                 meta: {
                   if (!modelData.net) return ""
                   if (!liveStore) return modelData.net
-                  var tip = liveStore.formatNetShort(modelData.net) + " UTC"
-                  if (liveStore.selectedLaunchId === modelData.id && liveStore.detailExpanded)
-                    tip += "  ·  tap to collapse"
-                  else
-                    tip += "  ·  tap for detail"
-                  return tip
+                  return liveStore.formatNetShort(modelData.net) + " UTC"
                 }
                 badgeText: badgeFor(modelData).text
                 badgeKind: badgeFor(modelData).kind
                 showWatch: false
-                onClicked: root.requestLaunchDetail(modelData.id)
+                showDetail: true
+                detailOpen: !!(liveStore && liveStore.selectedLaunchId === modelData.id
+                  && liveStore.detailExpanded)
+                onDetailClicked: root.requestLaunchDetail(modelData.id)
               }
 
               MissionDetail {
