@@ -24,8 +24,34 @@ Item {
   signal muteToggled()
   signal playPauseToggled()
 
+  function sanitizeOpenUrl(url, allowLoopback) {
+    var u = String(url || "").trim()
+    if (!u.length) return ""
+    var lower = u.toLowerCase()
+    if (lower.indexOf("file:") === 0 || lower.indexOf("javascript:") === 0
+        || lower.indexOf("smb:") === 0 || lower.indexOf("data:") === 0)
+      return ""
+    if (lower.indexOf("https://") === 0)
+      return u
+    if (allowLoopback && /^http:\/\/127\.0\.0\.1(?::[0-9]+)?(?:\/\S*)?$/i.test(u))
+      return u
+    return ""
+  }
+
+  function safeImageUrl(url) {
+    var u = root.sanitizeOpenUrl(url)
+    if (!u.length) return ""
+    var path = u.toLowerCase().split("?")[0].split("#")[0]
+    if (path.length >= 4) {
+      var ext4 = path.substring(path.length - 4)
+      if (ext4 === ".svg" || ext4 === ".xml") return ""
+    }
+    if (path.length >= 5 && path.substring(path.length - 5) === ".svgz") return ""
+    return u
+  }
+
   readonly property bool isFallback: statusText === "fallback" || statusText === "error"
-  readonly property bool hasStream: streamUrl.length > 0 && !isFallback
+  readonly property bool hasStream: root.sanitizeOpenUrl(streamUrl, true).length > 0 && !isFallback
 
   implicitWidth: Style.space(320)
   implicitHeight: (active && chromeVisible) ? (videoFrame.height + controls.height + Style.space(8)) : 0
@@ -62,7 +88,7 @@ Item {
   onStreamUrlChanged: {
     if (!active) return
     if (hasStream) {
-      mediaPlayer.source = streamUrl
+      mediaPlayer.source = root.sanitizeOpenUrl(streamUrl, true)
       mediaPlayer.play()
     } else {
       mediaPlayer.stop()
@@ -76,7 +102,7 @@ Item {
       stop()
     } else if (hasStream) {
       // User re-opened Watch with a stream; play only when they (re)start Watch.
-      mediaPlayer.source = streamUrl
+      mediaPlayer.source = root.sanitizeOpenUrl(streamUrl, true)
       mediaPlayer.play()
     }
   }
@@ -108,7 +134,7 @@ Item {
       // Poster / fallback thumbnail when X (or resolve) fails
       Image {
         anchors.fill: parent
-        source: root.featureImage
+        source: root.safeImageUrl(root.featureImage)
         fillMode: Image.PreserveAspectCrop
         asynchronous: true
         visible: root.isFallback || root.statusText === "resolving" || !root.hasStream

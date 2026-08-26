@@ -33,9 +33,9 @@ Item {
   readonly property bool hasCrew: !!(crewList && crewList.length > 0)
   readonly property string preferredPatchUrl: {
     if (!detail) return ""
-    if (detail.patch_url) return detail.patch_url
-    if (detail.image_url) return detail.image_url
-    return ""
+    var p = root.safeImageUrl(detail.patch_url || "")
+    if (p) return p
+    return root.safeImageUrl(detail.image_url || "")
   }
 
   property bool patchFailed: false
@@ -63,6 +63,20 @@ Item {
     return ""
   }
 
+  function safeImageUrl(url) {
+    var u = String(url || "").trim()
+    if (!u.length) return ""
+    var lower = u.toLowerCase()
+    if (lower.indexOf("https://") !== 0) return ""
+    var path = lower.split("?")[0].split("#")[0]
+    if (path.length >= 4) {
+      var t = path.substring(path.length - 4)
+      if (t === ".svg" || t === ".xml") return ""
+    }
+    if (path.length >= 5 && path.substring(path.length - 5) === ".svgz") return ""
+    return u
+  }
+
   Column {
     id: col
     width: parent.width
@@ -87,7 +101,7 @@ Item {
           id: patchImage
           anchors.fill: parent
           anchors.margins: 4
-          source: root.patchSource
+          source: root.safeImageUrl(root.patchSource)
           fillMode: Image.PreserveAspectFit
           asynchronous: true
           cache: true
@@ -274,7 +288,7 @@ Item {
               Image {
                 id: crewAvatar
                 anchors.fill: parent
-                source: (modelData && modelData.image_url) ? modelData.image_url : ""
+                source: root.safeImageUrl((modelData && modelData.image_url) ? modelData.image_url : "")
                 fillMode: Image.PreserveAspectCrop
                 asynchronous: true
                 cache: true

@@ -16,19 +16,76 @@ Dependencies (optional — Watch degrades without them):
   - python3
   - yt-dlp  (pipx / pacman / pip install yt-dlp)
 
-Security: binds 127.0.0.1 only. No remote installers. Exits after --timeout
-or when the client disconnects / process is killed by the plugin.
+Security: binds 127.0.0.1 only. Input and upstream fetches are https-only.
+No remote installers. Exits after --timeout or when the client disconnects /
+process is killed by the plugin.
 """
 from __future__ import annotations
 
 import argparse
-import json
 import sys
 import threading
 import time
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from urllib.error import URLError, HTTPError
-from urllib.request import Request, urlopen
+from urllib.parse import urlparse
+from urllib.request import HTTPRedirectHandler, HTTPSHandler, Request, build_opener
+
+
+def require_https(url: str, what: str = "url") -> str:
+    """Return url if it is https://; raise RuntimeError otherwise.
+
+    Rejects file: / javascript: / smb: / data: / http: before yt-dlp or urlopen.
+    """
+    u = (url or "").strip()
+    low = u.lower()
+    if not u or any(c in u for c in "\r\n\x00"):
+        raise RuntimeError(f"refused {what}: https only")
+    if (
+        low.startswith("file:")
+        or low.startswith("javascript:")
+        or low.startswith("smb:")
+        or low.startswith("data:")
+    ):
+        raise RuntimeError(f"refused {what}: https only")
+    parsed = urlparse(u)
+    if (parsed.scheme or "").lower() != "https" or not parsed.hostname:
+        raise RuntimeError(f"refused {what}: https only")
+    return u
+
+
+class _NoOffHostAuthRedirect(HTTPRedirectHandler):
+    """Prefer not following off-host; never send Authorization/Cookie cross-host."""
+
+    def redirect_request(self, req, fp, code, msg, headers, newurl):
+        parsed = urlparse(newurl)
+        if (parsed.scheme or "").lower() != "https" or not parsed.hostname:
+            return None
+        orig = urlparse(req.full_url)
+        orig_host = (orig.hostname or "").lower()
+        new_host = (parsed.hostname or "").lower()
+        newreq = super().redirect_request(req, fp, code, msg, headers, newurl)
+        if newreq is None:
+            return None
+        # Drop credentials on any hop (defense in depth).
+        for hdr in ("Authorization", "Cookie", "authorization", "cookie"):
+            try:
+                del newreq.headers[hdr]
+            except KeyError:
+                pass
+        unredir = getattr(newreq, "unredirected_hdrs", None)
+        if unredir:
+            for hdr in list(unredir):
+                if hdr.lower() in ("authorization", "cookie"):
+                    del unredir[hdr]
+        if orig_host != new_host:
+            # Prefer not following off-host (cookie/auth leak).
+            return None
+        return newreq
+
+
+def _https_opener():
+    return build_opener(_NoOffHostAuthRedirect(), HTTPSHandler())
 
 
 def format_selector(quality: str) -> str:
@@ -55,6 +112,7 @@ def format_selector(quality: str) -> str:
 
 def resolve(url: str, quality: str = "best") -> dict:
     """Return {url, headers} via yt-dlp, else raise RuntimeError."""
+    url = require_https(url, "input")
     try:
         import yt_dlp  # type: ignore
     except ImportError as e:
@@ -82,6 +140,7 @@ def resolve(url: str, quality: str = "best") -> dict:
                 break
     if not media:
         raise RuntimeError("no playable URL extracted")
+    media = require_https(str(media), "media")
     return {"url": media, "headers": headers}
 
 
@@ -106,8 +165,10 @@ class _Handler(BaseHTTPRequestHandler):
             self.end_headers()
             return
         try:
+            require_https(self.media_url, "media")
             req = Request(self.media_url, headers=dict(self.media_headers or {}))
-            with urlopen(req, timeout=30) as resp:
+            opener = _https_opener()
+            with opener.open(req, timeout=30) as resp:
                 data = resp.read(64 * 1024)
                 ctype = resp.headers.get("Content-Type", "application/octet-stream")
                 self.send_response(200)
@@ -120,7 +181,7 @@ class _Handler(BaseHTTPRequestHandler):
                     if not chunk:
                         break
                     self.wfile.write(chunk)
-        except (HTTPError, URLError, OSError) as e:
+        except (HTTPError, URLError, OSError, RuntimeError) as e:
             try:
                 self.send_error(502, str(e))
             except Exception:
@@ -142,6 +203,7 @@ def main() -> int:
     args = ap.parse_args()
 
     try:
+        require_https(args.url, "input")
         resolved = resolve(args.url, quality=args.quality)
     except Exception as e:
         print(f"ERROR {e}", flush=True)

@@ -103,6 +103,7 @@ Item {
             id: titleText
             width: Math.min(implicitWidth, parent.width - (badge.visible ? badge.width + parent.spacing : 0))
             text: root.title
+            textFormat: Text.PlainText
             elide: Text.ElideRight
             color: root.foreground
             font.family: root.fontFamily
@@ -123,6 +124,7 @@ Item {
               id: badgeLabel
               anchors.centerIn: parent
               text: root.badgeText
+              textFormat: Text.PlainText
               color: root.badgeFg()
               font.family: root.fontFamily
               font.pixelSize: Style.font.caption
@@ -135,6 +137,7 @@ Item {
           width: parent.width
           visible: root.subtitle.length > 0
           text: root.subtitle
+          textFormat: Text.PlainText
           elide: Text.ElideRight
           color: root.foreground
           opacity: 0.55
@@ -146,6 +149,7 @@ Item {
           width: parent.width
           visible: root.meta.length > 0
           text: root.meta
+          textFormat: Text.PlainText
           elide: Text.ElideRight
           color: root.foreground
           opacity: 0.4
