@@ -473,6 +473,7 @@ Panel {
               return liveStore.selectedLaunchId === liveStore.nextLaunch.id
             }
             text: liveStore ? liveStore.lastError : ""
+            textFormat: Text.PlainText
             color: Color.urgent
             opacity: 0.75
             font.family: root.contentFontFamily
@@ -700,6 +701,7 @@ Panel {
                   && String(liveStore.selectedLaunchId) === String(modelData.id)
                   && !liveStore.detailLoading)
                 text: liveStore ? liveStore.lastError : ""
+                textFormat: Text.PlainText
                 color: Color.urgent
                 opacity: 0.75
                 font.family: root.contentFontFamily

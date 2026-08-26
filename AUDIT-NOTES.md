@@ -21,6 +21,12 @@ Mapping of plugin audit IDs after the 1.5.0 fix pass.
 | **L4** | Comment that 4-digit `FlipCounter` is intentional odometer look. | `Panel.qml`, `FlipCounter.qml` |
 | **HC1** | Bounded HTTP/cache reads via `scripts/fetch-json.py` (1 MiB/response, 2 MiB cache); row/field caps after parse; FileView cache writes-only. | `LaunchStore.qml`, `scripts/fetch-json.py` |
 | **HC-05** | `--file` refuses symlink/FIFO/non-regular via O_NOFOLLOW + S_ISREG; ERR not-regular. | `scripts/fetch-json.py` |
+| **HC-06** | Watch / MediaPlayer / stream-proxy https-only (`sanitizeOpenUrl`; reject file:/javascript:/smb:/data:). | `LaunchStore.qml`, `WatchPlayer.qml`, `scripts/stream-proxy.py` |
+| **HC-07** | Image.source https allowlist; refuse data:/file:/.svg/.xml at slim + QML. | `LaunchStore.qml`, `MissionDetail.qml`, `WatchPlayer.qml` |
+| **HC-08** | fetch-json pin/re-validate host after redirects; stream-proxy drop auth cookies off-host. | `scripts/fetch-json.py`, `scripts/stream-proxy.py` |
+| **HC-09** | Cache write: O_EXCL\|O_NOFOLLOW 0600 temp, fsync, replace; dir 0700. FileView fallback only. | `scripts/fetch-json.py`, `LaunchStore.qml` |
+| **HC-10** | AutoText neutralize at slim/apply; PlainText on MissionCard + lastError. Re-slim all rows + per-record byte cap. | `LaunchStore.qml`, `MissionCard.qml`, `Panel.qml` |
+| **HC-11** | notify-send `--` before title/body; PATH=/usr/bin:/bin on Processes. | `LaunchStore.qml` |
 
 ## Remaining — live Omarchy / UTM VM
 
@@ -34,3 +40,4 @@ Mapping of plugin audit IDs after the 1.5.0 fix pass.
 - **1.5.0** — stickyWatch hoist is a behavioral change (from 1.4.2).
 - **1.5.20** — defensive I/O bounds (helper + cache + row/field caps).
 - **1.5.21** — refuse symlink/FIFO cache reads (HC-05).
+- **1.5.22** — Watch/image URL allowlists, redirect pinning, atomic cache writes, AutoText neutralize (HC-06–HC-11).

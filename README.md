@@ -10,7 +10,16 @@ native Quattro `bar-widget` (not Electron). Named for Heinlein’s Rocketlaunche
 **ID:** `kenhara.rocketlauncher`  
 **Author:** Harris Kenny  
 **License:** MIT  
-**Version:** 1.5.21  
+**Version:** 1.5.22  
+
+### 1.5.22
+- Watch URLs (webcast, proxy, HLS, MediaPlayer) go through https-only `sanitizeOpenUrl`; stream-proxy rejects `file:` / non-https before yt-dlp/urlopen
+- Image sources (patch / crew / feature) allowlist https; refuse `data:` / `file:` / `.svg` / `.xml`
+- fetch-json.py re-validates LL2 host after redirects; stream-proxy drops Authorization/Cookie and does not follow off-host
+- Cache writes via helper (`O_EXCL|O_NOFOLLOW` 0600 temp, fsync, replace; dir 0700); FileView is fallback only
+- Neutralize remote text at slim/apply; PlainText on MissionCard fields and lastError
+- Re-slim every cache/API row (ongoing, fallback crew, details with `detailed_at`); per-record byte cap
+- `notify-send --` before title/body; pin `PATH=/usr/bin:/bin` on Processes
 
 ### 1.5.21
 - Refuse symlink/FIFO cache reads in fetch-json.py
@@ -313,12 +322,12 @@ process. Pure QML + Qt network (+ optional local `yt-dlp` helper for Watch).
 
 ## Privacy and safety
 
-- Network: `ll.thespacedevs.com` for launch data; when Watch is used,
-  `yt-dlp` contacts the webcast host (YouTube / X / etc.) and the helper
-  binds **127.0.0.1 only**.
-- Disk: read/write `~/.cache/rocketlauncher/cache.json`; read bundled samples.
-- Opens user-selected webcast URLs in the default browser as a fallback.
-- Optional `notify-send` toasts when `notifyMilestones` is enabled (FreeDesktop Notifications).
+- Network: `ll.thespacedevs.com` for launch data (https, host pinned after redirects); when Watch is used,
+  `yt-dlp` contacts the webcast host (YouTube / X / etc.) over **https only** and the helper
+  binds **127.0.0.1 only**. Webcast / image URLs that are not https are dropped.
+- Disk: read/write `~/.cache/rocketlauncher/cache.json` (atomic helper write; reads refuse symlink/FIFO); read bundled samples.
+- Opens user-selected **https** webcast URLs in the default browser as a fallback.
+- Optional `notify-send` toasts when `notifyMilestones` is enabled (FreeDesktop Notifications; `--` before title/body).
 - Optional `systemd-inhibit --what=idle` while `stickyWatch` Watch is playing (user-session inhibit only; not used when sticky is off).
 - Zero privilege beyond normal desktop user permissions inside `omarchy-shell`.
 

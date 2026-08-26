@@ -4,7 +4,7 @@ import Quickshell.Io
 
 // Launch Library 2 client + cache for Rocketlauncher.
 // Network + cache reads go through scripts/fetch-json.py (hard byte cap).
-// FileView is write-only for the user cache.
+// Cache writes go through fetch-json.py --write (O_EXCL|O_NOFOLLOW); FileView is fallback only.
 //
 // Refresh budget: default 30–60 min (schema knob, min 600s). Free tier is
 // 15 req/hour — we use mode=list and at most 3 GETs per refresh cycle.
@@ -32,7 +32,7 @@ Item {
     .replace(/\/$/, "")
   readonly property string samplePath: pluginDir + "/data/sample-cache.json"
 
-  readonly property string pluginVersion: "1.5.21"
+  readonly property string pluginVersion: "1.5.22"
   readonly property string userAgent: "Rocketlauncher/" + pluginVersion + " (Omarchy unofficial; kenhara.rocketlauncher)"
 
   readonly property int netByteCap: 1048576   // 1 MiB per LL2 response
@@ -44,10 +44,96 @@ Item {
   readonly property int maxCrew:     16
   readonly property int maxStr:      4000
   readonly property int maxShortStr: 512
+  readonly property int maxRecordBytes: 49152  // 48 KiB per slimmed row
+  readonly property var helperEnv: ({
+    "PYTHONDONTWRITEBYTECODE": "1",
+    "PATH": "/usr/bin:/bin"
+  })
 
   function clampStr(v, n) {
     var s = String(v == null ? "" : v)
     return s.length > n ? s.substring(0, n) : s
+  }
+
+  // Strip markup / controls at slim/apply so AutoText cannot revive them.
+  function neutralizeText(v) {
+    var s = String(v == null ? "" : v)
+    s = s.replace(/!\[[^\]]*\]\([^)]*\)/g, "")
+    s = s.replace(/[<>]/g, "")
+    s = s.replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, "")
+    return s
+  }
+
+  function autoText(v, n) {
+    return store.clampStr(store.neutralizeText(v), n)
+  }
+
+  function sanitizeOpenUrl(url, allowLoopback) {
+    var u = String(url || "").trim()
+    if (!u.length) return ""
+    if (/[\x00-\x1F\x7F]/.test(u)) return ""
+    var lower = u.toLowerCase()
+    if (lower.indexOf("file:") === 0 || lower.indexOf("javascript:") === 0
+        || lower.indexOf("smb:") === 0 || lower.indexOf("data:") === 0)
+      return ""
+    if (lower.indexOf("https://") === 0)
+      return u
+    // Localhost proxy from stream-proxy.py (READY line) — http://127.0.0.1 only.
+    if (allowLoopback && /^http:\/\/127\.0\.0\.1(?::[0-9]+)?(?:\/\S*)?$/i.test(u))
+      return u
+    return ""
+  }
+
+  function sanitizeImageUrl(url) {
+    var u = store.sanitizeOpenUrl(url)
+    if (!u.length) return ""
+    var path = u.toLowerCase().split("?")[0].split("#")[0]
+    if (path.length >= 4) {
+      var ext4 = path.substring(path.length - 4)
+      if (ext4 === ".svg" || ext4 === ".xml")
+        return ""
+    }
+    if (path.length >= 5 && path.substring(path.length - 5) === ".svgz")
+      return ""
+    return u
+  }
+
+  function recordByteLen(obj) {
+    try {
+      return JSON.stringify(obj).length
+    } catch (e) {
+      return store.maxRecordBytes + 1
+    }
+  }
+
+  function fitRecord(obj) {
+    if (!obj) return null
+    if (store.recordByteLen(obj) <= store.maxRecordBytes)
+      return obj
+    if (obj.vid_urls && obj.vid_urls.length)
+      obj.vid_urls = obj.vid_urls.slice(0, 2)
+    if (obj.description)
+      obj.description = store.clampStr(obj.description, 400)
+    if (obj.crew && obj.crew.length)
+      obj.crew = obj.crew.slice(0, 4)
+    if (store.recordByteLen(obj) <= store.maxRecordBytes)
+      return obj
+    return null
+  }
+
+  function utf8Len(s) {
+    s = String(s || "")
+    var n = 0
+    for (var i = 0; i < s.length; i++) {
+      var c = s.charCodeAt(i)
+      if (c < 128) n += 1
+      else if (c < 2048) n += 2
+      else if (c >= 0xD800 && c <= 0xDBFF) {
+        n += 4
+        i++
+      } else n += 3
+    }
+    return n
   }
 
 
@@ -114,7 +200,7 @@ Item {
     if (store.stickyWatch && store.watching)
       parts.push("▶")
     if (store.barShowMissionName && store.nextLaunch) {
-      var mn = String(store.nextLaunch.mission_name || store.nextLaunch.name || "")
+      var mn = store.autoText(store.nextLaunch.mission_name || store.nextLaunch.name || "", 18)
       if (mn.length > 18)
         mn = mn.substring(0, 16) + "…"
       if (mn.length)
@@ -191,34 +277,36 @@ Item {
     var vlim = Math.min(rawVids.length, store.maxVids)
     for (var i = 0; i < vlim; i++) {
       var v = rawVids[i] || {}
+      var vu = store.sanitizeOpenUrl(v.url || "")
+      if (!vu) continue
       var t = v.type
       var tname = (t && typeof t === "object") ? (t.name || "") : String(t || "")
       vids.push({
-        url: store.clampStr(v.url || "", store.maxShortStr),
-        source: store.clampStr(v.source || "", store.maxShortStr),
-        publisher: store.clampStr(v.publisher || "", store.maxShortStr),
-        type: store.clampStr(tname, store.maxShortStr),
+        url: store.autoText(vu, store.maxShortStr),
+        source: store.autoText(v.source || "", store.maxShortStr),
+        publisher: store.autoText(v.publisher || "", store.maxShortStr),
+        type: store.autoText(tname, store.maxShortStr),
         priority: v.priority || 0,
-        feature_image: store.clampStr(v.feature_image || "", store.maxShortStr)
+        feature_image: store.sanitizeImageUrl(v.feature_image || "")
       })
     }
-    return {
-      id: store.clampStr(item.id || "", store.maxShortStr),
-      name: store.clampStr(item.name || "", store.maxShortStr),
-      mission_name: store.clampStr(item.mission_name || parts.mission, store.maxShortStr),
-      vehicle: store.clampStr(item.vehicle || parts.vehicle, store.maxShortStr),
+    return store.fitRecord({
+      id: store.autoText(item.id || "", store.maxShortStr),
+      name: store.autoText(item.name || "", store.maxShortStr),
+      mission_name: store.autoText(item.mission_name || parts.mission, store.maxShortStr),
+      vehicle: store.autoText(item.vehicle || parts.vehicle, store.maxShortStr),
       status_id: status.id !== undefined ? status.id : (item.status_id || 0),
-      status: store.clampStr(status.name || item.status || "", store.maxShortStr),
-      status_abbrev: store.clampStr(status.abbrev || item.status_abbrev || "", store.maxShortStr),
-      net: store.clampStr(item.net || "", store.maxShortStr),
-      window_start: store.clampStr(item.window_start || "", store.maxShortStr),
-      window_end: store.clampStr(item.window_end || "", store.maxShortStr),
-      net_precision: store.clampStr((typeof netP === "object" ? (netP.name || "") : String(netP || "")), store.maxShortStr),
-      image_url: store.clampStr(img.image_url || item.image_url || "", store.maxShortStr),
-      thumbnail_url: store.clampStr(img.thumbnail_url || item.thumbnail_url || "", store.maxShortStr),
+      status: store.autoText(status.name || item.status || "", store.maxShortStr),
+      status_abbrev: store.autoText(status.abbrev || item.status_abbrev || "", store.maxShortStr),
+      net: store.autoText(item.net || "", store.maxShortStr),
+      window_start: store.autoText(item.window_start || "", store.maxShortStr),
+      window_end: store.autoText(item.window_end || "", store.maxShortStr),
+      net_precision: store.autoText((typeof netP === "object" ? (netP.name || "") : String(netP || "")), store.maxShortStr),
+      image_url: store.sanitizeImageUrl(img.image_url || item.image_url || ""),
+      thumbnail_url: store.sanitizeImageUrl(img.thumbnail_url || item.thumbnail_url || ""),
       webcast_live: !!(item.webcast_live),
       vid_urls: vids
-    }
+    })
   }
 
   function slimOngoing(item) {
@@ -226,17 +314,17 @@ Item {
     var cfg = item.spacecraft_config || {}
     var img = item.image || {}
     var st = item.status || {}
-    return {
+    return store.fitRecord({
       id: item.id || 0,
-      name: item.name || "",
-      serial: item.serial_number || item.serial || "",
-      config: cfg.name || item.config || "",
+      name: store.autoText(item.name || "", store.maxShortStr),
+      serial: store.autoText(item.serial_number || item.serial || "", store.maxShortStr),
+      config: store.autoText(cfg.name || item.config || "", store.maxShortStr),
       in_space: !!(item.in_space),
-      time_in_space: item.time_in_space || "",
-      time_docked: item.time_docked || "",
-      image_url: img.image_url || item.image_url || "",
-      status: st.name || item.status || ""
-    }
+      time_in_space: store.autoText(item.time_in_space || "", store.maxShortStr),
+      time_docked: store.autoText(item.time_docked || "", store.maxShortStr),
+      image_url: store.sanitizeImageUrl(img.image_url || item.image_url || ""),
+      status: store.autoText(st.name || item.status || "", store.maxShortStr)
+    })
   }
 
   function detailFor(id) {
@@ -270,30 +358,8 @@ Item {
     if (store.launchDetails[id]) return store.launchDetails[id]
     var row = store.launchRowById(id)
     if (!row) return null
-    var stub = {
-      id: row.id,
-      name: row.name || "",
-      mission_name: row.mission_name || row.name || "",
-      vehicle: row.vehicle || "",
-      status: row.status || "",
-      status_abbrev: row.status_abbrev || "",
-      status_id: row.status_id || 0,
-      net: row.net || "",
-      window_start: row.window_start || "",
-      window_end: row.window_end || "",
-      net_precision: row.net_precision || "",
-      vid_urls: row.vid_urls || [],
-      image_url: row.image_url || "",
-      thumbnail_url: row.thumbnail_url || "",
-      webcast_live: !!(row.webcast_live),
-      description: row.description || "",
-      pad_name: row.pad_name || "",
-      landing_summary: row.landing_summary || "",
-      mission_type: row.mission_type || "",
-      orbit: row.orbit || "",
-      crew: row.crew || [],
-      detailed_at: ""
-    }
+    var stub = slimDetail(row)
+    if (!stub) return null
     rememberDetail(stub)
     return stub
   }
@@ -307,24 +373,26 @@ Item {
     if (!launch) return ""
     var vids = launch.vid_urls || []
     for (var i = 0; i < vids.length; i++) {
-      if (vids[i] && vids[i].feature_image)
-        return vids[i].feature_image
+      if (vids[i] && vids[i].feature_image) {
+        var fi = store.sanitizeImageUrl(vids[i].feature_image)
+        if (fi) return fi
+      }
     }
-    return launch.image_url || launch.thumbnail_url || ""
+    return store.sanitizeImageUrl(launch.image_url || launch.thumbnail_url || "")
   }
 
   function slimCrewMember(c) {
     if (!c) return null
     // Already-slim sample / cache rows
     if (!c.astronaut && (c.name || c.wiki_url || c.image_url)) {
-      return {
-        name: store.clampStr(c.name || "", store.maxShortStr),
-        role: store.clampStr(c.role || "", store.maxShortStr),
-        agency: store.clampStr(c.agency || "", store.maxShortStr),
-        image_url: store.clampStr(c.image_url || "", store.maxShortStr),
-        wiki_url: store.clampStr(c.wiki_url || "", store.maxShortStr),
-        url: store.clampStr(c.url || "", store.maxShortStr)
-      }
+      return store.fitRecord({
+        name: store.autoText(c.name || "", store.maxShortStr),
+        role: store.autoText(c.role || "", store.maxShortStr),
+        agency: store.autoText(c.agency || "", store.maxShortStr),
+        image_url: store.sanitizeImageUrl(c.image_url || ""),
+        wiki_url: store.sanitizeOpenUrl(c.wiki_url || ""),
+        url: store.sanitizeOpenUrl(c.url || "")
+      })
     }
     var a = c.astronaut || {}
     var role = c.role || {}
@@ -334,14 +402,14 @@ Item {
     // Prefer Wikipedia, else LL2 astronaut page
     var wiki = a.wiki || a.wiki_url || c.wiki_url || ""
     var astrUrl = a.url || c.url || ""
-    return {
-      name: store.clampStr(a.name || "", store.maxShortStr),
-      role: store.clampStr(roleName, store.maxShortStr),
-      agency: store.clampStr(ag.abbrev || ag.name || "", store.maxShortStr),
-      image_url: store.clampStr(img.image_url || img.thumbnail_url || "", store.maxShortStr),
-      wiki_url: store.clampStr(wiki, store.maxShortStr),
-      url: store.clampStr(astrUrl, store.maxShortStr)
-    }
+    return store.fitRecord({
+      name: store.autoText(a.name || "", store.maxShortStr),
+      role: store.autoText(roleName, store.maxShortStr),
+      agency: store.autoText(ag.abbrev || ag.name || "", store.maxShortStr),
+      image_url: store.sanitizeImageUrl(img.image_url || img.thumbnail_url || ""),
+      wiki_url: store.sanitizeOpenUrl(wiki),
+      url: store.sanitizeOpenUrl(astrUrl)
+    })
   }
 
   function slimDetail(item) {
@@ -405,34 +473,43 @@ Item {
         var pri = Number(patches[p].priority) || 0
         if (pri >= bestPri) { bestPri = pri; bestP = patches[p] }
       }
-      patchUrl = store.clampStr(bestP.image_url || "", store.maxShortStr)
+      patchUrl = store.sanitizeImageUrl(bestP.image_url || "")
     }
     var img = item.image || {}
     var base = slimLaunch(item) || {}
     var fallbackCrew = item.crew || []
-    if (fallbackCrew.length > store.maxCrew)
-      fallbackCrew = fallbackCrew.slice(0, store.maxCrew)
-    return {
-      id: store.clampStr(item.id || base.id || "", store.maxShortStr),
-      name: store.clampStr(item.name || base.name || "", store.maxShortStr),
-      mission_name: store.clampStr(mission.name || base.mission_name || parts.mission, store.maxShortStr),
-      mission_type: store.clampStr(mission.type || item.mission_type || "", store.maxShortStr),
-      description: store.clampStr(mission.description || item.description || "", store.maxStr),
-      orbit: store.clampStr(orbit.abbrev || orbit.name || item.orbit || "", store.maxShortStr),
-      vehicle: store.clampStr(cfg.full_name || cfg.name || base.vehicle || parts.vehicle, store.maxShortStr),
-      pad_name: store.clampStr(pad.name || item.pad_name || "", store.maxShortStr),
-      location_name: store.clampStr(loc.name || item.location_name || "", store.maxShortStr),
-      landing_summary: store.clampStr(landingSummary || item.landing_summary || "", store.maxShortStr),
-      booster_serial: store.clampStr(boosterSerial || item.booster_serial || "", store.maxShortStr),
+    if (!crew.length && fallbackCrew.length) {
+      var seenFb = ({})
+      var fblim = Math.min(fallbackCrew.length, store.maxCrew)
+      for (var fi = 0; fi < fblim; fi++) {
+        var fm = slimCrewMember(fallbackCrew[fi])
+        if (!fm || !fm.name) continue
+        if (seenFb[fm.name]) continue
+        seenFb[fm.name] = true
+        crew.push(fm)
+      }
+    }
+    return store.fitRecord({
+      id: store.autoText(item.id || base.id || "", store.maxShortStr),
+      name: store.autoText(item.name || base.name || "", store.maxShortStr),
+      mission_name: store.autoText(mission.name || base.mission_name || parts.mission, store.maxShortStr),
+      mission_type: store.autoText(mission.type || item.mission_type || "", store.maxShortStr),
+      description: store.autoText(mission.description || item.description || "", store.maxStr),
+      orbit: store.autoText(orbit.abbrev || orbit.name || item.orbit || "", store.maxShortStr),
+      vehicle: store.autoText(cfg.full_name || cfg.name || base.vehicle || parts.vehicle, store.maxShortStr),
+      pad_name: store.autoText(pad.name || item.pad_name || "", store.maxShortStr),
+      location_name: store.autoText(loc.name || item.location_name || "", store.maxShortStr),
+      landing_summary: store.autoText(landingSummary || item.landing_summary || "", store.maxShortStr),
+      booster_serial: store.autoText(boosterSerial || item.booster_serial || "", store.maxShortStr),
       booster_flight: boosterFlight || item.booster_flight || 0,
-      patch_url: store.clampStr(patchUrl || item.patch_url || "", store.maxShortStr),
-      image_url: store.clampStr(img.image_url || base.image_url || "", store.maxShortStr),
-      thumbnail_url: store.clampStr(img.thumbnail_url || base.thumbnail_url || "", store.maxShortStr),
+      patch_url: store.sanitizeImageUrl(patchUrl || item.patch_url || ""),
+      image_url: store.sanitizeImageUrl(img.image_url || base.image_url || ""),
+      thumbnail_url: store.sanitizeImageUrl(img.thumbnail_url || base.thumbnail_url || ""),
       webcast_live: !!(item.webcast_live),
       vid_urls: base.vid_urls || [],
-      crew: crew.length ? crew : fallbackCrew,
-      spacecraft_name: store.clampStr(sc.name || item.spacecraft_name || "", store.maxShortStr),
-      spacecraft_serial: store.clampStr(sc.serial_number || item.spacecraft_serial || "", store.maxShortStr),
+      crew: crew,
+      spacecraft_name: store.autoText(sc.name || item.spacecraft_name || "", store.maxShortStr),
+      spacecraft_serial: store.autoText(sc.serial_number || item.spacecraft_serial || "", store.maxShortStr),
       status_id: base.status_id,
       status: base.status,
       status_abbrev: base.status_abbrev,
@@ -440,8 +517,8 @@ Item {
       window_start: base.window_start,
       window_end: base.window_end,
       net_precision: base.net_precision,
-      detailed_at: store.clampStr(item.detailed_at || (new Date()).toISOString(), store.maxShortStr)
-    }
+      detailed_at: store.autoText(item.detailed_at || (new Date()).toISOString(), store.maxShortStr)
+    })
   }
 
   function rememberDetail(detail) {
@@ -553,13 +630,17 @@ Item {
     store.statConsecutiveSuccessfulLaunches = store.stats.consecutive_successful_launches
     var up = []
     var rawUp = (obj.upcoming || []).slice(0, store.maxListRows)
-    for (var i = 0; i < rawUp.length; i++)
-      up.push(slimLaunch(rawUp[i]))
+    for (var i = 0; i < rawUp.length; i++) {
+      var sl = slimLaunch(rawUp[i])
+      if (sl) up.push(sl)
+    }
     store.upcoming = up
     var past = []
     var rawPast = (obj.past || obj.previous || []).slice(0, store.maxListRows)
-    for (var pi = 0; pi < rawPast.length; pi++)
-      past.push(slimLaunch(rawPast[pi]))
+    for (var pi = 0; pi < rawPast.length; pi++) {
+      var spl = slimLaunch(rawPast[pi])
+      if (spl) past.push(spl)
+    }
     if (past.length) {
       store.past = past
       store.pastLoaded = true
@@ -571,18 +652,13 @@ Item {
       var dlim = Math.min(dkeys.length, store.maxDetails)
       for (var di = 0; di < dlim; di++) {
         var rawD = obj.details[dkeys[di]]
-        var sd = rawD && rawD.detailed_at && (rawD.description !== undefined || rawD.pad_name !== undefined)
-          ? rawD
-          : slimDetail(rawD)
+        var sd = slimDetail(rawD)
         if (sd) rememberDetail(sd)
       }
     }
     // next_launch may already carry slim detail fields (sample)
     if (obj.next_launch && (obj.next_launch.detailed_at || obj.next_launch.description || obj.next_launch.pad_name)) {
       var nd = slimDetail(obj.next_launch)
-      if (!nd && obj.next_launch.id) {
-        nd = obj.next_launch
-      }
       if (nd) {
         if (!nd.detailed_at) nd.detailed_at = (new Date()).toISOString()
         rememberDetail(nd)
@@ -593,8 +669,10 @@ Item {
     store.nextLaunch = next
     var on = []
     var rawOn = (obj.ongoing || []).slice(0, store.maxListRows)
-    for (var j = 0; j < rawOn.length; j++)
-      on.push(slimOngoing(rawOn[j]))
+    for (var j = 0; j < rawOn.length; j++) {
+      var so = slimOngoing(rawOn[j])
+      if (so) on.push(so)
+    }
     store.ongoing = on
     store.fetchedAt = (obj.meta && obj.meta.fetched_at) ? obj.meta.fetched_at : (new Date()).toISOString()
     store.dataSource = source || "unknown"
@@ -630,16 +708,18 @@ Item {
     var bestPri = -1
     for (var i = 0; i < vids.length; i++) {
       var v = vids[i] || {}
+      var vu = store.sanitizeOpenUrl(v.url || "")
+      if (!vu) continue
       var t = String(v.type || "")
       var pri = Number(v.priority) || 0
-      if (t.indexOf("Official") >= 0 && v.url)
-        return v.url
-      if (v.url && pri >= bestPri) {
+      if (t.indexOf("Official") >= 0)
+        return vu
+      if (pri >= bestPri) {
         bestPri = pri
-        best = v.url
+        best = vu
       }
     }
-    return best
+    return store.sanitizeOpenUrl(best)
   }
 
   function isYoutubeUrl(url) {
@@ -658,14 +738,6 @@ Item {
     return u.length >= 5 && u.substring(u.length - 5) === ".m3u8"
   }
 
-  function sanitizeOpenUrl(url) {
-    var u = String(url || "").trim()
-    if (!u.length) return ""
-    // Remote / webcast / wiki links — https only (no javascript:/file: surprises).
-    if (u.toLowerCase().indexOf("https://") !== 0) return ""
-    return u
-  }
-
   function openUrlExternal(url) {
     var u = store.sanitizeOpenUrl(url)
     if (!u.length) {
@@ -679,6 +751,7 @@ Item {
         return true
       }
     } catch (e) {}
+    openUrlProc.environment = store.helperEnv
     openUrlProc.command = ["xdg-open", u]
     openUrlProc.running = true
     return true
@@ -728,6 +801,7 @@ Item {
     try {
       if (want) {
         if (!idleInhibit.running) {
+          idleInhibit.environment = store.helperEnv
           idleInhibit.command = [
             "systemd-inhibit",
             "--what=idle",
@@ -750,12 +824,14 @@ Item {
 
   function notifySend(title, body) {
     try {
+      notifyProc.environment = store.helperEnv
       notifyProc.command = [
         "notify-send",
         "-a", "Rocketlauncher",
         "-u", "normal",
-        String(title || "Rocketlauncher"),
-        String(body || "")
+        "--",
+        store.autoText(title || "Rocketlauncher", store.maxShortStr),
+        store.autoText(body || "", store.maxShortStr)
       ]
       notifyProc.running = true
     } catch (e) {}
@@ -796,7 +872,7 @@ Item {
     if (!isFinite(netMs)) return
     var delta = Math.floor((netMs - store.nowMs) / 1000)
     var prev = store.prevCountdownSec
-    var mission = L.mission_name || L.name || "Launch"
+    var mission = store.autoText(L.mission_name || L.name || "Launch", 80)
     // Cross T−10 (600s): was above 10 min, now at/under 10 min but still pre-liftoff
     if (prev > 600 && delta <= 600 && delta > 0 && !store.wasNotified(L.id, "t10")) {
       store.markNotified(L.id, "t10")
@@ -821,12 +897,16 @@ Item {
     stopStreamProxy()
     store.watchStatus = "resolving"
     store.watchStreamUrl = ""
+    var safe = store.sanitizeOpenUrl(url)
+    if (!safe) {
+      store.watchStatus = "fallback"
+      store.watching = true
+      return
+    }
     var script = store.pluginDir + "/scripts/stream-proxy.py"
     var q = store.normalizeWatchQuality(store.watchQuality)
-    streamProxy.command = ["python3", "-B", script, url, "--timeout", "180", "--quality", q]
-    streamProxy.environment = ({
-      "PYTHONDONTWRITEBYTECODE": "1"
-    })
+    streamProxy.command = ["python3", "-B", script, safe, "--timeout", "180", "--quality", q]
+    streamProxy.environment = store.helperEnv
     streamProxyStdout = ""
     streamProxy.running = true
     resolveTimer.restart()
@@ -840,7 +920,14 @@ Item {
     if (!line) return
     if (line.indexOf("READY ") === 0) {
       resolveTimer.stop()
-      store.watchStreamUrl = line.substring(6).trim()
+      var ready = store.sanitizeOpenUrl(line.substring(6).trim(), true)
+      if (!ready) {
+        store.watchStreamUrl = ""
+        store.watchStatus = "fallback"
+        store.watching = true
+        return
+      }
+      store.watchStreamUrl = ready
       store.watchStatus = "playing"
       store.watching = true
       store.syncIdleInhibit()
@@ -848,7 +935,14 @@ Item {
     }
     if (line.indexOf("DIRECT ") === 0) {
       resolveTimer.stop()
-      store.watchStreamUrl = line.substring(7).trim()
+      var direct = store.sanitizeOpenUrl(line.substring(7).trim())
+      if (!direct) {
+        store.watchStreamUrl = ""
+        store.watchStatus = "fallback"
+        store.watching = true
+        return
+      }
+      store.watchStreamUrl = direct
       store.watchStatus = "playing"
       store.watching = true
       store.syncIdleInhibit()
@@ -867,7 +961,7 @@ Item {
   function openWatch(launch) {
     var L = launch || store.nextLaunch
     if (!L) return false
-    var url = officialWebcast(L)
+    var url = store.sanitizeOpenUrl(officialWebcast(L))
     // H2: list mode often omits vid_urls — fetch detail, then start Watch.
     if (!url) {
       if (L.id) {
@@ -894,7 +988,13 @@ Item {
     // X broadcasts: try yt-dlp, then degrade to feature_image + Open original.
     // Never claim X always works.
     if (isHlsUrl(url)) {
-      store.watchStreamUrl = url
+      var hls = store.sanitizeOpenUrl(url)
+      if (!hls) {
+        store.watchStreamUrl = ""
+        store.watchStatus = "fallback"
+        return true
+      }
+      store.watchStreamUrl = hls
       store.watchStatus = "playing"
       store.syncIdleInhibit()
       return true
@@ -1173,13 +1273,27 @@ Item {
   }
 
   function persistToDisk() {
-    // FileView.setText mkpath — no mkdir Process + Qt.callLater race.
+    // Primary: fetch-json.py --write (O_EXCL|O_NOFOLLOW 0600 temp, fsync, replace).
+    // FileView.setText remains writes-only fallback if the helper cannot start.
     var body = JSON.stringify(buildCacheObject(), null, 2) + "\n"
-    try {
-      cacheFile.setText(body)
-    } catch (e) {
-      // Disk may be unwritable — stay on sample / memory.
+    store.runAtomicWrite(store.cachePath, body)
+  }
+
+  function runAtomicWrite(path, body) {
+    var proc = writeProcComp.createObject(store)
+    if (!proc) {
+      try { cacheFile.setText(body) } catch (e) {}
+      return
     }
+    proc.writeBody = body
+    proc.command = [
+      "python3", "-B", store.pluginDir + "/scripts/fetch-json.py",
+      "--write", path,
+      "--cap", String(store.cacheByteCap),
+      "--nbytes", String(store.utf8Len(body))
+    ]
+    proc.environment = store.helperEnv
+    proc.running = true
   }
 
   function bootstrap() {
@@ -1245,8 +1359,10 @@ Item {
         var raw = JSON.parse(body)
         var rows = (raw.results || []).slice(0, store.maxListRows)
         var past = []
-        for (var i = 0; i < rows.length; i++)
-          past.push(slimLaunch(rows[i]))
+        for (var i = 0; i < rows.length; i++) {
+          var pl = slimLaunch(rows[i])
+          if (pl) past.push(pl)
+        }
         store.past = past
         store.pastLoaded = true
             persistToDisk()
@@ -1305,8 +1421,10 @@ Item {
     var upRaw = (store.fetchUpcoming && store.fetchUpcoming.results) ? store.fetchUpcoming.results : []
     upRaw = upRaw.slice(0, store.maxListRows)
     var up = []
-    for (var i = 0; i < upRaw.length; i++)
-      up.push(slimLaunch(upRaw[i]))
+    for (var i = 0; i < upRaw.length; i++) {
+      var ul = slimLaunch(upRaw[i])
+      if (ul) up.push(ul)
+    }
     // Preserve webcast URLs from previous next launch when list mode omits them
     var prev = store.nextLaunch
     var next = pickNext(up)
@@ -1315,8 +1433,10 @@ Item {
     var onRaw = (store.fetchDragon && store.fetchDragon.results) ? store.fetchDragon.results : []
     onRaw = onRaw.slice(0, store.maxListRows)
     var on = []
-    for (var j = 0; j < onRaw.length; j++)
-      on.push(slimOngoing(onRaw[j]))
+    for (var j = 0; j < onRaw.length; j++) {
+      var ol = slimOngoing(onRaw[j])
+      if (ol) on.push(ol)
+    }
     var payload = {
       meta: {
         schema_version: 1,
@@ -1367,7 +1487,7 @@ Item {
       var end = t.indexOf("\n")
       reason = (end >= 0 ? t.substring(4, end) : t.substring(4)).trim() || reason
     }
-    store.lastError = reason
+    store.lastError = store.autoText(reason, store.maxShortStr)
     if (cb) cb(false, "")
   }
 
@@ -1380,7 +1500,7 @@ Item {
     }
     proc.doneCb = cb
     proc.command = ["python3", "-B", store.pluginDir + "/scripts/fetch-json.py"].concat(args)
-    proc.environment = ({ "PYTHONDONTWRITEBYTECODE": "1" })
+    proc.environment = store.helperEnv
     proc.running = true
   }
 
@@ -1425,7 +1545,7 @@ Item {
     atomicWrites: true
     printErrors: false
     preload: false
-    // Writes only (setText). Reads go through fetch-json.py --file.
+    // Writes-only fallback. Primary cache write is fetch-json.py --write.
   }
 
   FileView {
@@ -1443,6 +1563,7 @@ Item {
   Process {
     id: openUrlProc
     running: false
+    environment: store.helperEnv
     onExited: function(exitCode, exitStatus) {
       if (exitCode === 0)
         store.notifySend("Rocketlauncher", "Opened")
@@ -1454,11 +1575,13 @@ Item {
   Process {
     id: notifyProc
     running: false
+    environment: store.helperEnv
   }
 
   Process {
     id: idleInhibit
     running: false
+    environment: store.helperEnv
   }
 
   Timer {
@@ -1480,6 +1603,7 @@ Item {
       property var doneCb: null
       property bool delivered: false
       running: false
+      environment: store.helperEnv
       stdout: StdioCollector {
         id: capOut
         waitForEnd: true
@@ -1506,9 +1630,38 @@ Item {
     }
   }
 
+  Component {
+    id: writeProcComp
+    Process {
+      id: wp
+      property string writeBody: ""
+      running: false
+      stdinEnabled: true
+      environment: store.helperEnv
+      stdout: StdioCollector {
+        id: writeOut
+        waitForEnd: true
+      }
+      onStarted: {
+        try {
+          wp.write(wp.writeBody)
+        } catch (e) {}
+        // Close stdin so the helper sees EOF even if --nbytes is off.
+        wp.stdinEnabled = false
+      }
+      onExited: function(exitCode, exitStatus) {
+        if (exitCode !== 0) {
+          try { cacheFile.setText(wp.writeBody) } catch (e) {}
+        }
+        Qt.callLater(function() { wp.destroy() })
+      }
+    }
+  }
+
   Process {
     id: streamProxy
     running: false
+    environment: store.helperEnv
     stdout: SplitParser {
       onRead: function(line) { store.onStreamProxyLine(line) }
     }
