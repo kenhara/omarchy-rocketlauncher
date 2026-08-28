@@ -175,14 +175,27 @@ Item {
           Accessible.name: "Watch"
           Accessible.role: Accessible.Button
 
-          Text {
+          Row {
             anchors.centerIn: parent
-            text: "WATCH"
-            color: Color.background
-            font.family: root.fontFamily
-            font.pixelSize: Style.font.caption
-            font.bold: true
-            font.letterSpacing: 1
+            spacing: 4
+
+            PhosphorIcon {
+              name: "play-circle"
+              color: Color.background
+              width: Style.font.caption
+              height: Style.font.caption
+              anchors.verticalCenter: parent.verticalCenter
+            }
+
+            Text {
+              text: "WATCH"
+              color: Color.background
+              font.family: root.fontFamily
+              font.pixelSize: Style.font.caption
+              font.bold: true
+              font.letterSpacing: 1
+              anchors.verticalCenter: parent.verticalCenter
+            }
           }
 
           MouseArea {

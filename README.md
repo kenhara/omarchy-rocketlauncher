@@ -10,7 +10,18 @@ native Quattro `bar-widget` (not Electron). Named for Heinlein’s Rocketlaunche
 **ID:** `kenhara.rocketlauncher`  
 **Author:** Harris Kenny  
 **License:** MIT  
-**Version:** 1.6.0  
+**Version:** 1.6.1  
+
+### 1.6.1
+- Phosphor Icons (regular, MIT) bundled as local QML Shape/Path — no remote webfont, no SVG Image.source
+- Bar chip + header: `rocket` idle, `rocket-launch` when `webcast_live`; accent-green only then (same rule as 1.5.14)
+- Watch primary button: `play-circle` next to WATCH
+- Next-launch labels only (not every row): `map-pin` pad, `planet` orbit, `parachute` landing — parachute hidden unless LL2 already has a landing/target
+- Honest job-line: `offline · cached …` only after a failed list fetch / no result; merely old cache is `stale · cached …` (or the normal phase line). Stale ≠ offline
+- Chip keeps the short countdown next to LIVE / HOLD / SOON / SUCCESS (`LIVE 14h 06m`); green still `webcast_live` only
+- Trajectory hidden until the bead will move (webcast / T-0 / result, or ~T-10 / hold-in-window). No 12-day pad decoration
+- Local NET drops “your time” (`Tue 25 Aug · 12:00`); zone stays on the unofficial footer
+- 1.5.22 / 1.6.0 security posture kept
 
 ### 1.6.0
 - Next launch stays THE launch: existing cards / Watch / flips; Ongoing / Upcoming / Past stay collapsed compact
@@ -344,7 +355,11 @@ process. Pure QML + Qt network (+ optional local `yt-dlp` helper for Watch).
 
 MIT — see `LICENSE`. Copyright (c) 2026 Harris Kenny.
 
+Icons from [Phosphor Icons](https://phosphoricons.com/) (regular weight) by
+Helena Zhang and Tobias Fried, MIT. Paths are bundled in `PhosphorIcon.qml` and
+painted with QML Shape/Path — no remote webfont, no `Image.source` of SVG.
+
 Launch data © The Space Devs / Launch Library 2 contributors. Imagery URLs in
 samples may carry CC BY-NC or NASA terms — this plugin does not redistribute
 those binaries; it only links or references metadata. No SpaceX logos or
-wordmarks are shipped.
+wordmarks are shipped. Unofficial; not affiliated with SpaceX or NASA.

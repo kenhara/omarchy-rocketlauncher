@@ -1,4 +1,18 @@
-# Rocketlauncher — pre-ship checklist (v1.6.0)
+# Rocketlauncher — pre-ship checklist (v1.6.1)
+
+## PRE-SHIP note — Phosphor icons + 1.6.0 nits (1.6.1)
+
+Harris-approved set only: rocket / rocket-launch (bar + header), play-circle (Watch),
+map-pin / planet / parachute (next-launch labels; parachute hidden without LL2 landing).
+Bundled Phosphor regular paths in PhosphorIcon.qml (MIT). No Image.source SVG, no remote
+webfont, no FA rocket on chip/header. Do not grow the chip. Unofficial still.
+
+Nits: job-line offline only after a failed list fetch (stale ≠ offline);
+chip keeps short countdown next to LIVE/HOLD/SOON/SUCCESS; trajectory hidden
+until T-10 / hold-in-window / webcast / T-0 / result; NET drops “your time”.
+1.5.22 / 1.6.0 security posture kept.
+
+
 
 ## PRE-SHIP note — next-launch board (1.6.0)
 

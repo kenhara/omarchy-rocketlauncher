@@ -272,11 +272,10 @@ BarWidget {
     id: button
     anchors.fill: parent
     bar: root.bar
-    // FA rocket (\uf135) + optional ▶ / mission / countdown — tintable; emoji is not
+    // Em-space reserves the quiet Phosphor rocket slot (same size as the old glyph).
     text: {
-      var g = launchStore.barGlyph || "\uf135"
       var label = launchStore.barLabel || ""
-      return label.length ? (g + " " + label) : g
+      return label.length ? ("\u2003 " + label) : "\u2003"
     }
     active: launchStore.barLive
     activeColor: Color.accent
@@ -302,5 +301,16 @@ BarWidget {
       else if (buttonCode === Qt.MiddleButton) root.onBarMiddleClick()
       else if (buttonCode === Qt.RightButton) root.onBarRightClick()
     }
+  }
+
+  PhosphorIcon {
+    z: 1
+    anchors.verticalCenter: button.verticalCenter
+    anchors.left: button.left
+    anchors.leftMargin: 8.5
+    width: Style.font.caption
+    height: Style.font.caption
+    name: launchStore.barIcon
+    color: launchStore.barLive ? Color.accent : root.foreground
   }
 }
