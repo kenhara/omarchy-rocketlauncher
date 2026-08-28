@@ -10,7 +10,10 @@ native Quattro `bar-widget` (not Electron). Named for Heinlein’s Rocketlaunche
 **ID:** `kenhara.rocketlauncher`  
 **Author:** Harris Kenny  
 **License:** MIT  
-**Version:** 1.6.2  
+**Version:** 1.6.5  
+
+### 1.6.5
+- Ongoing **LOCATE** (on click): ISS docked ring from SATCAT+TLE, static course if destination is known, or `NO PUBLIC TRACK`. Not on the refresh cycle.
 
 ### 1.6.2
 - Cut keyboard-legend footer (keys still work; README Controls table stays)
@@ -187,6 +190,7 @@ bundles binaries and never runs remote installers.
   SpaceX launches (`/launches/previous/`, lazy on first expand to save free-tier
   quota). Tap a card for the same on-demand mission detail as Next / Upcoming.
   Offline sample cache ships a few past rows from research fixtures.
+- **Ongoing missions** — expand the section; **LOCATE** (on click) proves a docked ISS fix or shows a static course / `NO PUBLIC TRACK`. Not on the refresh cycle.
 - Crew avatars with a Wikipedia / LL2 astronaut URL are clickable (opens in the
   browser). Pointer cursor only appears on actionable controls.
 - Tap the next-launch card to expand/collapse detail (description, pad,
@@ -313,6 +317,8 @@ Up to **three** list GETs on the regular refresh cycle:
 2. `GET /launches/upcoming/?lsp__id=121&limit=5&mode=list` — upcoming list (compact)
 3. `GET /spacecraft/?search=Crew%20Dragon&in_space=true` — ongoing Crew Dragon
 
+On-click **LOCATE** (not on this cycle): LL2 spacecraft_flights + CelesTrak SATCAT/TLE.
+
 ### Past missions (lazy)
 
 On **first expand** of the Past Missions section (not on every refresh):
@@ -347,7 +353,7 @@ process. Pure QML + Qt network (+ optional local `yt-dlp` helper for Watch).
 
 ## Privacy and safety
 
-- Network: `ll.thespacedevs.com` for launch data (https, host pinned after redirects); when Watch is used,
+- Network: `ll.thespacedevs.com` for launch data (https, host pinned after redirects); on-click LOCATE also hits `celestrak.org` (SATCAT + ISS TLE). When Watch is used,
   `yt-dlp` contacts the webcast host (YouTube / X / etc.) over **https only** and the helper
   binds **127.0.0.1 only**. Webcast / image URLs that are not https are dropped.
 - Disk: read/write `~/.cache/rocketlauncher/cache.json` (atomic helper write; reads refuse symlink/FIFO); read bundled samples.

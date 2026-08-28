@@ -615,25 +615,84 @@ Panel {
           Repeater {
             model: root.ongoingSectionExpanded && liveStore ? liveStore.ongoing : []
 
-            MissionCard {
+            Column {
               required property var modelData
               width: parent.width
-              compact: true
-              interactive: false
-              foreground: root.contentForeground
-              surfaceColor: root.surfaceColor
-              fontFamily: root.contentFontFamily
-              title: modelData.name || "Crew Dragon"
-              subtitle: (modelData.config || "Crew Dragon")
-                + (modelData.serial ? " · " + modelData.serial : "")
-              meta: {
-                var tis = liveStore ? liveStore.formatIsoDuration(modelData.time_in_space) : modelData.time_in_space
-                return "Time in space: " + tis
+              spacing: Style.space(6)
+
+              readonly property string craftId: String(modelData && modelData.id != null ? modelData.id : "")
+              readonly property var locateMap: liveStore ? liveStore.locateById : ({})
+              readonly property var locateOpenMap: liveStore ? liveStore.locateOpenById : ({})
+              readonly property var locateFix: {
+                var _m = locateMap
+                return liveStore ? liveStore.locateFixFor(craftId) : null
               }
-              badgeText: modelData.in_space ? "IN SPACE" : ""
-              badgeKind: "ok"
-              showWatch: false
-              showDetail: false
+              readonly property bool locateIsOpen: {
+                var _o = locateOpenMap
+                return !!(locateOpenMap && locateOpenMap[craftId])
+              }
+
+              MissionCard {
+                width: parent.width
+                compact: true
+                interactive: false
+                foreground: root.contentForeground
+                surfaceColor: root.surfaceColor
+                fontFamily: root.contentFontFamily
+                title: modelData.name || "Crew Dragon"
+                subtitle: (modelData.config || "Crew Dragon")
+                  + (modelData.serial ? " · " + modelData.serial : "")
+                meta: {
+                  var tis = liveStore ? liveStore.formatIsoDuration(modelData.time_in_space) : modelData.time_in_space
+                  return "Time in space: " + tis
+                }
+                badgeText: modelData.in_space ? "IN SPACE" : ""
+                badgeKind: "ok"
+                showWatch: false
+                showDetail: false
+                showLocate: true
+                locateOpen: parent.locateIsOpen
+                locateBusy: !!(parent.locateFix && parent.locateFix.kind === "checking")
+                locateKind: parent.locateFix && parent.locateFix.kind ? parent.locateFix.kind : ""
+                onLocateClicked: {
+                  if (liveStore)
+                    liveStore.requestLocate(modelData.id)
+                }
+              }
+
+              OrbitRing {
+                width: parent.width
+                visible: parent.locateIsOpen && parent.locateFix && parent.locateFix.kind === "iss-docked"
+                inclinationDeg: parent.locateFix && parent.locateFix.inclination_deg != null ? parent.locateFix.inclination_deg : 0
+                meanAnomalyDeg: parent.locateFix && parent.locateFix.mean_anomaly_deg != null ? parent.locateFix.mean_anomaly_deg : 0
+                caption: parent.locateFix && parent.locateFix.caption ? parent.locateFix.caption : ""
+                foreground: root.contentForeground
+                fontFamily: root.contentFontFamily
+              }
+
+              CourseStroke {
+                width: parent.width
+                visible: parent.locateIsOpen && parent.locateFix && parent.locateFix.kind === "course"
+                path: parent.locateFix && parent.locateFix.path ? parent.locateFix.path : "leo"
+                caption: parent.locateFix && parent.locateFix.caption ? parent.locateFix.caption : ""
+                foreground: root.contentForeground
+                fontFamily: root.contentFontFamily
+              }
+
+              Text {
+                width: parent.width
+                visible: parent.locateIsOpen && parent.locateFix && parent.locateFix.kind === "none"
+                text: parent.locateFix && parent.locateFix.caption ? parent.locateFix.caption : "NO PUBLIC TRACK"
+                textFormat: Text.PlainText
+                horizontalAlignment: Text.AlignHCenter
+                color: root.contentForeground
+                opacity: 0.5
+                font.family: root.contentFontFamily
+                font.pixelSize: Style.font.caption
+                font.letterSpacing: 1
+                font.capitalization: Font.AllUppercase
+                wrapMode: Text.WordWrap
+              }
             }
           }
         }

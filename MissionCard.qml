@@ -16,6 +16,10 @@ Item {
   property string fontFamily: "monospace"
   property bool showWatch: false
   property bool showDetail: false
+  property bool showLocate: false
+  property bool locateOpen: false
+  property bool locateBusy: false
+  property string locateKind: ""   // checking | none | iss-docked | course
   property bool detailOpen: false
   property bool compact: false
   // Only true when parent wires an action (detail expand, etc.)
@@ -23,6 +27,7 @@ Item {
 
   signal watchClicked()
   signal detailClicked()
+  signal locateClicked()
   signal clicked()
 
   implicitWidth: Style.space(320)
@@ -35,9 +40,16 @@ Item {
   }
 
   readonly property real cardRadius: Math.max(4, Style.cornerRadius)
-  readonly property int actionBtnCount: (showWatch ? 1 : 0) + (showDetail ? 1 : 0)
+  readonly property int actionBtnCount: (showWatch ? 1 : 0) + (showDetail ? 1 : 0) + (showLocate ? 1 : 0)
   // Stacked buttons share one column width (single button width).
-  readonly property real actionBtnsWidth: actionBtnCount > 0 ? Style.space(72) : 0
+  readonly property real actionBtnsWidth: actionBtnCount > 0 ? Style.space(showLocate ? 80 : 72) : 0
+  readonly property string locateLabel: {
+    if (root.locateBusy || root.locateKind === "checking")
+      return "LOCATING"
+    if (root.locateOpen && (root.locateKind === "iss-docked" || root.locateKind === "course"))
+      return "HIDE"
+    return "LOCATE"
+  }
 
   function badgeColor() {
     // Alpha wells from theme accent/urgent — readable on light and dark themes.
@@ -237,6 +249,52 @@ Item {
             hoverEnabled: true
             cursorShape: Qt.PointingHandCursor
             onClicked: root.detailClicked()
+          }
+        }
+
+        Rectangle {
+          id: locateBtn
+          visible: root.showLocate
+          width: Style.space(80)
+          height: Style.space(28)
+          radius: Math.max(3, Style.cornerRadius - 3)
+          color: Qt.rgba(root.foreground.r, root.foreground.g, root.foreground.b,
+            locateMa.containsMouse ? 0.12 : 0.06)
+          border.width: 1
+          border.color: Qt.rgba(root.foreground.r, root.foreground.g, root.foreground.b,
+            locateMa.containsMouse ? 0.5 : 0.35)
+          Accessible.name: root.locateLabel
+          Accessible.role: Accessible.Button
+
+          Row {
+            anchors.centerIn: parent
+            spacing: 4
+
+            PhosphorIcon {
+              name: "map-pin"
+              color: root.foreground
+              width: Style.font.caption
+              height: Style.font.caption
+              anchors.verticalCenter: parent.verticalCenter
+            }
+
+            Text {
+              text: root.locateLabel
+              color: root.foreground
+              font.family: root.fontFamily
+              font.pixelSize: Style.font.caption
+              font.bold: true
+              font.letterSpacing: root.locateLabel === "LOCATING" ? 0.5 : 1
+              anchors.verticalCenter: parent.verticalCenter
+            }
+          }
+
+          MouseArea {
+            id: locateMa
+            anchors.fill: parent
+            hoverEnabled: true
+            cursorShape: Qt.PointingHandCursor
+            onClicked: root.locateClicked()
           }
         }
       }
