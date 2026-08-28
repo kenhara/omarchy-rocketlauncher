@@ -1,5 +1,16 @@
 # Changelog
 
+## 1.6.0
+
+Grow the existing Rocketlauncher desk. Inspired by nocram.f1 *ideas* only — not a copy of their hero, session table, or QML.
+
+- Adaptive job-line on the existing header subheader (next NET / T-10 / hold / webcast live / T+ / success / failure; offline · cached …)
+- Local wall-clock NET; unofficial footer adds zone (`times local, $zone`)
+- Bar chip short countdown + optional HOLD/LIVE/SUCCESS; LIVE tint still `webcast_live` only
+- Next-launch Shape/Path trajectory (LEO/GTO/landing), discrete LL2 phase bead
+- 1.5.22 security posture unchanged (neutralize, exclusive writes, HC-05, https allowlists, `--`, pinned PATH, python3 -B)
+
+
 ## 1.5.22
 
 Defensive hardening. No behavior change to Watch-in-panel, HC-05 reads, `python3 -B`, KeyboardPanel, or unofficial footer.

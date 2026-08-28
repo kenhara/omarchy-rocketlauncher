@@ -1,4 +1,12 @@
-# Rocketlauncher audit notes (v1.5.0)
+# Rocketlauncher audit notes (v1.6.0)
+
+## 1.6.0 — inspired, not copied
+
+Next-launch board grows existing grammar (cards / Watch / flips / job-line).
+Inspired by nocram.f1 *ideas* only — their QML and Monza/session/live-mode chrome were not adopted.
+L3 (UTC NET) is superseded: cards and footer use local wall-clock; panel/tooltip countdown stays T-HH:MM:SS.
+HC-06–HC-11 from 1.5.22 are unchanged.
+
 
 Mapping of plugin audit IDs after the 1.5.0 fix pass.
 
@@ -41,3 +49,4 @@ Mapping of plugin audit IDs after the 1.5.0 fix pass.
 - **1.5.20** — defensive I/O bounds (helper + cache + row/field caps).
 - **1.5.21** — refuse symlink/FIFO cache reads (HC-05).
 - **1.5.22** — Watch/image URL allowlists, redirect pinning, atomic cache writes, AutoText neutralize (HC-06–HC-11).
+- **1.6.0** — next-launch board (job-line, local NET, short chip, trajectory). Inspired, not copied.

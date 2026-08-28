@@ -1,4 +1,13 @@
-# Rocketlauncher — pre-ship checklist (v1.5.3)
+# Rocketlauncher — pre-ship checklist (v1.6.0)
+
+## PRE-SHIP note — next-launch board (1.6.0)
+
+Inspired by nocram.f1 *ideas* only — not a copy of their product shape or QML.
+Grows the existing desk: adaptive job-line, local NET, width-stable bar chip,
+next-launch Shape/Path trajectory. No Monza hero, no weekend session table,
+no live-mode toggle, no F1 keyboard-legend footer, no remote SVGs.
+1.5.22 security posture kept. notifyMilestones stays opt-in.
+
 
 ## PRE-SHIP note — discoverability (1.5.3)
 

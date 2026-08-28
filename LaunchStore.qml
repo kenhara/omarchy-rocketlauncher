@@ -32,7 +32,7 @@ Item {
     .replace(/\/$/, "")
   readonly property string samplePath: pluginDir + "/data/sample-cache.json"
 
-  readonly property string pluginVersion: "1.5.22"
+  readonly property string pluginVersion: "1.6.0"
   readonly property string userAgent: "Rocketlauncher/" + pluginVersion + " (Omarchy unofficial; kenhara.rocketlauncher)"
 
   readonly property int netByteCap: 1048576   // 1 MiB per LL2 response
@@ -188,13 +188,23 @@ Item {
   property var notifiedMilestones: ({})
   property int prevCountdownSec: 999999999
 
-  readonly property string countdownText: formatCountdown(nextLaunch)
-  readonly property string lastUpdatedText: formatUpdated(fetchedAt)
+  readonly property string countdownText: { var _n = nowMs; return formatCountdown(nextLaunch) }
+  readonly property string lastUpdatedText: { var _n = nowMs; return formatUpdated(fetchedAt) }
+  readonly property string localZoneName: localTimeZone()
+  readonly property string jobLine: {
+    var _n = nowMs
+    var _s = dataSource
+    var _f = fetchedAt
+    var _l = loading
+    return formatJobLine()
+  }
+  readonly property string barChipCountdown: { var _n = nowMs; return formatCountdownShort(nextLaunch) }
+  readonly property string barChipWord: { var _n = nowMs; return formatBarChipWord(nextLaunch) }
   // FA rocket (\uf135) — tintable via Text.color; color emoji 🚀 is not.
   readonly property string barGlyph: "\uf135"
-  // LIVE chip tint: webcast_live only (not stickyWatch ▶).
+  // LIVE chip tint: webcast_live only (not stickyWatch ▶). HOLD/SOON never tint.
   readonly property bool barLive: !!(store.nextLaunch && store.nextLaunch.webcast_live)
-  // Inline binding so QML tracks stickyWatch / watching / mission / countdown / barShowCountdown.
+  // Chip: rocket + optional word/short countdown. Panel/tooltip keep T-HH:MM:SS.
   readonly property string barLabel: {
     var parts = []
     if (store.stickyWatch && store.watching)
@@ -207,8 +217,11 @@ Item {
         parts.push(mn)
     }
     if (store.barShowCountdown) {
-      var cd = store.countdownText.length ? store.countdownText : "NET —"
-      parts.push(cd)
+      var word = store.barChipWord
+      if (word.length)
+        parts.push(word)
+      else
+        parts.push(store.barChipCountdown.length ? store.barChipCountdown : "NET —")
     }
     return parts.join(" ")
   }
@@ -305,8 +318,29 @@ Item {
       image_url: store.sanitizeImageUrl(img.image_url || item.image_url || ""),
       thumbnail_url: store.sanitizeImageUrl(img.thumbnail_url || item.thumbnail_url || ""),
       webcast_live: !!(item.webcast_live),
-      vid_urls: vids
+      vid_urls: vids,
+      orbit: store.autoText(store.orbitAbbrev(item), store.maxShortStr),
+      mission_type: store.autoText(store.missionTypeOf(item), store.maxShortStr),
+      landing_summary: store.autoText(item.landing_summary || "", store.maxShortStr)
     })
+  }
+
+  function orbitAbbrev(item) {
+    if (!item) return ""
+    if (typeof item.orbit === "string") return item.orbit
+    if (item.orbit && typeof item.orbit === "object")
+      return item.orbit.abbrev || item.orbit.name || ""
+    var mission = item.mission || {}
+    var o = mission.orbit || {}
+    if (typeof o === "string") return o
+    return o.abbrev || o.name || ""
+  }
+
+  function missionTypeOf(item) {
+    if (!item) return ""
+    if (item.mission_type) return item.mission_type
+    var mission = item.mission || {}
+    return mission.type || ""
   }
 
   function slimOngoing(item) {
@@ -752,7 +786,7 @@ Item {
       }
     } catch (e) {}
     openUrlProc.environment = store.helperEnv
-    openUrlProc.command = ["xdg-open", u]
+    openUrlProc.command = ["xdg-open", "--", u]
     openUrlProc.running = true
     return true
   }
@@ -1192,11 +1226,11 @@ Item {
     var netMs = Date.parse(launch.net)
     if (!isFinite(netMs)) return ""
     var precision = String(launch.net_precision || "").toLowerCase()
-    // Fuzzy NET when precision is coarse
+    // Fuzzy NET when precision is coarse — local wall clock, not UTC.
     if (precision.indexOf("day") >= 0 || precision.indexOf("month") >= 0 || precision.indexOf("year") >= 0)
-      return "NET " + formatNetShort(launch.net) + " UTC"
+      return "NET " + formatNetLocalDay(launch.net)
     var delta = Math.floor((netMs - store.nowMs) / 1000)
-    if (delta < -3600) return "NET " + formatNetShort(launch.net) + " UTC"
+    if (delta < -3600) return "NET " + formatNetLocalDay(launch.net)
     if (delta < 0) return "T+" + formatHMS(-delta)
     return "T-" + formatHMS(delta)
   }
@@ -1211,19 +1245,194 @@ Item {
     return pad(h) + ":" + pad(m) + ":" + pad(sec)
   }
 
-  // NET calendar day in UTC (callers may append " UTC"; countdown uses this for fuzzy NET).
-  function formatNetShort(iso) {
+  function pad2(n) {
+    n = Math.floor(Number(n) || 0)
+    return (n < 10 ? "0" : "") + n
+  }
+
+  function localTimeZone() {
+    try {
+      if (typeof Intl !== "undefined" && Intl.DateTimeFormat) {
+        var tz = Intl.DateTimeFormat().resolvedOptions().timeZone
+        if (tz && String(tz).length)
+          return String(tz)
+      }
+    } catch (e) {}
+    var off = -new Date().getTimezoneOffset()
+    var sign = off >= 0 ? "+" : "-"
+    var abs = Math.abs(off)
+    var h = Math.floor(abs / 60)
+    var m = abs % 60
+    return "UTC" + sign + store.pad2(h) + (m ? ":" + store.pad2(m) : "")
+  }
+
+  // Local wall-clock NET: "Tue 25 Aug · 12:00 your time"
+  function formatNetLocal(iso) {
     var d = new Date(iso)
     if (isNaN(d.getTime())) return "—"
+    return store.formatNetLocalDay(iso) + " · " + store.pad2(d.getHours()) + ":" + store.pad2(d.getMinutes()) + " your time"
+  }
+
+  function formatNetLocalDay(iso) {
+    var d = new Date(iso)
+    if (isNaN(d.getTime())) return "—"
+    var days = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"]
     var months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"]
-    return months[d.getUTCMonth()] + " " + d.getUTCDate()
+    return days[d.getDay()] + " " + d.getDate() + " " + months[d.getMonth()]
+  }
+
+  // Kept for any leftover callers; local day, not UTC.
+  function formatNetShort(iso) {
+    return store.formatNetLocalDay(iso)
   }
 
   function formatUpdated(iso) {
     if (!iso) return "never"
-    var d = new Date(iso)
-    if (isNaN(d.getTime())) return iso
-    return d.toISOString().replace("T", " ").replace(/\.\d+Z$/, " UTC")
+    return store.formatRelativeAge(iso)
+  }
+
+  function formatRelativeAge(iso) {
+    if (!iso) return "unknown"
+    var t = Date.parse(iso)
+    if (!isFinite(t)) return "unknown"
+    var sec = Math.max(0, Math.floor((store.nowMs - t) / 1000))
+    if (sec < 45) return "just now"
+    var min = Math.floor(sec / 60)
+    if (min < 60) return min + "m ago"
+    var h = Math.floor(min / 60)
+    if (h < 48) return h + "h ago"
+    var d = Math.floor(h / 24)
+    return d + "d ago"
+  }
+
+  function cacheAgeMs() {
+    if (!store.fetchedAt) return Number.POSITIVE_INFINITY
+    var t = Date.parse(store.fetchedAt)
+    if (!isFinite(t)) return Number.POSITIVE_INFINITY
+    return Math.max(0, store.nowMs - t)
+  }
+
+  function isCacheStale() {
+    var age = store.cacheAgeMs()
+    if (!isFinite(age)) return true
+    return age > store.refreshIntervalSec * 1000
+  }
+
+  // Chip-only short countdown (width-stable): 12d / 2d 14h / 14h 06m / 06:22
+  function formatCountdownShort(launch) {
+    if (!launch || !launch.net) return ""
+    var netMs = Date.parse(launch.net)
+    if (!isFinite(netMs)) return ""
+    var delta = Math.floor((netMs - store.nowMs) / 1000)
+    var sign = ""
+    var s = delta
+    if (delta < 0) {
+      sign = "+"
+      s = -delta
+    }
+    s = Math.max(0, Math.floor(s))
+    var days = Math.floor(s / 86400)
+    var hours = Math.floor((s % 86400) / 3600)
+    var mins = Math.floor((s % 3600) / 60)
+    var secs = s % 60
+    if (days >= 10)
+      return sign + days + "d"
+    if (days >= 1)
+      return sign + days + "d " + hours + "h"
+    if (hours >= 1)
+      return sign + hours + "h " + store.pad2(mins) + "m"
+    return sign + store.pad2(mins) + ":" + store.pad2(secs)
+  }
+
+  function formatBarChipWord(launch) {
+    if (!launch) return ""
+    if (launch.webcast_live) return "LIVE"
+    var phase = store.launchPhase(launch)
+    if (phase === "hold") return "HOLD"
+    if (phase === "success") return "SUCCESS"
+    if (phase === "failure") return "FAIL"
+    if (phase === "t10") return "SOON"
+    return ""
+  }
+
+  // Discrete LL2 job phase for the existing header subheader (not a second header).
+  function launchPhase(launch) {
+    if (!launch) return "net"
+    var a = String(launch.status_abbrev || "")
+    var id = Number(launch.status_id) || 0
+    var st = String(launch.status || "").toLowerCase()
+    if (a === "Failure" || id === 4 || id === 7 || a === "Partial Failure"
+        || st.indexOf("fail") === 0)
+      return "failure"
+    if (a === "Success" || id === 3)
+      return "success"
+    if (launch.webcast_live)
+      return "live"
+    if (a === "Hold" || id === 5 || st.indexOf("hold") >= 0)
+      return "hold"
+    if (id === 6 || a === "In Flight")
+      return "tplus"
+    var netMs = Date.parse(launch.net || "")
+    if (isFinite(netMs)) {
+      var delta = Math.floor((netMs - store.nowMs) / 1000)
+      if (delta <= 0)
+        return "tplus"
+      if (delta <= 600)
+        return "t10"
+    }
+    return "net"
+  }
+
+  function formatJobLine() {
+    if (!store.loading && (store.dataSource === "none" || store.isCacheStale())) {
+      var age = store.fetchedAt ? store.formatRelativeAge(store.fetchedAt) : "unknown"
+      return "offline · cached " + age
+    }
+    var L = store.nextLaunch
+    if (!L)
+      return "next NET · none scheduled"
+    var phase = store.launchPhase(L)
+    if (phase === "failure") return "failure"
+    if (phase === "success") return "success"
+    if (phase === "live") return "webcast live"
+    if (phase === "hold") return "hold"
+    if (phase === "tplus") {
+      var plus = store.countdownText
+      return plus.length ? plus : "T+"
+    }
+    if (phase === "t10") return "T-10"
+    var cd = store.countdownText
+    if (cd.indexOf("T-") === 0)
+      return "next NET · " + cd
+    if (L.net)
+      return "next NET · " + store.formatNetLocal(L.net)
+    return "next NET"
+  }
+
+  function trajectoryKind(launch) {
+    if (!launch) return "leo"
+    var o = String(launch.orbit || "").toLowerCase()
+    if (o.indexOf("gto") >= 0 || o.indexOf("geo") >= 0 || o.indexOf("gso") >= 0
+        || o.indexOf("heo") >= 0)
+      return "gto"
+    if (o.indexOf("sub") >= 0 || o.indexOf("ballistic") >= 0)
+      return "landing"
+    if (o.indexOf("leo") >= 0 || o.indexOf("sso") >= 0 || o.indexOf("meo") >= 0
+        || o.indexOf("po") === 0)
+      return "leo"
+    var land = String(launch.landing_summary || "").toLowerCase()
+    if (land.length)
+      return "landing"
+    return "leo"
+  }
+
+  function trajectoryPhase(launch) {
+    var p = store.launchPhase(launch)
+    if (p === "failure") return "failure"
+    if (p === "success") return "success"
+    if (p === "live") return "webcast"
+    if (p === "tplus") return "t0"
+    return "net"
   }
 
   function formatIsoDuration(isoDur) {
