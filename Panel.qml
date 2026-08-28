@@ -357,7 +357,7 @@ Panel {
           spacing: Style.space(8)
 
           PanelSectionHeader {
-            text: "NEXT LAUNCH"
+            text: "NEXT"
             foreground: root.contentForeground
             fontFamily: root.contentFontFamily
           }
@@ -574,7 +574,7 @@ Panel {
               anchors.right: ongoingToggle.left
               anchors.rightMargin: Style.space(8)
               anchors.verticalCenter: parent.verticalCenter
-              text: "ONGOING MISSIONS"
+              text: "ONGOING"
               foreground: root.contentForeground
               fontFamily: root.contentFontFamily
             }
@@ -607,7 +607,11 @@ Panel {
                 anchors.fill: parent
                 hoverEnabled: true
                 cursorShape: Qt.PointingHandCursor
-                onClicked: root.ongoingSectionExpanded = !root.ongoingSectionExpanded
+                onClicked: {
+                  root.ongoingSectionExpanded = !root.ongoingSectionExpanded
+                  if (root.ongoingSectionExpanded && liveStore)
+                    liveStore.locateVisibleOngoing()
+                }
               }
             }
           }
@@ -779,7 +783,7 @@ Panel {
                 }
                 badgeText: badgeFor(modelData).text
                 badgeKind: badgeFor(modelData).kind
-                showWatch: !!(liveStore && liveStore.officialWebcast(modelData))
+                showWatch: false
                 showDetail: true
                 detailOpen: !!(liveStore && liveStore.selectedLaunchId === modelData.id
                   && liveStore.detailExpanded)
@@ -855,7 +859,7 @@ Panel {
               anchors.right: pastToggle.left
               anchors.rightMargin: Style.space(8)
               anchors.verticalCenter: parent.verticalCenter
-              text: "PAST MISSIONS"
+              text: "PAST"
               foreground: root.contentForeground
               fontFamily: root.contentFontFamily
             }

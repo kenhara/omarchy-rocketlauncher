@@ -31,7 +31,7 @@ Item {
     .replace(/\/$/, "")
   readonly property string samplePath: pluginDir + "/data/sample-cache.json"
 
-  readonly property string pluginVersion: "1.6.5"
+  readonly property string pluginVersion: "1.6.6"
   readonly property string userAgent: "Rocketlauncher/" + pluginVersion + " (Omarchy unofficial; kenhara.rocketlauncher)"
 
   readonly property int netByteCap: 1048576   // 1 MiB per LL2 response
@@ -435,6 +435,17 @@ Item {
       mean_anomaly_deg: ma,
       epoch: store.autoText(o.epoch || "", store.maxShortStr),
       fetched_at: store.autoText(o.fetched_at || "", store.maxShortStr)
+    }
+  }
+
+  function locateVisibleOngoing() {
+    var rows = store.ongoing || []
+    var i
+    for (i = 0; i < rows.length; i++) {
+      var id = String(rows[i] && rows[i].id != null ? rows[i].id : "")
+      if (!id || store.locateOpenById[id])
+        continue
+      store.requestLocate(id)
     }
   }
 

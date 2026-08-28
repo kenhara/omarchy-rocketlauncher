@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.6.6
+
+Section titles are NEXT / ONGOING / PAST / UPCOMING. Upcoming drops Watch. Expanding Ongoing locates the visible craft (Freedom is ISS).
+
+
 ## 1.6.5
 
 LOCATE on ongoing missions (click only). SATCAT DOC + ISS TLE draws a flat orbit ring; otherwise a static ISS/LEO course, or NO PUBLIC TRACK. No extra GET on the 15 req/h refresh cycle.
