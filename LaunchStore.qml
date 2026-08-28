@@ -4,7 +4,7 @@ import Quickshell.Io
 
 // Launch Library 2 client + cache for Rocketlauncher.
 // Network + cache reads go through scripts/fetch-json.py (hard byte cap).
-// Cache writes go through fetch-json.py --write (O_EXCL|O_NOFOLLOW); FileView is fallback only.
+// Cache writes go through fetch-json.py --write (O_EXCL|O_NOFOLLOW). Fail closed if the helper cannot start.
 //
 // Refresh budget: default 30–60 min (schema knob, min 600s). Free tier is
 // 15 req/hour — we use mode=list and at most 3 GETs per refresh cycle.
@@ -31,7 +31,7 @@ Item {
     .replace(/\/$/, "")
   readonly property string samplePath: pluginDir + "/data/sample-cache.json"
 
-  readonly property string pluginVersion: "1.6.6"
+  readonly property string pluginVersion: "1.7.0"
   readonly property string userAgent: "Rocketlauncher/" + pluginVersion + " (Omarchy unofficial; kenhara.rocketlauncher)"
 
   readonly property int netByteCap: 1048576   // 1 MiB per LL2 response
@@ -1058,6 +1058,7 @@ Item {
 
   function stopStreamProxy() {
     resolveTimer.stop()
+    store.watchProxyAccept = false
     if (streamProxy.running)
       streamProxy.running = false
     store.watchProxyPid = 0
@@ -1065,10 +1066,12 @@ Item {
 
   function startStreamProxy(url) {
     stopStreamProxy()
+    store.watchProxyAccept = true
     store.watchStatus = "resolving"
     store.watchStreamUrl = ""
     var safe = store.sanitizeOpenUrl(url)
     if (!safe) {
+      store.watchProxyAccept = false
       store.watchStatus = "fallback"
       store.watching = true
       return
@@ -1084,10 +1087,12 @@ Item {
   }
 
   property string streamProxyStdout: ""
+  property bool watchProxyAccept: false
 
   function onStreamProxyLine(line) {
     line = String(line || "").trim()
     if (!line) return
+    if (!store.watchProxyAccept) return
     if (line.indexOf("READY ") === 0) {
       resolveTimer.stop()
       var ready = store.sanitizeOpenUrl(line.substring(6).trim(), true)
@@ -1273,9 +1278,13 @@ Item {
 
   // opts.expand (default true): update selectedLaunchId / detailExpanded for UI.
   // Quiet eager fetches pass { expand: false }.
+  function isLl2LaunchId(id) {
+    return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(String(id || ""))
+  }
+
   function fetchLaunchDetail(id, opts) {
     id = String(id || "")
-    if (!id) return false
+    if (!store.isLl2LaunchId(id)) return false
     opts = opts || {}
     var expand = opts.expand !== false
 
@@ -1643,18 +1652,14 @@ Item {
   }
 
   function persistToDisk() {
-    // Primary: fetch-json.py --write (O_EXCL|O_NOFOLLOW 0600 temp, fsync, replace).
-    // FileView.setText remains writes-only fallback if the helper cannot start.
     var body = JSON.stringify(buildCacheObject(), null, 2) + "\n"
     store.runAtomicWrite(store.cachePath, body)
   }
 
   function runAtomicWrite(path, body) {
     var proc = writeProcComp.createObject(store)
-    if (!proc) {
-      try { cacheFile.setText(body) } catch (e) {}
+    if (!proc)
       return
-    }
     proc.writeBody = body
     proc.command = [
       "python3", "-B", store.pluginDir + "/scripts/fetch-json.py",
@@ -1914,16 +1919,6 @@ Item {
   }
 
   FileView {
-    id: cacheFile
-    path: store.cachePath
-    watchChanges: false
-    atomicWrites: true
-    printErrors: false
-    preload: false
-    // Writes-only fallback. Primary cache write is fetch-json.py --write.
-  }
-
-  FileView {
     id: sampleFile
     path: store.samplePath
     watchChanges: false
@@ -1964,10 +1959,9 @@ Item {
     interval: 25000
     repeat: false
     onTriggered: {
-      if (store.watching && store.watchStatus === "resolving") {
-        store.watchStatus = "fallback"
-        store.watchStreamUrl = ""
-      }
+      store.stopStreamProxy()
+      store.watchStreamUrl = ""
+      store.watchStatus = "fallback"
     }
   }
 
@@ -1977,12 +1971,27 @@ Item {
       id: fp
       property var doneCb: null
       property bool delivered: false
+      property bool tornDown: false
+      property int watchdogMs: (store.netTimeoutSec + 5) * 1000
       running: false
       environment: store.helperEnv
       stdout: StdioCollector {
         id: capOut
         waitForEnd: true
         onStreamFinished: fp.completeFetch(capOut.text)
+      }
+      Timer {
+        id: fetchWatchdog
+        interval: fp.watchdogMs
+        repeat: false
+        running: fp.running
+        onTriggered: {
+          if (fp.delivered)
+            return
+          try { fp.running = false } catch (e) {}
+          fp.completeFetch("")
+          fp.tearDown()
+        }
       }
       onExited: function(exitCode, exitStatus) {
         Qt.callLater(function() {
@@ -1991,7 +2000,7 @@ Item {
             try { t = capOut.text } catch (e) {}
             fp.completeFetch(t)
           }
-          fp.destroy()
+          fp.tearDown()
         })
       }
       function completeFetch(raw) {
@@ -2001,6 +2010,12 @@ Item {
         var cb = fp.doneCb
         fp.doneCb = null
         store.deliverFetch(raw, cb)
+      }
+      function tearDown() {
+        if (fp.tornDown)
+          return
+        fp.tornDown = true
+        Qt.callLater(function() { fp.destroy() })
       }
     }
   }
@@ -2025,9 +2040,6 @@ Item {
         wp.stdinEnabled = false
       }
       onExited: function(exitCode, exitStatus) {
-        if (exitCode !== 0) {
-          try { cacheFile.setText(wp.writeBody) } catch (e) {}
-        }
         Qt.callLater(function() { wp.destroy() })
       }
     }

@@ -12,7 +12,7 @@ Usage:
 Stdout (machine-readable):
   OK <nbytes>\n<body>      # body is <= cap bytes
   ERR <reason>             # timeout | http-<code> | too-large | not-found |
-                           # not-regular | io | https-only | redirect-host
+                           # not-regular | io | https-only | redirect-host | host
 """
 from __future__ import annotations
 
@@ -32,7 +32,13 @@ from urllib.request import (
     build_opener,
 )
 
-# LL2 hosts LaunchStore may use (apiBase today is ll.thespacedevs.com).
+# Initial GET host must be one of these. Redirects pin to the request host;
+# ll. ↔ api. on The Space Devs may swap.
+_ALLOWED_HOSTS = frozenset({
+    "ll.thespacedevs.com",
+    "api.thespacedevs.com",
+    "celestrak.org",
+})
 _LL2_HOSTS = frozenset({"ll.thespacedevs.com", "api.thespacedevs.com"})
 
 
@@ -188,6 +194,8 @@ def fetch_https(url: str, headers: dict, cap: int, timeout: int):
     host = (parsed.hostname or "").lower()
     if not host:
         raise URLError("https-only")
+    if host not in _ALLOWED_HOSTS:
+        raise URLError("host")
     opener = build_opener(_HostPinRedirect(host), HTTPSHandler())
     req = Request(url, headers=headers, method="GET")
     with opener.open(req, timeout=timeout) as resp:
@@ -278,6 +286,9 @@ def main() -> int:
         if "redirect-host" in reason:
             print("ERR redirect-host")
             return 8
+        if reason == "host":
+            print("ERR host")
+            return 10
         print("ERR timeout")
         return 4
     except OSError:
