@@ -1,4 +1,12 @@
-# Rocketlauncher audit notes (v1.6.2)
+# Rocketlauncher audit notes (v1.7.0)
+
+## 1.7.0 — robustness
+
+L1 fetch/locate Process watchdog (timeout+5). L2 initial https host allowlist (`ERR host`).
+L3 launch id UUID fail-closed. L5 cache write fail-closed (no FileView.setText).
+L8 Watch resolveTimer stops the proxy and ignores a later READY. M2 `prove-fetch-json.py`.
+Skipped: M1 CI, L9 persist locateById, L13–L16. HC-05 / host pin / neutralize / PlainText /
+PATH=/usr/bin:/bin / python3 -B / no XHR kept.
 
 ## 1.6.2 — less software
 
@@ -68,4 +76,5 @@ Mapping of plugin audit IDs after the 1.5.0 fix pass.
 - **1.6.0** — next-launch board (job-line, local NET, short chip, trajectory). Inspired, not copied.
 - **1.6.1** — Phosphor Icons (local Shape/Path). Unofficial; MIT credit.
 - **1.6.2** — less software (eight cuts). 1.5.22 locks kept.
+- **1.7.0** — fetch watchdog, host allowlist, launch-id + cache fail-closed, Watch resolve kill.
 

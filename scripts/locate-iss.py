@@ -84,6 +84,8 @@ def _get(url: str, headers: dict, cap: int, timeout: int) -> bytes:
             raise HardIO("https-only") from e
         if "redirect-host" in reason:
             raise HardIO("redirect-host") from e
+        if reason == "host":
+            raise HardIO("host") from e
         raise HardIO("timeout") from e
     except OSError as e:
         raise HardIO("timeout") from e

@@ -1,6 +1,6 @@
 # Rocketlauncher — design rationale
 
-**Version:** 1.6.2
+**Version:** 1.7.0
 
 ## Why this shape wins on Omarchy
 

@@ -1,5 +1,17 @@
 # Changelog
 
+## 1.7.0
+
+Fetch watchdog, initial-host allowlist, launch-id fail-closed, cache write fail-closed, Watch resolve timeout kills the proxy.
+
+- QML Timer kills hung fetch/locate Process at netTimeout+5s and delivers `cb(false,"")` once
+- `fetch-json.py` allowlists the first https host (`ll.thespacedevs.com`, `api.thespacedevs.com`, `celestrak.org`); off-list is `ERR host`
+- `fetchLaunchDetail` only concatenates LL2 UUIDs
+- Cache write skips if the helper Process cannot start (no FileView fallback)
+- Watch `resolveTimer` (25s) calls `stopStreamProxy()` and ignores a later READY
+- `scripts/prove-fetch-json.py` covers too-large / not-regular / host / redirect-host locally
+
+
 ## 1.6.6
 
 Section titles are NEXT / ONGOING / PAST / UPCOMING. Upcoming drops Watch. Expanding Ongoing locates the visible craft (Freedom is ISS).

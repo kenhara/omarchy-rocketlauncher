@@ -1,4 +1,9 @@
-# Rocketlauncher — pre-ship checklist (v1.6.2)
+# Rocketlauncher — pre-ship checklist (v1.7.0)
+
+## PRE-SHIP note — robustness (1.7.0)
+
+Fetch watchdog, initial-host allowlist, UUID launch ids, cache write fail-closed,
+Watch resolve timeout kills proxy. No CI. 1.5.22 locks kept.
 
 ## PRE-SHIP note — less software (1.6.2)
 

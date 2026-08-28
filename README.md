@@ -10,110 +10,11 @@ native Quattro `bar-widget` (not Electron). Named for Heinlein’s Rocketlaunche
 **ID:** `kenhara.rocketlauncher`  
 **Author:** Harris Kenny  
 **License:** MIT  
-**Version:** 1.6.5  
+**Version:** 1.7.0
 
-### 1.6.5
-- Ongoing **LOCATE** (on click): ISS docked ring from SATCAT+TLE, static course if destination is known, or `NO PUBLIC TRACK`. Not on the refresh cycle.
-
-### 1.6.2
-- Cut keyboard-legend footer (keys still work; README Controls table stays)
-- Cut starfield/scanline + `starfieldEnabled` — mood via Phosphor rocket + wordmark
-- Soft-fetch next detail on panel open (`expand: false`); do not auto-expand Detail
-- Hide next launch id from Upcoming; hide the section if the filtered slice is empty
-- Cut consecutive-success caption (Total / Landings / Pending flips stay)
-- Cut in-panel “Mission name on bar” + CLI dump; keep Countdown on bar (`barShowMissionName` stays in schema)
-- Next card: vehicle-only subtitle, no badge echo; NET meta stays (`NET Tue 25 Aug · 12:00`)
-- Job-line STATE words: LIVE / SOON / HOLD / SUCCESS / FAIL; keep `next NET · T-…` / local NET / `offline · cached …` / `stale · cached …`
-
-### 1.6.1
-- Phosphor Icons (regular, MIT) bundled as local QML Shape/Path — no remote webfont, no SVG Image.source
-- Bar chip + header: `rocket` idle, `rocket-launch` when `webcast_live`; accent-green only then (same rule as 1.5.14)
-- Watch primary button: `play-circle` next to WATCH
-- Next-launch labels only (not every row): `map-pin` pad, `planet` orbit, `parachute` landing — parachute hidden unless LL2 already has a landing/target
-- Honest job-line: `offline · cached …` only after a failed list fetch / no result; merely old cache is `stale · cached …` (or the normal phase line). Stale ≠ offline
-- Chip keeps the short countdown next to LIVE / HOLD / SOON / SUCCESS (`LIVE 14h 06m`); green still `webcast_live` only
-- Trajectory hidden until the bead will move (webcast / T-0 / result, or ~T-10 / hold-in-window). No 12-day pad decoration
-- Local NET drops “your time” (`Tue 25 Aug · 12:00`); zone stays on the unofficial footer
-- 1.5.22 / 1.6.0 security posture kept
-
-### 1.6.0
-- Next launch stays THE launch: existing cards / Watch / flips; Ongoing / Upcoming / Past stay collapsed compact
-- Adaptive job-line (existing header subheader): next NET / T-10 / hold / webcast live / T+ / success / failure; stale or offline → `offline · cached 20m ago`
-- Local wall-clock NET on cards (`Tue 25 Aug · 12:00`); footer `Unofficial · Launch Library 2 · times local, $zone`
-- Bar chip: FA rocket + width-stable short countdown (`12d` / `2d 14h` / `14h 06m` / `06:22`); optional HOLD / LIVE / SUCCESS; LIVE/green = `webcast_live` only
-- Next-launch-only QML Shape/Path trajectory (LEO / GTO / landing), theme-tinted bead at NET / webcast / T-0 / success|failure — no remote SVG, no fake telemetry
-- Inspired by nocram.f1 *ideas* only — not a copy of their product shape or QML
-- 1.5.22 security posture kept (neutralize + PlainText, exclusive cache writes, HC-05 reads, https allowlists, pin redirects, notify-send/xdg-open `--`, pinned PATH, python3 -B)
-
-### 1.5.22
-- Watch URLs (webcast, proxy, HLS, MediaPlayer) go through https-only `sanitizeOpenUrl`; stream-proxy rejects `file:` / non-https before yt-dlp/urlopen
-- Image sources (patch / crew / feature) allowlist https; refuse `data:` / `file:` / `.svg` / `.xml`
-- fetch-json.py re-validates LL2 host after redirects; stream-proxy drops Authorization/Cookie and does not follow off-host
-- Cache writes via helper (`O_EXCL|O_NOFOLLOW` 0600 temp, fsync, replace; dir 0700); FileView is fallback only
-- Neutralize remote text at slim/apply; PlainText on MissionCard fields and lastError
-- Re-slim every cache/API row (ongoing, fallback crew, details with `detailed_at`); per-record byte cap
-- `notify-send --` before title/body; pin `PATH=/usr/bin:/bin` on Processes
-
-### 1.5.21
-- Refuse symlink/FIFO cache reads in fetch-json.py
-
-### 1.5.20
-- Bound HTTP / helper / cache reads (#2217)
-
-### 1.5.19
-- Marketplace preview.png is the live Omarchy smoke screenshot.
-
-### 1.5.18
-- Header: FA rocket glyph (`\uf135`) left of ROCKETLAUNCHER (same as bar chip).
-
-### 1.5.16
-- List sections (Ongoing / Upcoming / Past) all start collapsed.
-
-### 1.5.15
-- In-panel **Bar** toggles near the footer: **Countdown on bar** and **Mission name on bar** (Compliantish-style On/Off). Omarchy has no widget-settings GUI — primary path to hide the bar countdown.
-- Toggles call `applySettings` and mirror into host widget settings so `shell.json` / `omarchy bar set` stay in sync.
-- CLI remains secondary: `omarchy bar set kenhara.rocketlauncher barShowCountdown false`.
-
-### 1.5.14
-- Tintable FA rocket bar glyph (Nerd Font `\uf135`); accent-green chip when next launch `webcast_live`.
-- New setting `barShowCountdown` (default on) — hide countdown from the bar chip; tooltip + panel still show it.
-- Watching-only (`▶`) no longer forces green — only LL2 `webcast_live`.
-
-### 1.5.13
-- MissionCard: stack Watch / Detail vertically (compact rows grow for two buttons).
-- Upcoming section EXPAND / COLLAPSE (default expanded); show Watch when webcast known.
-- MissionDetail: broader hasDetail + thin-stub fallback; Upcoming loading / lastError near card.
-- Detail fetch failure keeps expand open and seeds a list-mode stub.
-- Shortcuts: W watch · D detail (footer).
-
-### 1.5.12
-- MissionDetail: coerce patch/type/orbit row `visible` to bool (fixes QML bool warn).
-
-### 1.5.11
-- Real DETAIL / CLOSE secondary buttons on Next, Upcoming, and Past cards (Watch stays primary filled).
-- Past and Ongoing section headers use EXPAND / COLLAPSE secondary buttons (no fragile full-header tap).
-
-### 1.5.10
-- python3 -B + PYTHONDONTWRITEBYTECODE on stream-proxy Process (stops __pycache__ reload storms).
+1.7.0: fetch watchdog, host allowlist, launch-id and cache fail-closed, Watch resolve timeout. Prior releases: [CHANGELOG.md](CHANGELOG.md).
 
 **Repo:** https://github.com/kenhara/omarchy-rocketlauncher
-
-### 1.5.4
-- Renamed plugin id `harris.rocketlauncher` → `kenhara.rocketlauncher` (install path `~/.config/omarchy/plugins/kenhara.rocketlauncher`). Display name unchanged.
-
-### 1.5.3
-- Discoverability: category **Widgets**; expanded `keywords` + `barWidget.aliases`; honest search note.
-
-### 1.5.1
-- Pre-ship checklist: LICENSE second Software unquoted; FileView cache without mkdir race; drop dead `dataChanged` + invented summon handlers; https-only openUrl with honest toasts; PlainText on remote mission fields; button hover; version/UA sync.
-
-### 1.5.0
-- Audit fixes: panel Flickable scroll, stickyWatch MediaPlayer hoist, resilient Watch after detail fetch, sample-cache / stream-proxy / README cleanup.
-- Font fallbacks use concrete `"monospace"` when bar theme font is unavailable.
-
-### 1.4.2
-- Renamed to **Rocketlauncher** (`kenhara.rocketlauncher`); cache → `~/.cache/rocketlauncher`.
-- Local folder + GitHub: `kenhara/omarchy-rocketlauncher`.
 
 ## Unofficial disclaimer
 
@@ -172,8 +73,10 @@ Watch embeds when possible via **Qt Multimedia** + a small localhost helper:
 ```sh
 # Arch / Omarchy examples
 sudo pacman -S python yt-dlp
-# or: pipx install yt-dlp
+# or: python3 -m pip install --user yt-dlp
 ```
+
+`yt-dlp` must be importable by system `python3` (pacman / `pip --user`). A pipx-only install is not seen by the helper.
 
 Without these, **WATCH** still works: the panel shows a thumbnail fallback and
 **Open original** (or the store opens the URL externally). The plugin never
@@ -344,7 +247,7 @@ Offline fixtures: `data/sample-cache.json`, plus
 
 Labels are honest LL2 agency fields:
 
-- **Total launches** → `total_launch_count`
+- **LAUNCHES** → `total_launch_count`
 - **Landings** → `successful_landings`
 - **Pending** → `pending_launches`
 
