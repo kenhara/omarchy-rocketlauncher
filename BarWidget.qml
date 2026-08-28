@@ -89,16 +89,6 @@ BarWidget {
     return "best"
   }
 
-  property bool starfieldEnabled: {
-    try {
-      if (root.settings && root.settings.starfieldEnabled !== undefined)
-        return !!root.settings.starfieldEnabled
-      if (typeof root.setting === "function")
-        return !!root.setting("starfieldEnabled", true)
-    } catch (e) {}
-    return true
-  }
-
   property bool flipAnimate: {
     try {
       if (root.settings && root.settings.flipAnimate !== undefined)
@@ -197,7 +187,6 @@ BarWidget {
       barShowCountdown: root.barShowCountdown,
       stickyWatch: root.stickyWatch,
       watchQuality: root.watchQuality,
-      starfieldEnabled: root.starfieldEnabled,
       flipAnimate: root.flipAnimate
     })
     launchStore.panelOpen = root.opened
@@ -227,7 +216,6 @@ BarWidget {
   onBarShowCountdownChanged: syncStoreSettings()
   onStickyWatchChanged: syncStoreSettings()
   onWatchQualityChanged: syncStoreSettings()
-  onStarfieldEnabledChanged: syncStoreSettings()
   onFlipAnimateChanged: syncStoreSettings()
 
   LaunchStore {

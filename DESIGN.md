@@ -1,6 +1,6 @@
 # Rocketlauncher — design rationale
 
-**Version:** 1.6.1
+**Version:** 1.6.2
 
 ## Why this shape wins on Omarchy
 
@@ -16,7 +16,7 @@ Rocketlauncher follows that cluster exactly:
 | Forward `opened` / `open` / `close` / `toggle` / `closeForPopoutSwitch` + inject `bar` / `anchorItem` / `hostWidget` | Matches community BarWidget contracts so popout switching works |
 | Theme-aware `Style` / bar foreground | Primary chrome from Omarchy; SpaceX dark greys / cool white as **secondary** accents |
 | Schema knobs | `refreshIntervalSec` (min 600) so power users tune without editing QML |
-| Subtle motion, pause when hidden | Digit flips + starfield/scanline only while open |
+| Subtle motion, pause when hidden | Digit flips only while open |
 | Zero privilege | Pure QML + `XMLHttpRequest` + optional `xdg-open` — aim for security baseline `passed` |
 | Strong pitch (≤15 words) | “Rocketlauncher on your Omarchy bar — flip-digit Falcon & Starship stats, countdown, Watch.” |
 
@@ -24,7 +24,7 @@ Rocketlauncher follows that cluster exactly:
 
 - **Not Electron.** A launches SPA would fight Quattro; this lives in the shell.
 - **LL2 over scraping SpaceX.com** — stable API, webcasts, agency totals; free tier respected with aggressive cache + `mode=list`.
-- **Honest stats.** SpaceX.com “reflights” ≠ a single LL2 agency field. We show **Total launches / Landings / Pending** plus consecutive successes as meta — no invented reflight counter.
+- **Honest stats.** SpaceX.com “reflights” ≠ a single LL2 agency field. We show **Total launches / Landings / Pending** — no invented reflight counter.
 - **Offline-first sample** so judges see a full desk without burning API quota.
 
 ## Architecture sketch
