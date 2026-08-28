@@ -31,7 +31,7 @@ Item {
     .replace(/\/$/, "")
   readonly property string samplePath: pluginDir + "/data/sample-cache.json"
 
-  readonly property string pluginVersion: "1.6.4"
+  readonly property string pluginVersion: "1.6.5"
   readonly property string userAgent: "Rocketlauncher/" + pluginVersion + " (Omarchy unofficial; kenhara.rocketlauncher)"
 
   readonly property int netByteCap: 1048576   // 1 MiB per LL2 response
@@ -160,6 +160,10 @@ Item {
   // List refresh actually failed (not detail/past, not merely stale cache).
   property bool refreshFailed: false
   property double nowMs: Date.now()
+
+  // On-click locate (not on the refresh cycle). spacecraft id string → LocateFix.
+  property var locateById: ({})
+  property var locateOpenById: ({})
 
   // Mission detail cache (id → slim detail). Only fetched for next/selected.
   property var launchDetails: ({})
@@ -367,6 +371,113 @@ Item {
     if (!id) return null
     var d = store.launchDetails[id]
     return d || null
+  }
+
+  function locateFixFor(id) {
+    if (id === undefined || id === null || id === "") return null
+    var rec = store.locateById[String(id)]
+    return rec || null
+  }
+
+  function _setLocateFix(id, fix) {
+    var n = Object.assign({}, store.locateById)
+    n[String(id)] = fix
+    store.locateById = n
+  }
+
+  function _setLocateOpen(id, open) {
+    var n = Object.assign({}, store.locateOpenById)
+    n[String(id)] = !!open
+    store.locateOpenById = n
+  }
+
+  function _locateFresh(fix) {
+    if (!fix || fix.kind !== "iss-docked") return false
+    var t = Date.parse(fix.fetched_at || "")
+    if (!isFinite(t)) return false
+    return (Date.now() - t) < 7200 * 1000
+  }
+
+  function parseLocateFix(body) {
+    var o
+    try { o = JSON.parse(body) } catch (e) { o = null }
+    if (!o || typeof o !== "object")
+      return { kind: "none", caption: "NO PUBLIC TRACK" }
+    var kind = o.kind
+    if (kind === "checking")
+      return { kind: "checking" }
+    if (kind === "none") {
+      var nc = store.autoText(o.caption || "NO PUBLIC TRACK", 120)
+      return { kind: "none", caption: nc || "NO PUBLIC TRACK" }
+    }
+    if (kind === "course") {
+      var path = String(o.path || "")
+      if (path !== "iss-rendezvous" && path !== "leo")
+        return { kind: "none", caption: "NO PUBLIC TRACK" }
+      var cc = store.autoText(o.caption || "", 120)
+      if (!cc)
+        return { kind: "none", caption: "NO PUBLIC TRACK" }
+      return { kind: "course", caption: cc, path: path }
+    }
+    if (kind !== "iss-docked")
+      return { kind: "none", caption: "NO PUBLIC TRACK" }
+    var inc = Number(o.inclination_deg)
+    var ma = Number(o.mean_anomaly_deg)
+    if (!isFinite(inc) || inc < 0 || inc > 180 || !isFinite(ma) || ma < 0 || ma >= 360)
+      return { kind: "none", caption: "NO PUBLIC TRACK" }
+    var cap = store.autoText(o.caption || "", 120)
+    if (!cap)
+      return { kind: "none", caption: "NO PUBLIC TRACK" }
+    return {
+      kind: "iss-docked",
+      caption: cap,
+      inclination_deg: inc,
+      mean_anomaly_deg: ma,
+      epoch: store.autoText(o.epoch || "", store.maxShortStr),
+      fetched_at: store.autoText(o.fetched_at || "", store.maxShortStr)
+    }
+  }
+
+  function requestLocate(id) {
+    id = String(id || "")
+    if (!/^[0-9]{1,10}$/.test(id)) return
+    if (store.locateOpenById[id]) {
+      store._setLocateOpen(id, false)
+      return
+    }
+    store._setLocateOpen(id, true)
+    var fix = store.locateFixFor(id)
+    if (fix && fix.kind === "checking") return
+    if (fix && fix.kind === "iss-docked" && store._locateFresh(fix)) return
+    store._setLocateFix(id, { kind: "checking" })
+    store.runLocateHelper(id)
+  }
+
+  function runLocateHelper(id) {
+    id = String(id || "")
+    var proc = fetchProcComp.createObject(store)
+    if (!proc) {
+      store._setLocateFix(id, { kind: "none", caption: "NO PUBLIC TRACK" })
+      return
+    }
+    proc.doneCb = function(ok, body) {
+      var parsed
+      if (!ok) parsed = { kind: "none", caption: "NO PUBLIC TRACK" }
+      else parsed = store.parseLocateFix(body)
+      if (!parsed || parsed.kind === "checking")
+        parsed = { kind: "none", caption: "NO PUBLIC TRACK" }
+      store._setLocateFix(id, parsed)
+    }
+    proc.command = [
+      "python3", "-B", store.pluginDir + "/scripts/locate-iss.py",
+      "--spacecraft", id,
+      "--cap", String(store.netByteCap),
+      "--timeout", String(store.netTimeoutSec),
+      "--user-agent", store.userAgent,
+      "--cache-dir", store.cacheDir
+    ]
+    proc.environment = store.helperEnv
+    proc.running = true
   }
 
   // Resolve a list-mode launch row by id (next / upcoming / past) for stubs.

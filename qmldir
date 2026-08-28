@@ -7,3 +7,5 @@ MissionDetail 1.0 MissionDetail.qml
 WatchPlayer 1.0 WatchPlayer.qml
 TrajectoryStroke 1.0 TrajectoryStroke.qml
 PhosphorIcon 1.0 PhosphorIcon.qml
+OrbitRing 1.0 OrbitRing.qml
+CourseStroke 1.0 CourseStroke.qml
