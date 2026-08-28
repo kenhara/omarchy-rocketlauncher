@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "kenhara.rocketlauncher",
   "name": "Rocketlauncher",
-  "version": "1.6.2",
+  "version": "1.6.3",
   "author": "Harris Kenny",
   "license": "MIT",
   "description": "Rocketlauncher on your Omarchy bar — flip-digit Falcon & Starship stats, countdown, Watch. Unofficial SpaceX/NASA launch desk via The Space Devs (LL2); not affiliated.",

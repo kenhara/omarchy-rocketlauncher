@@ -197,101 +197,110 @@ Item {
       }
     }
 
-    Row {
+    Item {
       id: controls
       width: parent.width
-      spacing: Style.space(8)
+      height: Style.space(28)
 
-      Rectangle {
-        width: Style.space(64)
-        height: Style.space(28)
-        radius: Math.max(3, Style.cornerRadius - 3)
-        color: playMa.containsMouse && root.hasStream ? Qt.lighter(root.foreground, 1.12) : root.foreground
-        opacity: root.hasStream ? 1 : 0.35
+      Row {
+        id: transport
+        anchors.left: parent.left
+        anchors.right: closeBtn.left
+        anchors.rightMargin: Style.space(8)
+        anchors.verticalCenter: parent.verticalCenter
+        spacing: Style.space(8)
 
-        Text {
-          anchors.centerIn: parent
-          text: (mediaPlayer.playbackState === MediaPlayer.PlayingState) ? "PAUSE" : "PLAY"
-          color: Color.background
-          font.family: root.fontFamily
-          font.pixelSize: Style.font.caption
-          font.bold: true
-          font.letterSpacing: 1
+        Rectangle {
+          width: Style.space(64)
+          height: Style.space(28)
+          radius: Math.max(3, Style.cornerRadius - 3)
+          color: playMa.containsMouse && root.hasStream ? Qt.lighter(root.foreground, 1.12) : root.foreground
+          opacity: root.hasStream ? 1 : 0.35
+
+          Text {
+            anchors.centerIn: parent
+            text: (mediaPlayer.playbackState === MediaPlayer.PlayingState) ? "PAUSE" : "PLAY"
+            color: Color.background
+            font.family: root.fontFamily
+            font.pixelSize: Style.font.caption
+            font.bold: true
+            font.letterSpacing: 1
+          }
+
+          MouseArea {
+            id: playMa
+            anchors.fill: parent
+            enabled: root.hasStream
+            hoverEnabled: true
+            cursorShape: enabled ? Qt.PointingHandCursor : Qt.ArrowCursor
+            onClicked: {
+              if (mediaPlayer.playbackState === MediaPlayer.PlayingState)
+                mediaPlayer.pause()
+              else
+                mediaPlayer.play()
+              root.playPauseToggled()
+            }
+          }
         }
 
-        MouseArea {
-          id: playMa
-          anchors.fill: parent
-          enabled: root.hasStream
-          hoverEnabled: true
-          cursorShape: enabled ? Qt.PointingHandCursor : Qt.ArrowCursor
-          onClicked: {
-            if (mediaPlayer.playbackState === MediaPlayer.PlayingState)
-              mediaPlayer.pause()
-            else
-              mediaPlayer.play()
-            root.playPauseToggled()
+        Rectangle {
+          width: Style.space(64)
+          height: Style.space(28)
+          radius: Math.max(3, Style.cornerRadius - 3)
+          color: Qt.rgba(root.foreground.r, root.foreground.g, root.foreground.b, muteMa.containsMouse ? 0.22 : 0.14)
+
+          Text {
+            anchors.centerIn: parent
+            text: root.muted ? "UNMUTE" : "MUTE"
+            color: root.foreground
+            font.family: root.fontFamily
+            font.pixelSize: Style.font.caption
+            font.bold: true
+            font.letterSpacing: 1
+          }
+
+          MouseArea {
+            id: muteMa
+            anchors.fill: parent
+            hoverEnabled: true
+            cursorShape: Qt.PointingHandCursor
+            onClicked: {
+              root.muted = !root.muted
+              root.muteToggled()
+            }
+          }
+        }
+
+        Rectangle {
+          width: Style.space(110)
+          height: Style.space(28)
+          radius: Math.max(3, Style.cornerRadius - 3)
+          color: Qt.rgba(root.foreground.r, root.foreground.g, root.foreground.b, openMa.containsMouse ? 0.22 : 0.14)
+
+          Text {
+            anchors.centerIn: parent
+            text: "OPEN ORIGINAL"
+            color: root.foreground
+            font.family: root.fontFamily
+            font.pixelSize: Style.font.caption
+            font.bold: true
+            font.letterSpacing: 1
+          }
+
+          MouseArea {
+            id: openMa
+            anchors.fill: parent
+            hoverEnabled: true
+            cursorShape: Qt.PointingHandCursor
+            onClicked: root.openOriginal()
           }
         }
       }
-
-      Rectangle {
-        width: Style.space(64)
-        height: Style.space(28)
-        radius: Math.max(3, Style.cornerRadius - 3)
-        color: Qt.rgba(root.foreground.r, root.foreground.g, root.foreground.b, muteMa.containsMouse ? 0.22 : 0.14)
-
-        Text {
-          anchors.centerIn: parent
-          text: root.muted ? "UNMUTE" : "MUTE"
-          color: root.foreground
-          font.family: root.fontFamily
-          font.pixelSize: Style.font.caption
-          font.bold: true
-          font.letterSpacing: 1
-        }
-
-        MouseArea {
-          id: muteMa
-          anchors.fill: parent
-          hoverEnabled: true
-          cursorShape: Qt.PointingHandCursor
-          onClicked: {
-            root.muted = !root.muted
-            root.muteToggled()
-          }
-        }
-      }
-
-      Rectangle {
-        width: Style.space(110)
-        height: Style.space(28)
-        radius: Math.max(3, Style.cornerRadius - 3)
-        color: Qt.rgba(root.foreground.r, root.foreground.g, root.foreground.b, openMa.containsMouse ? 0.22 : 0.14)
-
-        Text {
-          anchors.centerIn: parent
-          text: "OPEN ORIGINAL"
-          color: root.foreground
-          font.family: root.fontFamily
-          font.pixelSize: Style.font.caption
-          font.bold: true
-          font.letterSpacing: 1
-        }
-
-        MouseArea {
-          id: openMa
-          anchors.fill: parent
-          hoverEnabled: true
-          cursorShape: Qt.PointingHandCursor
-          onClicked: root.openOriginal()
-        }
-      }
-
-      Item { width: Math.max(0, parent.width - Style.space(64) * 2 - Style.space(110) - parent.spacing * 3 - closeBtn.width); height: 1 }
 
       Rectangle {
         id: closeBtn
+        anchors.right: parent.right
+        anchors.verticalCenter: parent.verticalCenter
         width: Style.space(28)
         height: Style.space(28)
         radius: Math.max(3, Style.cornerRadius - 3)

@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.6.3
+
+Watch close stays on the right, inset so the × is fully inside the card. The old spacer overflowed the panel clip.
+
+
 ## 1.6.2
 
 Less software. Same locked grammar.
