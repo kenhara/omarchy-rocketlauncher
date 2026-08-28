@@ -2,15 +2,18 @@
 
 ![Rocketlauncher](preview.png)
 
-Rocket-pilot Falcon & Starship board for Omarchy — flip-digit stats, countdown,
-ongoing missions, past missions, expandable mission detail, and in-panel Watch. Built as a
-native Quattro `bar-widget` (not Electron). Named for Heinlein’s Rocketlauncher vibe
-(rocket pilot) — unofficial; not SpaceX-branded.
+See the next space launch without leaving Omarchy.
+
+Flip-digit Falcon and Starship stats, a local-time countdown (HOLD / LIVE / SOON),
+ongoing crew, past missions, and Watch in the panel. A native bar-widget, not a
+browser tab.
+
+Named for Heinlein’s rocket-pilot vibe. Unofficial; not SpaceX-branded.
 
 **ID:** `kenhara.rocketlauncher`  
 **Author:** Harris Kenny  
 **License:** MIT  
-**Version:** 1.7.0
+**Version:** 1.7.1
 
 1.7.0: fetch watchdog, host allowlist, launch-id and cache fail-closed, Watch resolve timeout. Prior releases: [CHANGELOG.md](CHANGELOG.md).
 
@@ -29,11 +32,9 @@ plugin links to LL2-hosted images and does not redistribute those binaries.
 
 ## Discoverability
 
-Marketplace filing: **Widgets** · tags `bar, media, quickshell`.
+Marketplace card: **Widgets** · tags `bar, media, quickshell`.
 
-Top-level `keywords` in `manifest.json` may help marketplace/search (SpaceX,
-NASA, Falcon, Starship, LL2, webcast, etc.). `barWidget.aliases` are for
-discovery docs and human search — the bar loader may not index them. Display
+Search words include **space**, Falcon, Starship, SpaceX, NASA, webcast. Display
 name stays **Rocketlauncher** (brand-free).
 
 ## Install
