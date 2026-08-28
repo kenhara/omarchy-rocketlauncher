@@ -1,4 +1,13 @@
-# Rocketlauncher audit notes (v1.6.0)
+# Rocketlauncher audit notes (v1.6.1)
+
+## 1.6.1 — Phosphor icons + 1.6.0 nits
+
+Local Shape/Path glyphs only (rocket, rocket-launch, play-circle, map-pin, planet, parachute).
+No remote webfont, no SVG Image.source, no FA on chip/header. Next-launch labels only.
+Job-line: offline only after failed list refresh / dataSource none; stale cache is stale ≠ offline.
+Chip keeps short countdown next to LIVE/HOLD/SOON/SUCCESS. Trajectory hidden until bead moves.
+formatNetLocal drops “your time”. HC-06–HC-11 from 1.5.22 and 1.6.0 desk unchanged.
+
 
 ## 1.6.0 — inspired, not copied
 
@@ -50,3 +59,4 @@ Mapping of plugin audit IDs after the 1.5.0 fix pass.
 - **1.5.21** — refuse symlink/FIFO cache reads (HC-05).
 - **1.5.22** — Watch/image URL allowlists, redirect pinning, atomic cache writes, AutoText neutralize (HC-06–HC-11).
 - **1.6.0** — next-launch board (job-line, local NET, short chip, trajectory). Inspired, not copied.
+- **1.6.1** — Phosphor Icons (local Shape/Path). Unofficial; MIT credit.

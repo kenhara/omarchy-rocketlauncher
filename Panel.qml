@@ -161,6 +161,18 @@ Panel {
     return liveStore.detailFor(id) || liveStore.nextLaunch
   }
 
+  function nextFact(field) {
+    var d = root.nextDetail()
+    if (d && d[field]) return String(d[field])
+    var n = liveStore ? liveStore.nextLaunch : null
+    if (n && n[field]) return String(n[field])
+    return ""
+  }
+
+  readonly property string nextPadLabel: root.nextFact("pad_name")
+  readonly property string nextOrbitLabel: root.nextFact("orbit")
+  readonly property string nextLandingLabel: root.nextFact("landing_summary")
+
   function requestNextDetail() {
     if (!liveStore) return
     liveStore.ensureNextDetail()
@@ -309,11 +321,11 @@ Panel {
 
           Row {
             spacing: Style.space(8)
-            Text {
-              text: "\uf135"
-              color: root.contentForeground
-              font.family: root.contentFontFamily
-              font.pixelSize: Style.font.body
+            PhosphorIcon {
+              name: (liveStore && liveStore.barLive) ? "rocket-launch" : "rocket"
+              color: (liveStore && liveStore.barLive) ? Color.accent : root.contentForeground
+              width: Style.font.body
+              height: Style.font.body
               anchors.verticalCenter: parent.verticalCenter
             }
             Text {
@@ -454,9 +466,93 @@ Panel {
             }
           }
 
+          Flow {
+            width: parent.width
+            spacing: Style.space(12)
+            visible: root.nextPadLabel.length > 0
+              || root.nextOrbitLabel.length > 0
+              || root.nextLandingLabel.length > 0
+
+            Row {
+              spacing: 4
+              visible: root.nextPadLabel.length > 0
+              PhosphorIcon {
+                name: "map-pin"
+                color: root.contentForeground
+                width: Style.font.caption
+                height: Style.font.caption
+                opacity: 0.5
+                anchors.verticalCenter: parent.verticalCenter
+              }
+              Text {
+                text: root.nextPadLabel
+                textFormat: Text.PlainText
+                elide: Text.ElideRight
+                width: Math.min(implicitWidth, Style.space(168))
+                color: root.contentForeground
+                opacity: 0.5
+                font.family: root.contentFontFamily
+                font.pixelSize: Style.font.caption
+                anchors.verticalCenter: parent.verticalCenter
+              }
+            }
+
+            Row {
+              spacing: 4
+              visible: root.nextOrbitLabel.length > 0
+              PhosphorIcon {
+                name: "planet"
+                color: root.contentForeground
+                width: Style.font.caption
+                height: Style.font.caption
+                opacity: 0.5
+                anchors.verticalCenter: parent.verticalCenter
+              }
+              Text {
+                text: root.nextOrbitLabel
+                textFormat: Text.PlainText
+                elide: Text.ElideRight
+                width: Math.min(implicitWidth, Style.space(96))
+                color: root.contentForeground
+                opacity: 0.5
+                font.family: root.contentFontFamily
+                font.pixelSize: Style.font.caption
+                anchors.verticalCenter: parent.verticalCenter
+              }
+            }
+
+            Row {
+              spacing: 4
+              visible: root.nextLandingLabel.length > 0
+              PhosphorIcon {
+                name: "parachute"
+                color: root.contentForeground
+                width: Style.font.caption
+                height: Style.font.caption
+                opacity: 0.5
+                anchors.verticalCenter: parent.verticalCenter
+              }
+              Text {
+                text: root.nextLandingLabel
+                textFormat: Text.PlainText
+                elide: Text.ElideRight
+                width: Math.min(implicitWidth, Style.space(168))
+                color: root.contentForeground
+                opacity: 0.5
+                font.family: root.contentFontFamily
+                font.pixelSize: Style.font.caption
+                anchors.verticalCenter: parent.verticalCenter
+              }
+            }
+          }
+
           TrajectoryStroke {
             width: parent.width
-            visible: !!(liveStore && liveStore.nextLaunch)
+            visible: {
+              if (!liveStore || !liveStore.nextLaunch) return false
+              var _n = liveStore.nowMs
+              return liveStore.trajectoryVisible(liveStore.nextLaunch)
+            }
             kind: liveStore ? liveStore.trajectoryKind(liveStore.nextLaunch) : "leo"
             phase: {
               if (!liveStore) return "net"

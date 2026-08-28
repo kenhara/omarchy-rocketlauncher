@@ -1,5 +1,19 @@
 # Changelog
 
+## 1.6.1
+
+Local Phosphor Icons (regular, MIT) as QML Shape/Path — no remote webfont, no SVG Image.source. Ships the 1.6.0 nits.
+
+- Bar chip + header: `rocket` idle, `rocket-launch` when `webcast_live`; accent-green only then
+- Watch primary button: `play-circle`
+- Next-launch labels only: `map-pin` pad, `planet` orbit, `parachute` landing (hidden unless LL2 has a landing/target)
+- Job-line: offline only after a failed list refresh / `dataSource === none`; old cache is `stale · cached …`. Stale ≠ offline
+- Chip: LIVE/HOLD/SOON/SUCCESS sit next to the short countdown (clock stays)
+- Trajectory hidden until webcast / T-0 / result / ~T-10 (or hold-in-window)
+- `formatNetLocal` is `Tue 25 Aug · 12:00` — no “your time”; zone stays on the footer
+- 1.5.22 / 1.6.0 security locks unchanged
+
+
 ## 1.6.0
 
 Grow the existing Rocketlauncher desk. Inspired by nocram.f1 *ideas* only — not a copy of their hero, session table, or QML.

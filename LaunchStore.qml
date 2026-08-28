@@ -32,7 +32,7 @@ Item {
     .replace(/\/$/, "")
   readonly property string samplePath: pluginDir + "/data/sample-cache.json"
 
-  readonly property string pluginVersion: "1.6.0"
+  readonly property string pluginVersion: "1.6.1"
   readonly property string userAgent: "Rocketlauncher/" + pluginVersion + " (Omarchy unofficial; kenhara.rocketlauncher)"
 
   readonly property int netByteCap: 1048576   // 1 MiB per LL2 response
@@ -158,6 +158,8 @@ Item {
   property string dataSource: "none"   // sample | disk | network
   property bool loading: false
   property string lastError: ""
+  // List refresh actually failed (not detail/past, not merely stale cache).
+  property bool refreshFailed: false
   property double nowMs: Date.now()
 
   // Mission detail cache (id → slim detail). Only fetched for next/selected.
@@ -200,10 +202,10 @@ Item {
   }
   readonly property string barChipCountdown: { var _n = nowMs; return formatCountdownShort(nextLaunch) }
   readonly property string barChipWord: { var _n = nowMs; return formatBarChipWord(nextLaunch) }
-  // FA rocket (\uf135) — tintable via Text.color; color emoji 🚀 is not.
-  readonly property string barGlyph: "\uf135"
   // LIVE chip tint: webcast_live only (not stickyWatch ▶). HOLD/SOON never tint.
   readonly property bool barLive: !!(store.nextLaunch && store.nextLaunch.webcast_live)
+  // Phosphor rocket / rocket-launch (Shape/Path). Accent only when webcast_live.
+  readonly property string barIcon: store.barLive ? "rocket-launch" : "rocket"
   // Chip: rocket + optional word/short countdown. Panel/tooltip keep T-HH:MM:SS.
   readonly property string barLabel: {
     var parts = []
@@ -218,10 +220,13 @@ Item {
     }
     if (store.barShowCountdown) {
       var word = store.barChipWord
+      var cd = store.barChipCountdown
       if (word.length)
         parts.push(word)
-      else
-        parts.push(store.barChipCountdown.length ? store.barChipCountdown : "NET —")
+      if (cd.length)
+        parts.push(cd)
+      else if (!word.length)
+        parts.push("NET —")
     }
     return parts.join(" ")
   }
@@ -711,6 +716,8 @@ Item {
     store.fetchedAt = (obj.meta && obj.meta.fetched_at) ? obj.meta.fetched_at : (new Date()).toISOString()
     store.dataSource = source || "unknown"
     store.lastError = ""
+    if (source === "network")
+      store.refreshFailed = false
     if (obj.notified_milestones && typeof obj.notified_milestones === "object")
       store.notifiedMilestones = obj.notified_milestones
     return true
@@ -1266,11 +1273,11 @@ Item {
     return "UTC" + sign + store.pad2(h) + (m ? ":" + store.pad2(m) : "")
   }
 
-  // Local wall-clock NET: "Tue 25 Aug · 12:00 your time"
+  // Local wall-clock NET: "Tue 25 Aug · 12:00" (zone lives on the unofficial footer).
   function formatNetLocal(iso) {
     var d = new Date(iso)
     if (isNaN(d.getTime())) return "—"
-    return store.formatNetLocalDay(iso) + " · " + store.pad2(d.getHours()) + ":" + store.pad2(d.getMinutes()) + " your time"
+    return store.formatNetLocalDay(iso) + " · " + store.pad2(d.getHours()) + ":" + store.pad2(d.getMinutes())
   }
 
   function formatNetLocalDay(iso) {
@@ -1383,14 +1390,22 @@ Item {
     return "net"
   }
 
+  function isJobOffline() {
+    // Offline = no result, or the list refresh actually failed. Stale cache is not offline.
+    if (store.dataSource === "none") return true
+    return !!store.refreshFailed
+  }
+
   function formatJobLine() {
-    if (!store.loading && (store.dataSource === "none" || store.isCacheStale())) {
-      var age = store.fetchedAt ? store.formatRelativeAge(store.fetchedAt) : "unknown"
+    var age = store.fetchedAt ? store.formatRelativeAge(store.fetchedAt) : "unknown"
+    if (!store.loading && store.isJobOffline())
       return "offline · cached " + age
-    }
     var L = store.nextLaunch
-    if (!L)
+    if (!L) {
+      if (!store.loading && store.isCacheStale())
+        return "stale · cached " + age
       return "next NET · none scheduled"
+    }
     var phase = store.launchPhase(L)
     if (phase === "failure") return "failure"
     if (phase === "success") return "success"
@@ -1401,12 +1416,29 @@ Item {
       return plus.length ? plus : "T+"
     }
     if (phase === "t10") return "T-10"
+    if (!store.loading && store.isCacheStale())
+      return "stale · cached " + age
     var cd = store.countdownText
     if (cd.indexOf("T-") === 0)
       return "next NET · " + cd
     if (L.net)
       return "next NET · " + store.formatNetLocal(L.net)
     return "next NET"
+  }
+
+  // Hide far-out NET decoration (bead stuck at pad for days). Show once the
+  // bead will move: webcast / T-0 / result, or countdown inside ~T-10 / hold-in-window.
+  function trajectoryVisible(launch) {
+    if (!launch) return false
+    var p = store.launchPhase(launch)
+    if (p === "live" || p === "tplus" || p === "success" || p === "failure" || p === "t10")
+      return true
+    if (p === "hold") {
+      var holdNet = Date.parse(launch.net || "")
+      if (!isFinite(holdNet)) return false
+      return Math.floor((holdNet - store.nowMs) / 1000) <= 600
+    }
+    return false
   }
 
   function trajectoryKind(launch) {
@@ -1586,6 +1618,7 @@ Item {
     if (store.loading) return
     store.loading = true
     store.lastError = ""
+    store.refreshFailed = false
     store.fetchStep = 0
     store.fetchAgency = null
     store.fetchUpcoming = null
@@ -1593,22 +1626,26 @@ Item {
     httpGet(store.apiBase + "/agencies/" + store.agencyId + "/", function(ok, body) {
       if (!ok) {
         store.loading = false
+        store.refreshFailed = true
         store.lastError = "agency fetch failed"
         return
       }
       try { store.fetchAgency = JSON.parse(body) } catch (e) {
         store.loading = false
+        store.refreshFailed = true
         store.lastError = "agency parse failed"
         return
       }
       httpGet(store.apiBase + "/launches/upcoming/?lsp__id=" + store.agencyId + "&limit=5&mode=list", function(ok2, body2) {
         if (!ok2) {
           store.loading = false
+          store.refreshFailed = true
           store.lastError = "upcoming fetch failed"
           return
         }
         try { store.fetchUpcoming = JSON.parse(body2) } catch (e2) {
           store.loading = false
+          store.refreshFailed = true
           store.lastError = "upcoming parse failed"
           return
         }
