@@ -329,15 +329,19 @@ Panel {
 
           Text {
             text: {
-              var src = liveStore ? liveStore.dataSource : "—"
-              var upd = liveStore ? liveStore.lastUpdatedText : "never"
-              var load = (liveStore && liveStore.loading) ? " · refreshing…" : ""
-              return "next launch · updated " + upd + " · " + src + load
+              if (!liveStore) return "next NET"
+              var line = liveStore.jobLine || "next NET"
+              if (liveStore.loading && String(line).indexOf("offline") !== 0)
+                line += " · refreshing…"
+              return line
             }
+            textFormat: Text.PlainText
             color: root.contentForeground
             opacity: 0.45
             font.family: root.contentFontFamily
             font.pixelSize: Style.font.caption
+            wrapMode: Text.WordWrap
+            width: parent.width
           }
         }
 
@@ -428,7 +432,7 @@ Panel {
             meta: {
               var n = liveStore ? liveStore.nextLaunch : null
               if (!n || !n.net) return ""
-              return "NET " + n.net.replace("T", " ").replace(/\.\d+Z$/, " UTC")
+              return "NET " + liveStore.formatNetLocal(n.net)
             }
             badgeText: badgeFor(liveStore ? liveStore.nextLaunch : null).text
             badgeKind: badgeFor(liveStore ? liveStore.nextLaunch : null).kind
@@ -448,6 +452,18 @@ Panel {
                 root.requestNextDetail()
               }
             }
+          }
+
+          TrajectoryStroke {
+            width: parent.width
+            visible: !!(liveStore && liveStore.nextLaunch)
+            kind: liveStore ? liveStore.trajectoryKind(liveStore.nextLaunch) : "leo"
+            phase: {
+              if (!liveStore) return "net"
+              var _n = liveStore.nowMs
+              return liveStore.trajectoryPhase(liveStore.nextLaunch)
+            }
+            foreground: root.contentForeground
           }
 
           Text {
@@ -666,7 +682,7 @@ Panel {
                 meta: {
                   if (!modelData.net) return ""
                   if (!liveStore) return modelData.net
-                  return "NET " + liveStore.formatNetShort(modelData.net) + " UTC"
+                  return "NET " + liveStore.formatNetLocal(modelData.net)
                 }
                 badgeText: badgeFor(modelData).text
                 badgeKind: badgeFor(modelData).kind
@@ -832,7 +848,7 @@ Panel {
                 meta: {
                   if (!modelData.net) return ""
                   if (!liveStore) return modelData.net
-                  return liveStore.formatNetShort(modelData.net) + " UTC"
+                  return "NET " + liveStore.formatNetLocal(modelData.net)
                 }
                 badgeText: badgeFor(modelData).text
                 badgeKind: badgeFor(modelData).kind
@@ -1031,7 +1047,16 @@ Panel {
 
         Text {
           width: parent.width
-          text: "Unofficial · Launch Library 2"
+          text: {
+            var zone = liveStore && typeof liveStore.localTimeZone === "function"
+              ? liveStore.localTimeZone()
+              : (liveStore ? (liveStore.localZoneName || "") : "")
+            var t = "Unofficial · Launch Library 2"
+            if (zone)
+              t += " · times local, " + zone
+            return t
+          }
+          textFormat: Text.PlainText
           wrapMode: Text.WordWrap
           color: root.contentForeground
           opacity: 0.32

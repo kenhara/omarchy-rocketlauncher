@@ -10,7 +10,16 @@ native Quattro `bar-widget` (not Electron). Named for Heinlein’s Rocketlaunche
 **ID:** `kenhara.rocketlauncher`  
 **Author:** Harris Kenny  
 **License:** MIT  
-**Version:** 1.5.22  
+**Version:** 1.6.0  
+
+### 1.6.0
+- Next launch stays THE launch: existing cards / Watch / flips; Ongoing / Upcoming / Past stay collapsed compact
+- Adaptive job-line (existing header subheader): next NET / T-10 / hold / webcast live / T+ / success / failure; stale or offline → `offline · cached 20m ago`
+- Local wall-clock NET on cards (`Tue 25 Aug · 12:00 your time`); footer `Unofficial · Launch Library 2 · times local, $zone`
+- Bar chip: FA rocket + width-stable short countdown (`12d` / `2d 14h` / `14h 06m` / `06:22`); optional HOLD / LIVE / SUCCESS; LIVE/green = `webcast_live` only
+- Next-launch-only QML Shape/Path trajectory (LEO / GTO / landing), theme-tinted bead at NET / webcast / T-0 / success|failure — no remote SVG, no fake telemetry
+- Inspired by nocram.f1 *ideas* only — not a copy of their product shape or QML
+- 1.5.22 security posture kept (neutralize + PlainText, exclusive cache writes, HC-05 reads, https allowlists, pin redirects, notify-send/xdg-open `--`, pinned PATH, python3 -B)
 
 ### 1.5.22
 - Watch URLs (webcast, proxy, HLS, MediaPlayer) go through https-only `sanitizeOpenUrl`; stream-proxy rejects `file:` / non-https before yt-dlp/urlopen
@@ -148,7 +157,7 @@ bundles binaries and never runs remote installers.
 
 ## Usage
 
-- **Left-click** the bar rocket + countdown (`T-02:14:33` or `NET Aug 25`) to
+- **Left-click** the bar rocket + short countdown (`14h 06m` / `06:22`; tooltip keeps `T-HH:MM:SS`) to
   open/close the panel. Opening fetches **mission detail** for the next launch
   (cached by id after the first hit). **Middle-click** play/pauses Watch when
   active, otherwise refreshes data. **Right-click** starts Watch for the next
