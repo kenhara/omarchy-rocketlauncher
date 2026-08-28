@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.7.1
+
+Watchdog Timer sits beside the fetch Process, not inside it. 1.7.0 could not load, so the bar chip vanished.
+
+
 ## 1.7.0
 
 Fetch watchdog, initial-host allowlist, launch-id fail-closed, cache write fail-closed, Watch resolve timeout kills the proxy.

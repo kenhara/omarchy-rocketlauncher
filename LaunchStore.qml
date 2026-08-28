@@ -31,7 +31,7 @@ Item {
     .replace(/\/$/, "")
   readonly property string samplePath: pluginDir + "/data/sample-cache.json"
 
-  readonly property string pluginVersion: "1.7.0"
+  readonly property string pluginVersion: "1.7.1"
   readonly property string userAgent: "Rocketlauncher/" + pluginVersion + " (Omarchy unofficial; kenhara.rocketlauncher)"
 
   readonly property int netByteCap: 1048576   // 1 MiB per LL2 response
@@ -1967,55 +1967,63 @@ Item {
 
   Component {
     id: fetchProcComp
-    Process {
-      id: fp
+    Item {
+      id: wrap
       property var doneCb: null
       property bool delivered: false
       property bool tornDown: false
       property int watchdogMs: (store.netTimeoutSec + 5) * 1000
-      running: false
-      environment: store.helperEnv
-      stdout: StdioCollector {
-        id: capOut
-        waitForEnd: true
-        onStreamFinished: fp.completeFetch(capOut.text)
+      property alias command: fp.command
+      property alias running: fp.running
+      property alias environment: fp.environment
+
+      Process {
+        id: fp
+        running: false
+        environment: store.helperEnv
+        stdout: StdioCollector {
+          id: capOut
+          waitForEnd: true
+          onStreamFinished: wrap.completeFetch(capOut.text)
+        }
+        onExited: function(exitCode, exitStatus) {
+          Qt.callLater(function() {
+            if (!wrap.delivered) {
+              var t = ""
+              try { t = capOut.text } catch (e) {}
+              wrap.completeFetch(t)
+            }
+            wrap.tearDown()
+          })
+        }
       }
+
       Timer {
-        id: fetchWatchdog
-        interval: fp.watchdogMs
+        interval: wrap.watchdogMs
         repeat: false
         running: fp.running
         onTriggered: {
-          if (fp.delivered)
+          if (wrap.delivered)
             return
           try { fp.running = false } catch (e) {}
-          fp.completeFetch("")
-          fp.tearDown()
+          wrap.completeFetch("")
+          wrap.tearDown()
         }
       }
-      onExited: function(exitCode, exitStatus) {
-        Qt.callLater(function() {
-          if (!fp.delivered) {
-            var t = ""
-            try { t = capOut.text } catch (e) {}
-            fp.completeFetch(t)
-          }
-          fp.tearDown()
-        })
-      }
+
       function completeFetch(raw) {
-        if (fp.delivered)
+        if (wrap.delivered)
           return
-        fp.delivered = true
-        var cb = fp.doneCb
-        fp.doneCb = null
+        wrap.delivered = true
+        var cb = wrap.doneCb
+        wrap.doneCb = null
         store.deliverFetch(raw, cb)
       }
       function tearDown() {
-        if (fp.tornDown)
+        if (wrap.tornDown)
           return
-        fp.tornDown = true
-        Qt.callLater(function() { fp.destroy() })
+        wrap.tornDown = true
+        Qt.callLater(function() { wrap.destroy() })
       }
     }
   }
