@@ -318,7 +318,7 @@ Panel {
           FlipCounter {
             width: (parent.width - parent.spacing * 2) / 3
             value: liveStore ? liveStore.statTotalLaunches : 0
-            label: "Total launches"
+            label: "Launches"
             digitCount: 4
             foreground: root.contentForeground
             accentColor: root.digitWell

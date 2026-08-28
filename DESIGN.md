@@ -24,7 +24,7 @@ Rocketlauncher follows that cluster exactly:
 
 - **Not Electron.** A launches SPA would fight Quattro; this lives in the shell.
 - **LL2 over scraping SpaceX.com** — stable API, webcasts, agency totals; free tier respected with aggressive cache + `mode=list`.
-- **Honest stats.** SpaceX.com “reflights” ≠ a single LL2 agency field. We show **Total launches / Landings / Pending** — no invented reflight counter.
+- **Honest stats.** SpaceX.com “reflights” ≠ a single LL2 agency field. We show **Launches / Landings / Pending** — no invented reflight counter.
 - **Offline-first sample** so judges see a full desk without burning API quota.
 
 ## Architecture sketch
