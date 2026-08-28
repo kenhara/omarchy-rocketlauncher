@@ -10,7 +10,17 @@ native Quattro `bar-widget` (not Electron). Named for Heinlein’s Rocketlaunche
 **ID:** `kenhara.rocketlauncher`  
 **Author:** Harris Kenny  
 **License:** MIT  
-**Version:** 1.6.1  
+**Version:** 1.6.2  
+
+### 1.6.2
+- Cut keyboard-legend footer (keys still work; README Controls table stays)
+- Cut starfield/scanline + `starfieldEnabled` — mood via Phosphor rocket + wordmark
+- Soft-fetch next detail on panel open (`expand: false`); do not auto-expand Detail
+- Hide next launch id from Upcoming; hide the section if the filtered slice is empty
+- Cut consecutive-success caption (Total / Landings / Pending flips stay)
+- Cut in-panel “Mission name on bar” + CLI dump; keep Countdown on bar (`barShowMissionName` stays in schema)
+- Next card: vehicle-only subtitle, no badge echo; NET meta stays (`NET Tue 25 Aug · 12:00`)
+- Job-line STATE words: LIVE / SOON / HOLD / SUCCESS / FAIL; keep `next NET · T-…` / local NET / `offline · cached …` / `stale · cached …`
 
 ### 1.6.1
 - Phosphor Icons (regular, MIT) bundled as local QML Shape/Path — no remote webfont, no SVG Image.source
@@ -26,7 +36,7 @@ native Quattro `bar-widget` (not Electron). Named for Heinlein’s Rocketlaunche
 ### 1.6.0
 - Next launch stays THE launch: existing cards / Watch / flips; Ongoing / Upcoming / Past stay collapsed compact
 - Adaptive job-line (existing header subheader): next NET / T-10 / hold / webcast live / T+ / success / failure; stale or offline → `offline · cached 20m ago`
-- Local wall-clock NET on cards (`Tue 25 Aug · 12:00 your time`); footer `Unofficial · Launch Library 2 · times local, $zone`
+- Local wall-clock NET on cards (`Tue 25 Aug · 12:00`); footer `Unofficial · Launch Library 2 · times local, $zone`
 - Bar chip: FA rocket + width-stable short countdown (`12d` / `2d 14h` / `14h 06m` / `06:22`); optional HOLD / LIVE / SUCCESS; LIVE/green = `webcast_live` only
 - Next-launch-only QML Shape/Path trajectory (LEO / GTO / landing), theme-tinted bead at NET / webcast / T-0 / success|failure — no remote SVG, no fake telemetry
 - Inspired by nocram.f1 *ideas* only — not a copy of their product shape or QML
@@ -186,8 +196,7 @@ bundles binaries and never runs remote installers.
   resolve). Official webcasts are often **X broadcasts** — those try
   `yt-dlp` first, then degrade to the webcast `feature_image` + **Open
   original**. We never claim X always embeds.
-- Flip counters animate when totals change; the faint starfield pauses while
-  the panel is closed **or** while Watch is active (perf).
+- Flip counters animate when totals change.
 
 ### Controls
 
@@ -256,8 +265,7 @@ Omarchy has **no widget-settings GUI**. Prefer the in-panel toggles; CLI / `shel
 
 Open Rocketlauncher → scroll to the **Bar** section near the footer:
 
-- **Countdown on bar** — On/Off (default On). When Off, the bar chip is just the rocket (optional mission name still respects its own toggle); countdown stays in the panel and tooltip.
-- **Mission name on bar** — On/Off (default Off). Prefixes a short mission name on the chip.
+- **Countdown on bar** — On/Off (default On). When Off, the bar chip is just the rocket (optional mission name still respects `barShowMissionName` via CLI); countdown stays in the panel and tooltip.
 
 Edits update the live store and mirror into bar settings so they survive reload.
 
@@ -274,11 +282,10 @@ omarchy bar set kenhara.rocketlauncher barShowMissionName true
 |-----|------|---------|-------------|
 | `refreshIntervalSec` | integer | `1800` | Poll interval in seconds. **Minimum 600** so the free Launch Library 2 tier (15 req/hour) is never hammered. |
 | `notifyMilestones` | bool | `false` | Opt-in `notify-send` once per launch id at **T−10** and **T−0** (debounced in `~/.cache/rocketlauncher/cache.json`). |
-| `barShowMissionName` | bool | `false` | Prefix the bar countdown with a short mission name. Prefer the in-panel **Mission name on bar** toggle. |
+| `barShowMissionName` | bool | `false` | Prefix the bar countdown with a short mission name (CLI / `shell.json`; no in-panel switch). |
 | `barShowCountdown` | bool | `true` | Show NET countdown on the bar chip. Prefer the in-panel **Countdown on bar** toggle. When off, chip is just the rocket (mission name still respects `barShowMissionName`); countdown stays in panel + tooltip. |
 | `stickyWatch` | bool | `false` | Keep Watch playing when the panel hides — Meet-style PiP (see above). |
 | `watchQuality` | enum | `best` | `best`, `720`, or `480` — passed to `scripts/stream-proxy.py` as yt-dlp height preference. |
-| `starfieldEnabled` | bool | `true` | Faint panel starfield ambience (pauses while Watch is active). |
 | `flipAnimate` | bool | `true` | Animate flip-digit counters when totals change. |
 
 ## Remove
@@ -334,8 +341,6 @@ Labels are honest LL2 agency fields:
 - **Total launches** → `total_launch_count`
 - **Landings** → `successful_landings`
 - **Pending** → `pending_launches`
-- Meta line: **Consecutive successful launches** (site “reflight” counters are
-  not a single LL2 agency field, so they are not shown as a fake total)
 
 No API key is used (free tier). No scrapers, no sudo, no second Quickshell
 process. Pure QML + Qt network (+ optional local `yt-dlp` helper for Watch).

@@ -41,11 +41,22 @@ Panel {
   property bool ongoingSectionExpanded: false
   property bool upcomingSectionExpanded: false
 
+  function upcomingWithoutNext() {
+    if (!liveStore || !liveStore.upcoming) return []
+    var nid = liveStore.nextLaunch ? String(liveStore.nextLaunch.id || "") : ""
+    var src = liveStore.upcoming
+    var out = []
+    for (var i = 0; i < src.length; i++) {
+      if (src[i] && String(src[i].id) !== nid)
+        out.push(src[i])
+    }
+    return out
+  }
+
   onOpenedChanged: {
     if (root.opened && liveStore && liveStore.nextLaunch && liveStore.nextLaunch.id) {
       // Soft-fetch detail for next launch when the panel opens (cached after first hit).
-      liveStore.fetchLaunchDetail(liveStore.nextLaunch.id)
-      liveStore.detailExpanded = true
+      liveStore.fetchLaunchDetail(liveStore.nextLaunch.id, { expand: false })
     }
     // L2: pauseWatchOnHide is owned by LaunchStore.onPanelOpenChanged (via BarWidget).
   }
@@ -241,65 +252,6 @@ Panel {
         root.handleWatchKeys(event)
       }
 
-      // Subtle starfield — paused when panel closed
-      Canvas {
-        id: starfield
-        anchors.fill: parent
-        opacity: root.opened && !root.isWatching && (!liveStore || liveStore.starfieldEnabled) ? 0.35 : 0
-        property var stars: []
-        property real t: 0
-
-        function rebuild() {
-          var list = []
-          var w = Math.max(1, width)
-          var h = Math.max(1, height)
-          for (var i = 0; i < 48; i++) {
-            list.push({
-              x: Math.random() * w,
-              y: Math.random() * h,
-              r: 0.6 + Math.random() * 1.4,
-              a: 0.15 + Math.random() * 0.55,
-              s: 0.2 + Math.random() * 0.8
-            })
-          }
-          stars = list
-          requestPaint()
-        }
-
-        onWidthChanged: rebuild()
-        onHeightChanged: rebuild()
-        Component.onCompleted: rebuild()
-
-        onPaint: {
-          var ctx = getContext("2d")
-          ctx.clearRect(0, 0, width, height)
-          for (var i = 0; i < stars.length; i++) {
-            var s = stars[i]
-            var twinkle = 0.65 + 0.35 * Math.sin(t * s.s + i)
-            ctx.globalAlpha = s.a * twinkle
-            ctx.fillStyle = Qt.rgba(root.contentForeground.r, root.contentForeground.g, root.contentForeground.b, 1)
-            ctx.beginPath()
-            ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2)
-            ctx.fill()
-          }
-          // Faint scanline
-          ctx.globalAlpha = 0.04
-          ctx.fillStyle = Qt.rgba(root.contentForeground.r, root.contentForeground.g, root.contentForeground.b, 1)
-          for (var y = 0; y < height; y += 3)
-            ctx.fillRect(0, y, width, 1)
-        }
-
-        Timer {
-          interval: 80
-          running: root.opened && !root.isWatching && (!liveStore || liveStore.starfieldEnabled)
-          repeat: true
-          onTriggered: {
-            starfield.t += 0.08
-            starfield.requestPaint()
-          }
-        }
-      }
-
       Flickable {
         id: panelFlick
         anchors.fill: parent
@@ -397,20 +349,6 @@ Panel {
           }
         }
 
-        Text {
-          width: parent.width
-          text: {
-            var c = liveStore ? liveStore.statConsecutiveSuccessfulLaunches : 0
-            return "Consecutive successful launches: " + c
-              + "  ·  LL2 agency totals (not reflight counters)"
-          }
-          wrapMode: Text.WordWrap
-          color: root.contentForeground
-          opacity: 0.4
-          font.family: root.contentFontFamily
-          font.pixelSize: Style.font.caption
-        }
-
         PanelSeparator { foreground: root.contentForeground }
 
         // 3. Next launch card + expandable detail + in-panel Watch
@@ -438,16 +376,15 @@ Panel {
             subtitle: {
               var n = liveStore ? liveStore.nextLaunch : null
               if (!n) return ""
-              var cd = liveStore.countdownText || ""
-              return (n.vehicle || "") + (cd ? "  ·  " + cd : "")
+              return n.vehicle || ""
             }
             meta: {
               var n = liveStore ? liveStore.nextLaunch : null
               if (!n || !n.net) return ""
               return "NET " + liveStore.formatNetLocal(n.net)
             }
-            badgeText: badgeFor(liveStore ? liveStore.nextLaunch : null).text
-            badgeKind: badgeFor(liveStore ? liveStore.nextLaunch : null).kind
+            badgeText: ""
+            badgeKind: "muted"
             showWatch: {
               var n = liveStore ? liveStore.nextLaunch : null
               return !!(n && liveStore.officialWebcast(n))
@@ -705,6 +642,7 @@ Panel {
         Column {
           width: parent.width
           spacing: Style.space(8)
+          visible: root.upcomingWithoutNext().length > 0
 
           Item {
             width: parent.width
@@ -756,9 +694,9 @@ Panel {
 
           Repeater {
             model: {
-              if (!root.upcomingSectionExpanded || !liveStore || !liveStore.upcoming)
+              if (!root.upcomingSectionExpanded)
                 return []
-              return liveStore.upcoming.slice(0, 5)
+              return root.upcomingWithoutNext().slice(0, 5)
             }
 
             Column {
@@ -1059,86 +997,6 @@ Panel {
             }
           }
 
-          // Mission name on bar
-          Row {
-            width: parent.width
-            spacing: Style.space(10)
-
-            Column {
-              width: parent.width - missionNameToggleWell.width - Style.space(10)
-              spacing: 2
-              anchors.verticalCenter: parent.verticalCenter
-
-              Text {
-                width: parent.width
-                text: "Mission name on bar"
-                color: root.contentForeground
-                font.family: root.contentFontFamily
-                font.pixelSize: Style.font.body
-                font.bold: true
-                elide: Text.ElideRight
-              }
-
-              Text {
-                width: parent.width
-                text: (liveStore && liveStore.barShowMissionName)
-                  ? "On — short mission name prefixes the chip"
-                  : "Off — no mission name on the bar chip"
-                color: root.contentForeground
-                opacity: 0.4
-                font.family: root.contentFontFamily
-                font.pixelSize: Style.font.caption
-                elide: Text.ElideRight
-              }
-            }
-
-            Rectangle {
-              id: missionNameToggleWell
-              width: Style.space(46)
-              height: Style.space(24)
-              radius: height / 2
-              anchors.verticalCenter: parent.verticalCenter
-              color: (liveStore && liveStore.barShowMissionName)
-                ? Qt.rgba(Color.accent.r, Color.accent.g, Color.accent.b, 0.35)
-                : Qt.rgba(root.contentForeground.r, root.contentForeground.g, root.contentForeground.b, 0.12)
-              border.width: 1
-              border.color: Qt.rgba(root.contentForeground.r, root.contentForeground.g, root.contentForeground.b, 0.14)
-
-              Rectangle {
-                width: Style.space(18)
-                height: Style.space(18)
-                radius: width / 2
-                anchors.verticalCenter: parent.verticalCenter
-                x: (liveStore && liveStore.barShowMissionName)
-                  ? parent.width - width - Style.space(3)
-                  : Style.space(3)
-                color: root.contentForeground
-
-                Behavior on x {
-                  NumberAnimation { duration: 120; easing.type: Easing.OutCubic }
-                }
-              }
-
-              MouseArea {
-                anchors.fill: parent
-                cursorShape: Qt.PointingHandCursor
-                onClicked: {
-                  if (!liveStore) return
-                  root.persistSetting("barShowMissionName", !liveStore.barShowMissionName)
-                }
-              }
-            }
-          }
-
-          Text {
-            width: parent.width
-            text: "CLI secondary: omarchy bar set kenhara.rocketlauncher barShowCountdown false"
-            color: root.contentForeground
-            opacity: 0.28
-            font.family: root.contentFontFamily
-            font.pixelSize: Style.font.caption
-            wrapMode: Text.WordWrap
-          }
         }
 
         Text {
@@ -1160,23 +1018,6 @@ Panel {
           font.pixelSize: Style.font.caption
         }
 
-        Text {
-          width: parent.width
-          text: {
-            var sticky = liveStore && liveStore.stickyWatch
-            var base = "Esc closes · Space play/pause · W watch · D detail · M mute · O open original · S stop Watch"
-            if (sticky)
-              base += " · stickyWatch: Esc keeps playback (best-effort; verify on live Omarchy)"
-            else
-              base += " · Watch embeds when yt-dlp resolves (YouTube/HLS); X → Open original"
-            return base
-          }
-          wrapMode: Text.WordWrap
-          color: root.contentForeground
-          opacity: 0.28
-          font.family: root.contentFontFamily
-          font.pixelSize: Style.font.caption
-        }
         } // Column
       } // Flickable
     }

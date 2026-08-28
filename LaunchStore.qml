@@ -20,7 +20,6 @@ Item {
   property bool barShowCountdown: true
   property bool stickyWatch: false
   property string watchQuality: "best"   // best | 720 | 480 → stream-proxy.py
-  property bool starfieldEnabled: true
   property bool flipAnimate: true
 
   readonly property string apiBase: "https://ll.thespacedevs.com/2.3.0"
@@ -32,7 +31,7 @@ Item {
     .replace(/\/$/, "")
   readonly property string samplePath: pluginDir + "/data/sample-cache.json"
 
-  readonly property string pluginVersion: "1.6.1"
+  readonly property string pluginVersion: "1.6.2"
   readonly property string userAgent: "Rocketlauncher/" + pluginVersion + " (Omarchy unofficial; kenhara.rocketlauncher)"
 
   readonly property int netByteCap: 1048576   // 1 MiB per LL2 response
@@ -260,8 +259,6 @@ Item {
       store.stickyWatch = !!opts.stickyWatch
     if (opts.watchQuality !== undefined)
       store.watchQuality = store.normalizeWatchQuality(opts.watchQuality)
-    if (opts.starfieldEnabled !== undefined)
-      store.starfieldEnabled = !!opts.starfieldEnabled
     if (opts.flipAnimate !== undefined)
       store.flipAnimate = !!opts.flipAnimate
     store.syncIdleInhibit()
@@ -706,6 +703,16 @@ Item {
     if (next && next.id && store.launchDetails[next.id])
       next = mergeDetailOntoLaunch(next, store.launchDetails[next.id])
     store.nextLaunch = next
+    if (next && next.id) {
+      var nid = String(next.id)
+      var filteredUp = []
+      for (var ui = 0; ui < store.upcoming.length; ui++) {
+        var urow = store.upcoming[ui]
+        if (urow && String(urow.id) !== nid)
+          filteredUp.push(urow)
+      }
+      store.upcoming = filteredUp
+    }
     var on = []
     var rawOn = (obj.ongoing || []).slice(0, store.maxListRows)
     for (var j = 0; j < rawOn.length; j++) {
@@ -1407,15 +1414,15 @@ Item {
       return "next NET · none scheduled"
     }
     var phase = store.launchPhase(L)
-    if (phase === "failure") return "failure"
-    if (phase === "success") return "success"
-    if (phase === "live") return "webcast live"
-    if (phase === "hold") return "hold"
+    if (phase === "failure") return "FAIL"
+    if (phase === "success") return "SUCCESS"
+    if (phase === "live") return "LIVE"
+    if (phase === "hold") return "HOLD"
     if (phase === "tplus") {
       var plus = store.countdownText
       return plus.length ? plus : "T+"
     }
-    if (phase === "t10") return "T-10"
+    if (phase === "t10") return "SOON"
     if (!store.loading && store.isCacheStale())
       return "stale · cached " + age
     var cd = store.countdownText

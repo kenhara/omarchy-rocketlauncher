@@ -1,4 +1,9 @@
-# Rocketlauncher — pre-ship checklist (v1.6.1)
+# Rocketlauncher — pre-ship checklist (v1.6.2)
+
+## PRE-SHIP note — less software (1.6.2)
+
+Eight cuts only. No new hero, no new settings, no Phosphor on other plugins, no marketplace Verify.
+1.5.22 / HC-05 / AutoText / no XHR kept. Job-line STATE words match the chip.
 
 ## PRE-SHIP note — Phosphor icons + 1.6.0 nits (1.6.1)
 

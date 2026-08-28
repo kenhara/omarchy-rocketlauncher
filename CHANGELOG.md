@@ -1,5 +1,19 @@
 # Changelog
 
+## 1.6.2
+
+Less software. Same locked grammar.
+
+- Cut keyboard-legend footer (keys still work; README Controls table stays)
+- Cut starfield/scanline + `starfieldEnabled` (mood via Phosphor rocket + wordmark)
+- Soft-fetch next detail on panel open (`expand: false`); do not auto-expand Detail
+- Hide next launch id from Upcoming; hide the section if the filtered slice is empty
+- Cut consecutive-success caption (flips stay)
+- Cut in-panel “Mission name on bar” + CLI dump; keep Countdown on bar (`barShowMissionName` stays in schema)
+- Next card: vehicle-only subtitle, no badge echo (chip + job-line own LIVE/HOLD); NET meta stays
+- Job-line STATE words: LIVE / SOON / HOLD / SUCCESS / FAIL; keep `next NET · T-…` / local NET / `offline · cached …` / `stale · cached …`
+
+
 ## 1.6.1
 
 Local Phosphor Icons (regular, MIT) as QML Shape/Path — no remote webfont, no SVG Image.source. Ships the 1.6.0 nits.

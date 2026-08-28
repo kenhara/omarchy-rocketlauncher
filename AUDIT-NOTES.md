@@ -1,4 +1,11 @@
-# Rocketlauncher audit notes (v1.6.1)
+# Rocketlauncher audit notes (v1.6.2)
+
+## 1.6.2 — less software
+
+Eight cuts: keyboard-legend footer, starfield/scanline + starfieldEnabled, no auto-expand Detail,
+next id filtered from Upcoming, consecutive-success caption, in-panel mission-name + CLI dump,
+next-card countdown/badge echo, job-line STATE words (LIVE/SOON/HOLD/SUCCESS/FAIL).
+HC-05 / AutoText / no XHR / 1.5.22 locks unchanged.
 
 ## 1.6.1 — Phosphor icons + 1.6.0 nits
 
@@ -60,3 +67,5 @@ Mapping of plugin audit IDs after the 1.5.0 fix pass.
 - **1.5.22** — Watch/image URL allowlists, redirect pinning, atomic cache writes, AutoText neutralize (HC-06–HC-11).
 - **1.6.0** — next-launch board (job-line, local NET, short chip, trajectory). Inspired, not copied.
 - **1.6.1** — Phosphor Icons (local Shape/Path). Unofficial; MIT credit.
+- **1.6.2** — less software (eight cuts). 1.5.22 locks kept.
+
