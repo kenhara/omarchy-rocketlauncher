@@ -109,14 +109,14 @@ def _now_iso() -> str:
 
 
 def _none() -> dict:
-    return {"kind": "none", "caption": "NO PUBLIC TRACK"}
+    return {"kind": "none", "caption": "NO PUBLIC TRACK", "fetched_at": _now_iso()}
 
 
 def _course(caption: str, path: str) -> dict:
     cap = neutralize(caption, 120)
     if path not in ("iss-rendezvous", "leo") or not cap:
         return _none()
-    return {"kind": "course", "caption": cap, "path": path}
+    return {"kind": "course", "caption": cap, "path": path, "fetched_at": _now_iso()}
 
 
 def _dest_text(flight: dict) -> str:

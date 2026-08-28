@@ -392,7 +392,7 @@ Item {
   }
 
   function _locateFresh(fix) {
-    if (!fix || fix.kind !== "iss-docked") return false
+    if (!fix || fix.kind === "checking") return false
     var t = Date.parse(fix.fetched_at || "")
     if (!isFinite(t)) return false
     return (Date.now() - t) < 7200 * 1000
@@ -408,7 +408,7 @@ Item {
       return { kind: "checking" }
     if (kind === "none") {
       var nc = store.autoText(o.caption || "NO PUBLIC TRACK", 120)
-      return { kind: "none", caption: nc || "NO PUBLIC TRACK" }
+      return { kind: "none", caption: nc || "NO PUBLIC TRACK", fetched_at: store.autoText(o.fetched_at || "", store.maxShortStr) }
     }
     if (kind === "course") {
       var path = String(o.path || "")
@@ -417,7 +417,7 @@ Item {
       var cc = store.autoText(o.caption || "", 120)
       if (!cc)
         return { kind: "none", caption: "NO PUBLIC TRACK" }
-      return { kind: "course", caption: cc, path: path }
+      return { kind: "course", caption: cc, path: path, fetched_at: store.autoText(o.fetched_at || "", store.maxShortStr) }
     }
     if (kind !== "iss-docked")
       return { kind: "none", caption: "NO PUBLIC TRACK" }
@@ -448,7 +448,7 @@ Item {
     store._setLocateOpen(id, true)
     var fix = store.locateFixFor(id)
     if (fix && fix.kind === "checking") return
-    if (fix && fix.kind === "iss-docked" && store._locateFresh(fix)) return
+    if (fix && store._locateFresh(fix)) return
     store._setLocateFix(id, { kind: "checking" })
     store.runLocateHelper(id)
   }
